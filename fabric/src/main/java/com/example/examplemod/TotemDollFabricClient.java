@@ -23,7 +23,10 @@ public final class TotemDollFabricClient implements ClientModInitializer {
                         .map(style -> style.model())
                         .toList()
         ));
-        TotemDollClient.init(FabricLoader.getInstance().getConfigDir());
+        TotemDollClient.init(
+                FabricLoader.getInstance().getConfigDir(),
+                FabricLoader.getInstance().getGameDir()
+        );
 
         KeyMapping openConfig = KeyBindingHelper.registerKeyBinding(new KeyMapping(
                 "key.totemdoll.open_config",

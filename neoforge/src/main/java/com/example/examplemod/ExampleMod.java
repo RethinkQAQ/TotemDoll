@@ -33,7 +33,7 @@ public class ExampleMod {
             eventBus.addListener(this::registerAdditionalModels);
             eventBus.addListener(this::registerKeyMappings);
             NeoForge.EVENT_BUS.addListener(this::onClientTick);
-            TotemDollClient.init(FMLPaths.CONFIGDIR.get());
+            TotemDollClient.init(FMLPaths.CONFIGDIR.get(), FMLPaths.GAMEDIR.get());
         }
     }
 

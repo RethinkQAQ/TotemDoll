@@ -8,6 +8,11 @@
   "screen.totemdoll.restart_hint": "Changes apply immediately",
   "screen.totemdoll.choose": "Choose a doll style",
   "screen.totemdoll.current": "Selected",
+  "screen.totemdoll.create": "Create from skin",
+  "screen.totemdoll.delete": "Delete",
+  "screen.totemdoll.loading": "Reloading doll styles...",
+  "screen.totemdoll.import_failed": "Could not import skin: %s",
+  "screen.totemdoll.delete_failed": "Could not delete this style",
   "key.totemdoll.open_config": "Open Totem Doll settings",
   "key.categories.totemdoll": "Totem Doll"
 }

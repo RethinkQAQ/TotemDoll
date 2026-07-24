@@ -16,7 +16,11 @@
     "translation": [0.0, 0.0, 0.0]
   },
   "features": {
-    "supports_skin": false,
+    "supports_skin": true,
     "supports_animation": false
+  },
+  "skin": {
+    "format": "minecraft_64x64",
+    "texture_slot": "0"
   }
 }

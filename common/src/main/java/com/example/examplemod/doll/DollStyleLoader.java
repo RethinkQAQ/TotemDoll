@@ -58,16 +58,36 @@ public final class DollStyleLoader {
 
             String name = root.has("name") ? root.get("name").getAsString() : id.toString();
             String nameKey = root.has("name_key") ? root.get("name_key").getAsString() : null;
+            ResourceLocation templateId = root.has("template")
+                    ? requireId(root, "template")
+                    : null;
+            boolean userCreated = root.has("user_created") && root.get("user_created").getAsBoolean();
+            DollSkinDefinition skin = readSkin(root);
             destination.add(new DollStyle(
                     id,
                     name,
                     nameKey,
                     ResourceLocation.fromNamespaceAndPath(declaredModel.getNamespace(), modelPath),
-                    true
+                    true,
+                    templateId,
+                    userCreated,
+                    skin
             ));
         } catch (Exception exception) {
             Constants.LOG.error("Could not load doll style {}", source, exception);
         }
+    }
+
+    private static DollSkinDefinition readSkin(JsonObject root) {
+        JsonObject skin = root.getAsJsonObject("skin");
+        if (skin == null || !skin.has("format") || !skin.has("texture_slot")) {
+            return null;
+        }
+        DollSkinDefinition definition = new DollSkinDefinition(
+                skin.get("format").getAsString(),
+                skin.get("texture_slot").getAsString()
+        );
+        return definition.supportsImport() ? definition : null;
     }
 
     private static ResourceLocation requireId(JsonObject object, String member) {

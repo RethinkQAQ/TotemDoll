@@ -8,6 +8,11 @@
   "screen.totemdoll.restart_hint": "切换会立即生效",
   "screen.totemdoll.choose": "选择一个娃娃样式",
   "screen.totemdoll.current": "已选择",
+  "screen.totemdoll.create": "从皮肤创建",
+  "screen.totemdoll.delete": "删除",
+  "screen.totemdoll.loading": "正在重新加载娃娃样式……",
+  "screen.totemdoll.import_failed": "无法导入皮肤：%s",
+  "screen.totemdoll.delete_failed": "无法删除这个样式",
   "key.totemdoll.open_config": "打开图腾娃娃设置",
   "key.categories.totemdoll": "图腾娃娃"
 }

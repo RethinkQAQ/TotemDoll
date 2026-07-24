@@ -20,7 +20,10 @@ public final class DollStyles {
             "Vanilla Totem",
             "doll.totemdoll.vanilla",
             ResourceLocation.withDefaultNamespace("totem_of_undying"),
-            false
+            false,
+            null,
+            false,
+            null
     );
 
     private static final Map<ResourceLocation, DollStyle> STYLES = new LinkedHashMap<>();
