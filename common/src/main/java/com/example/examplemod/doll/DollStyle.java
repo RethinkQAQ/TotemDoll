@@ -11,7 +11,8 @@ public record DollStyle(
         boolean usesCustomModel,
         ResourceLocation templateId,
         boolean userCreated,
-        DollSkinDefinition skin
+        DollSkinDefinition skin,
+        DollStyleOrigin origin
 ) {
 
     public Component label() {
@@ -26,5 +27,9 @@ public record DollStyle(
 
     public boolean isTemplate() {
         return !userCreated && supportsSkin();
+    }
+
+    public boolean isLocal() {
+        return userCreated || origin == DollStyleOrigin.LOCAL;
     }
 }

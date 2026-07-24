@@ -1,6 +1,7 @@
 {
   "format": 1,
   "id": "totemdoll:steve",
+  "origin": "builtin",
   "name": "Steve Doll",
   "name_key": "doll.totemdoll.steve",
   "model": {

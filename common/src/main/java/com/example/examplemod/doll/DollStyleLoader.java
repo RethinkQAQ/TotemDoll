@@ -63,6 +63,7 @@ public final class DollStyleLoader {
                     : null;
             boolean userCreated = root.has("user_created") && root.get("user_created").getAsBoolean();
             DollSkinDefinition skin = readSkin(root);
+            DollStyleOrigin origin = readOrigin(root, source, userCreated);
             destination.add(new DollStyle(
                     id,
                     name,
@@ -71,11 +72,32 @@ public final class DollStyleLoader {
                     true,
                     templateId,
                     userCreated,
-                    skin
+                    skin,
+                    origin
             ));
         } catch (Exception exception) {
             Constants.LOG.error("Could not load doll style {}", source, exception);
         }
+    }
+
+    private static DollStyleOrigin readOrigin(
+            JsonObject root,
+            ResourceLocation source,
+            boolean userCreated
+    ) {
+        if (root.has("origin")) {
+            try {
+                return DollStyleOrigin.valueOf(root.get("origin").getAsString().toUpperCase());
+            } catch (IllegalArgumentException ignored) {
+                Constants.LOG.warn("Unknown doll style origin in {}", source);
+            }
+        }
+        if (userCreated) {
+            return DollStyleOrigin.LOCAL;
+        }
+        return Constants.MOD_ID.equals(source.getNamespace())
+                ? DollStyleOrigin.BUILTIN
+                : DollStyleOrigin.RESOURCE_PACK;
     }
 
     private static DollSkinDefinition readSkin(JsonObject root) {

@@ -72,6 +72,7 @@ public final class DollLocalStyleStore {
         style.addProperty("name", normalizeName(displayName, sourceSkin));
         style.addProperty("template", template.id().toString());
         style.addProperty("user_created", true);
+        style.addProperty("origin", DollStyleOrigin.LOCAL.name().toLowerCase());
 
         JsonObject modelDeclaration = new JsonObject();
         modelDeclaration.addProperty("type", "minecraft_item");
@@ -97,6 +98,39 @@ public final class DollLocalStyleStore {
         Files.copy(sourceSkin, styleDirectory.resolve("skin.png"), StandardCopyOption.REPLACE_EXISTING);
         rebuildGeneratedPack();
         return id;
+    }
+
+    public static boolean rename(DollStyle style, String displayName) {
+        if (!style.userCreated() || stylesDirectory == null) {
+            return false;
+        }
+        String name = displayName == null ? "" : displayName.trim();
+        if (name.isEmpty()) {
+            return false;
+        }
+        Path directory = stylesDirectory.resolve(style.id().getPath()).normalize();
+        Path metadataFile = directory.resolve("style.json");
+        if (!directory.getParent().equals(stylesDirectory.normalize())
+                || !Files.isRegularFile(metadataFile)) {
+            return false;
+        }
+        try {
+            JsonObject metadata = GSON.fromJson(
+                    Files.readString(metadataFile, StandardCharsets.UTF_8),
+                    JsonObject.class
+            );
+            metadata.addProperty("name", name);
+            Files.writeString(metadataFile, GSON.toJson(metadata), StandardCharsets.UTF_8);
+            rebuildGeneratedPack();
+            return true;
+        } catch (IOException exception) {
+            Constants.LOG.error("Could not rename local doll style {}", style.id(), exception);
+            return false;
+        }
+    }
+
+    public static void validateSkinFile(Path path) throws IOException {
+        validateSkin(path);
     }
 
     public static boolean delete(DollStyle style) {
