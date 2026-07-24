@@ -1,0 +1,13 @@
+{
+  "doll.totemdoll.vanilla": "原版不死图腾",
+  "doll.totemdoll.alex": "Alex 娃娃",
+  "doll.totemdoll.steve": "Steve 娃娃",
+  "screen.totemdoll.title": "图腾娃娃",
+  "screen.totemdoll.button": "图腾娃娃",
+  "screen.totemdoll.selected": "当前选择：%s",
+  "screen.totemdoll.restart_hint": "切换会立即生效",
+  "screen.totemdoll.choose": "选择一个娃娃样式",
+  "screen.totemdoll.current": "已选择",
+  "key.totemdoll.open_config": "打开图腾娃娃设置",
+  "key.categories.totemdoll": "图腾娃娃"
+}

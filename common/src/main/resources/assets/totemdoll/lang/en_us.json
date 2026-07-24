@@ -1,0 +1,13 @@
+{
+  "doll.totemdoll.vanilla": "Vanilla Totem",
+  "doll.totemdoll.alex": "Alex Doll",
+  "doll.totemdoll.steve": "Steve Doll",
+  "screen.totemdoll.title": "Totem Doll",
+  "screen.totemdoll.button": "Totem Doll",
+  "screen.totemdoll.selected": "Selected: %s",
+  "screen.totemdoll.restart_hint": "Changes apply immediately",
+  "screen.totemdoll.choose": "Choose a doll style",
+  "screen.totemdoll.current": "Selected",
+  "key.totemdoll.open_config": "Open Totem Doll settings",
+  "key.categories.totemdoll": "Totem Doll"
+}

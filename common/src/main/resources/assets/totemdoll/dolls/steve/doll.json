@@ -1,0 +1,22 @@
+{
+  "format": 1,
+  "id": "totemdoll:steve",
+  "name": "Steve Doll",
+  "name_key": "doll.totemdoll.steve",
+  "model": {
+    "type": "minecraft_item",
+    "path": "totemdoll:models/doll/steve"
+  },
+  "textures": {
+    "base": "totemdoll:textures/item/doll/steve"
+  },
+  "display": {
+    "scale": 1.0,
+    "rotation": [0.0, 0.0, 0.0],
+    "translation": [0.0, 0.0, 0.0]
+  },
+  "features": {
+    "supports_skin": false,
+    "supports_animation": false
+  }
+}
