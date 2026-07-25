@@ -1,0 +1,22 @@
+plugins {
+    id 'java-library'
+    id 'idea'
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+}
+
+sourceSets.main.java.srcDir('src/main/java')
+sourceSets.main.resources.srcDir('src/main/resources')
+
+tasks.named('processResources') {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
+
+// IDE-only classpath for NeoForge source navigation and code insight.
+dependencies {
+    // Reuse the complete NeoForge classpath so Minecraft classes resolve in IDEA.
+    compileOnly files(project(':1.21.1-neoforge').configurations.compileClasspath)
+    compileOnly files(project(':common').sourceSets.main.output)
+}

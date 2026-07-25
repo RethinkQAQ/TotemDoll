@@ -38,6 +38,7 @@ plugins {
 }
 
 rootProject.name = 'TotemDoll'
+include('common', 'fabric', 'neoforge')
 
 stonecutter {
     kotlinController = false

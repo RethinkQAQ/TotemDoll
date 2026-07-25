@@ -1,0 +1,22 @@
+plugins {
+    id 'java-library'
+    id 'idea'
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+}
+
+sourceSets.main.java.srcDir('src/main/java')
+sourceSets.main.resources.srcDir('src/main/resources')
+
+tasks.named('processResources') {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
+
+// IDE-only classpath for Fabric source navigation and code insight.
+dependencies {
+    // Reuse the complete Loom classpath so Fabric and Minecraft classes resolve in IDEA.
+    compileOnly files(project(':1.21.1-fabric').configurations.compileClasspath)
+    compileOnly files(project(':common').sourceSets.main.output)
+}
