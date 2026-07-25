@@ -178,11 +178,13 @@ public final class DollCreateScreen extends Screen {
                 0x808080
         );
         if (previewTexture != null) {
-            graphics.blit(previewTexture, this.width / 2 + 76, 104, 0, 0, 64, 64, 64, 64);
+            int previewX = Math.min(this.width - 72, this.width / 2 + 140);
+            int previewCenter = previewX + 32;
+            graphics.blit(previewTexture, previewX, 104, 0, 0, 64, 64, 64, 64);
             graphics.drawCenteredString(
                     this.font,
                     Component.translatable("screen.totemdoll.skin_preview"),
-                    this.width / 2 + 108,
+                    previewCenter,
                     172,
                     0xA0A0A0
             );

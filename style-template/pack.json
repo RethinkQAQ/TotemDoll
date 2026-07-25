@@ -1,0 +1,9 @@
+{
+  "format": 1,
+  "id": "example:style_pack",
+  "name": "Totem Doll Example Pack",
+  "author": "Totem Doll",
+  "styles": [
+    "styles/example/style.json"
+  ]
+}

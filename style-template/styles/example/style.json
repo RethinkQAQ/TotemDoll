@@ -1,0 +1,27 @@
+{
+  "format": 2,
+  "id": "example:style_template",
+  "name": "Style Template",
+  "model": {
+    "type": "minecraft_item",
+    "file": "models/main.json"
+  },
+  "textures": {
+    "skin": "textures/base.png"
+  },
+  "skin": {
+    "supported": true,
+    "format": "minecraft_64x64",
+    "target": "skin",
+    "mapping": "minecraft_player"
+  },
+  "display": {
+    "scale": 1.0,
+    "rotation": [0.0, 0.0, 0.0],
+    "translation": [0.0, 0.0, 0.0]
+  },
+  "features": {
+    "animations": false,
+    "dynamic_textures": false
+  }
+}

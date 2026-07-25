@@ -47,6 +47,7 @@ public class ExampleMod {
     }
 
     private void onClientTick(ClientTickEvent.Post event) {
+        TotemDollClient.reloadInitialStylesIfReady();
         while (OPEN_CONFIG.consumeClick()) {
             Minecraft client = Minecraft.getInstance();
             client.setScreen(new DollSelectionScreen(client.screen));

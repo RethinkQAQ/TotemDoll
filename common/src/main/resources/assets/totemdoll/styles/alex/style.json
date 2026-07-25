@@ -1,0 +1,11 @@
+{
+  "format": 2,
+  "id": "totemdoll:alex",
+  "origin": "builtin",
+  "name": "Alex Doll",
+  "name_key": "doll.totemdoll.alex",
+  "model": { "type": "minecraft_item", "file": "models/doll/alex.json" },
+  "textures": { "base": "textures/item/doll/alex" },
+  "skin": { "supported": true, "format": "minecraft_64x64", "target": "0", "mapping": "minecraft_player" },
+  "features": { "animations": false, "dynamic_textures": false }
+}

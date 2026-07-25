@@ -67,7 +67,7 @@ public final class DollLocalStyleStore {
         replaceTexture(model, template.skin().textureSlot(), textureId.toString());
 
         JsonObject style = new JsonObject();
-        style.addProperty("format", 1);
+        style.addProperty("format", 2);
         style.addProperty("id", id.toString());
         style.addProperty("name", normalizeName(displayName, sourceSkin));
         style.addProperty("template", template.id().toString());
@@ -76,12 +76,18 @@ public final class DollLocalStyleStore {
 
         JsonObject modelDeclaration = new JsonObject();
         modelDeclaration.addProperty("type", "minecraft_item");
-        modelDeclaration.addProperty("path", Constants.MOD_ID + ":models/" + modelId.getPath());
+        modelDeclaration.addProperty("file", "models/generated/" + key + ".json");
         style.add("model", modelDeclaration);
 
         JsonObject textures = new JsonObject();
         textures.addProperty("base", textureId.toString());
         style.add("textures", textures);
+        JsonObject skin = new JsonObject();
+        skin.addProperty("supported", true);
+        skin.addProperty("format", DollSkinDefinition.MINECRAFT_64X64);
+        skin.addProperty("target", template.skin().textureSlot());
+        skin.addProperty("mapping", "minecraft_player");
+        style.add("skin", skin);
 
         Path styleDirectory = stylesDirectory.resolve(key);
         Files.createDirectories(styleDirectory);
@@ -198,28 +204,23 @@ public final class DollLocalStyleStore {
                 throw new IOException("Style id does not match its directory");
             }
             JsonObject modelObject = metadata.getAsJsonObject("model");
-            ResourceLocation declaredModel = requireLocation(modelObject, "path");
-            String modelPath = declaredModel.getPath();
-            if (modelPath.startsWith("models/")) {
-                modelPath = modelPath.substring("models/".length());
+            String modelResourcePath = modelObject.get("file").getAsString();
+            if (modelResourcePath.startsWith("/") || modelResourcePath.contains("..") || !modelResourcePath.startsWith("models/")) {
+                throw new IOException("Invalid model file");
             }
 
             Path assets = generatedPackDirectory.resolve("assets");
-            Path dollTarget = assets.resolve(id.getNamespace())
-                    .resolve("dolls/generated")
-                    .resolve(id.getPath())
-                    .resolve("doll.json");
-            Path modelTarget = assets.resolve(declaredModel.getNamespace())
-                    .resolve("models")
-                    .resolve(modelPath + ".json");
+            Path styleTarget = assets.resolve(id.getNamespace()).resolve("styles/generated")
+                    .resolve(id.getPath()).resolve("style.json");
+            Path modelTarget = assets.resolve(id.getNamespace()).resolve(modelResourcePath);
             Path skinTarget = assets.resolve(id.getNamespace())
                     .resolve("textures/item/generated")
                     .resolve(id.getPath())
                     .resolve("skin.png");
-            Files.createDirectories(dollTarget.getParent());
+            Files.createDirectories(styleTarget.getParent());
             Files.createDirectories(modelTarget.getParent());
             Files.createDirectories(skinTarget.getParent());
-            Files.copy(metadataFile, dollTarget, StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(metadataFile, styleTarget, StandardCopyOption.REPLACE_EXISTING);
             Files.copy(modelFile, modelTarget, StandardCopyOption.REPLACE_EXISTING);
             Files.copy(skinFile, skinTarget, StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception exception) {

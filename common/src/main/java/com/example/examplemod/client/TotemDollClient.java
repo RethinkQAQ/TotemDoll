@@ -11,11 +11,28 @@ import java.util.concurrent.CompletableFuture;
 
 public final class TotemDollClient {
 
+    private static boolean initialStylesReloaded;
+
     public static void init(Path configDirectory, Path gameDirectory) {
         DollStyles.init();
         TotemDollConfig.initialize(configDirectory);
         DollLocalStyleStore.initialize(configDirectory, gameDirectory);
-        enableGeneratedPack(Minecraft.getInstance());
+        Minecraft client = Minecraft.getInstance();
+        enableGeneratedPack(client);
+    }
+
+    /** Reloads the generated pack once the client resource manager is ready. */
+    public static boolean reloadInitialStylesIfReady() {
+        if (initialStylesReloaded) {
+            return true;
+        }
+        Minecraft client = Minecraft.getInstance();
+        if (client.getResourceManager() == null) {
+            return false;
+        }
+        initialStylesReloaded = true;
+        reloadGeneratedStyles();
+        return true;
     }
 
     public static CompletableFuture<Void> reloadGeneratedStyles() {
