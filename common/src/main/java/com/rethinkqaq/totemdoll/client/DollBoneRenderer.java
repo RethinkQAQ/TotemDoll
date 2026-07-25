@@ -1,6 +1,8 @@
 package com.rethinkqaq.totemdoll.client;
 
 import com.rethinkqaq.totemdoll.doll.DollStyle;
+import com.rethinkqaq.totemdoll.doll.DollAnimationDefinition;
+import com.rethinkqaq.totemdoll.doll.DollAnimationManager;
 import com.rethinkqaq.totemdoll.doll.bone.BonePose;
 import com.rethinkqaq.totemdoll.doll.bone.DollBone;
 import com.rethinkqaq.totemdoll.doll.bone.DollBoneActionManager;
@@ -60,7 +62,18 @@ public final class DollBoneRenderer {
         // Player skin overlays may contain partial alpha. The cutout render
         // type treats those pixels as opaque; translucent keeps the second
         // skin layer's full alpha channel.
-        var consumer = buffers.getBuffer(RenderType.entityTranslucent(model.texture()));
+        net.minecraft.resources.ResourceLocation texture = model.texture();
+        if (DollAnimationManager.isTotemActivationActive(style)
+                && style.textures().containsKey("activate")) {
+            texture = style.textures().get("activate");
+        } else if (style.hasDynamicTextures() && !style.animations().isEmpty()) {
+            DollAnimationDefinition animation = style.animations().get(0);
+            int frame = DollAnimationManager.currentFrame(style, animation.id());
+            if (frame >= 0 && frame < animation.frames().size()) {
+                texture = style.textures().getOrDefault(animation.frames().get(frame), texture);
+            }
+        }
+        var consumer = buffers.getBuffer(RenderType.entityTranslucent(texture));
         for (RuntimePart root : runtime.roots)
             renderPart(root, poseStack, consumer, light, overlay);
         poseStack.popPose();

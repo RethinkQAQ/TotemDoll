@@ -68,8 +68,8 @@ public final class DollStyleLoader {
             ResourceLocation template = root.has("template") ? requiredId(root, "template") : null;
             DollSkinDefinition skin = readSkin(root);
             DollStyleOrigin origin = readOrigin(root, source);
-            Map<String, ResourceLocation> textures = readTextures(root);
-            List<DollAnimationDefinition> animations = boneModel ? List.of() : readAnimations(root, textures);
+            Map<String, ResourceLocation> textures = readTextures(root, boneModel);
+            List<DollAnimationDefinition> animations = readTextureAnimations(root, textures, boneModel);
             output.add(new DollStyle(id, name, nameKey, modelId, !boneModel, template,
                     origin == DollStyleOrigin.LOCAL, skin, origin, textures, animations,
                     modelType, source));
@@ -105,15 +105,31 @@ public final class DollStyleLoader {
         return result.supportsImport() ? result : null;
     }
 
-    private static Map<String, ResourceLocation> readTextures(JsonObject root) {
+    private static Map<String, ResourceLocation> readTextures(JsonObject root, boolean boneModel) {
         Map<String, ResourceLocation> result = new LinkedHashMap<>();
         JsonObject textures = root.getAsJsonObject("textures");
         if (textures == null) return result;
         for (String key : textures.keySet()) {
-            ResourceLocation id = ResourceLocation.tryParse(textures.get(key).getAsString());
+            ResourceLocation id = parseTextureId(textures.get(key).getAsString(), boneModel);
             if (id != null) result.put(key, id);
         }
         return result;
+    }
+
+    /**
+     * Item models reference atlas sprites (namespace:item/foo), while the
+     * custom bone renderer binds a texture file directly
+     * (namespace:textures/item/foo.png). Keep those two forms separate.
+     */
+    private static ResourceLocation parseTextureId(String value, boolean boneModel) {
+        String normalized = value.replace('\\', '/');
+        ResourceLocation id = ResourceLocation.tryParse(normalized);
+        if (id == null || !boneModel) return id;
+
+        String path = id.getPath();
+        if (!path.startsWith("textures/")) path = "textures/" + path;
+        if (!path.endsWith(".png")) path += ".png";
+        return ResourceLocation.fromNamespaceAndPath(id.getNamespace(), path);
     }
 
     private static List<DollAnimationDefinition> readAnimations(JsonObject root, Map<String, ResourceLocation> textures) {
@@ -147,6 +163,15 @@ public final class DollStyleLoader {
             } catch (Exception ignored) { }
         }
         return result;
+    }
+
+    private static List<DollAnimationDefinition> readTextureAnimations(JsonObject root,
+                                                                         Map<String, ResourceLocation> textures,
+                                                                         boolean boneModel) {
+        if (!root.has("texture_animations")) return List.of();
+        JsonObject copy = root.deepCopy();
+        copy.add("animations", root.get("texture_animations").deepCopy());
+        return readAnimations(copy, textures);
     }
 
     private static ResourceLocation requiredId(JsonObject object, String key) {

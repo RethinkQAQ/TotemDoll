@@ -12,18 +12,26 @@
     "open": "totemdoll:item/doll/blink_alex/open",
     "half": "totemdoll:item/doll/blink_alex/half",
     "close": "totemdoll:item/doll/blink_alex/close"
+    ,"activate": "totemdoll:item/doll/blink_alex/activate"
   },
   "features": {
     "animations": true,
     "dynamic_textures": true
   },
-  "animations": {
+  "texture_animations": {
     "blink": {
       "type": "frame_sequence",
       "frames": ["open", "half", "close", "half", "open"],
       "frame_duration": 3,
       "trigger": "random_idle",
       "interval": { "min": 80, "max": 180 }
+    },
+    "activate": {
+      "type": "frame_sequence",
+      "frames": ["activate"],
+      "frame_duration": 40,
+      "trigger": "on_totem_activate",
+      "interval": { "min": 0, "max": 0 }
     }
   }
 }

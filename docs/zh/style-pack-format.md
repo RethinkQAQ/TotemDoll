@@ -121,7 +121,7 @@ my-style/
     "animations": true,
     "dynamic_textures": true
   },
-  "animations": {
+  "texture_animations": {
     "blink": {
       "type": "frame_sequence",
       "frames": ["open", "closed", "open"],
@@ -133,7 +133,9 @@ my-style/
 }
 ```
 
-支持 `random_idle`、`loop`、`on_screen_open`、`on_totem_activate` 和 `manual` 触发器。
+`texture_animations` 专门用于纹理帧序列。动画名称对应 `textures` 中的纹理槽名称，不再用于骨骼动作绑定。支持 `random_idle`、`loop`、`on_screen_open`、`on_totem_activate` 和 `manual` 触发器。
+
+对于骨骼模型，`model.animations` 指向 Blockbench 导出的骨骼动画文件；顶层 `animations` 只用于声明动作绑定。纹理帧动画不能写入这个字段。`minecraft_item` 和 `minecraft_bone` 都可以使用 `texture_animations`。
 
 ## 安全和限制
 

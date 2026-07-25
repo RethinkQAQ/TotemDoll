@@ -62,7 +62,8 @@ public abstract class ItemRendererMixin {
         }
 
         if (style.hasAnimations()) {
-            var animation = style.animations().get(0);
+            var animation = DollAnimationManager.displayAnimation(style);
+            if (animation == null) return;
             int frame = DollAnimationManager.currentFrame(style, animation.id());
             ResourceLocation animatedModelId = DollAnimationModels.frameModelId(
                     style,

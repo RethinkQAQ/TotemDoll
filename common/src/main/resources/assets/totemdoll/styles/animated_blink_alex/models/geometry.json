@@ -1,0 +1,1250 @@
+﻿{
+    "format":  1,
+    "texture_width":  64,
+    "texture_height":  64,
+    "display":  {
+                    "thirdperson_righthand":  {
+                                                  "translation":  [
+                                                                      0,
+                                                                      0,
+                                                                      -2
+                                                                  ],
+                                                  "scale":  [
+                                                                0.5,
+                                                                0.5,
+                                                                0.5
+                                                            ]
+                                              },
+                    "thirdperson_lefthand":  {
+                                                 "translation":  [
+                                                                     0,
+                                                                     0,
+                                                                     -2
+                                                                 ],
+                                                 "scale":  [
+                                                               0.5,
+                                                               0.5,
+                                                               0.5
+                                                           ]
+                                             },
+                    "firstperson_righthand":  {
+                                                  "rotation":  [
+                                                                   0,
+                                                                   135,
+                                                                   0
+                                                               ],
+                                                  "translation":  [
+                                                                      0,
+                                                                      3,
+                                                                      0
+                                                                  ],
+                                                  "scale":  [
+                                                                0.5,
+                                                                0.5,
+                                                                0.5
+                                                            ]
+                                              },
+                    "firstperson_lefthand":  {
+                                                 "rotation":  [
+                                                                  0,
+                                                                  135,
+                                                                  0
+                                                              ],
+                                                 "translation":  [
+                                                                     0,
+                                                                     3,
+                                                                     0
+                                                                 ],
+                                                 "scale":  [
+                                                               0.5,
+                                                               0.5,
+                                                               0.5
+                                                           ]
+                                             },
+                    "ground":  {
+                                   "translation":  [
+                                                       0,
+                                                       5,
+                                                       0
+                                                   ],
+                                   "scale":  [
+                                                 0.5,
+                                                 0.5,
+                                                 0.5
+                                             ]
+                               },
+                    "gui":  {
+                                "rotation":  [
+                                                 15,
+                                                 150,
+                                                 0
+                                             ],
+                                "scale":  [
+                                              0.7,
+                                              0.7,
+                                              0.7
+                                          ]
+                            },
+                    "fixed":  {
+                                  "translation":  [
+                                                      0,
+                                                      0,
+                                                      -3
+                                                  ]
+                              }
+                },
+    "bones":  [
+                  {
+                      "name":  "root",
+                      "pivot":  [
+                                    8,
+                                    8,
+                                    8
+                                ],
+                      "rotation":  [
+                                       0,
+                                       0,
+                                       0
+                                   ],
+                      "cubes":  [
+
+                                ],
+                      "children":  [
+                                       {
+                                           "name":  "hand",
+                                           "pivot":  [
+                                                         8.3,
+                                                         5,
+                                                         11
+                                                     ],
+                                           "rotation":  [
+                                                            0,
+                                                            0,
+                                                            0
+                                                        ],
+                                           "cubes":  [
+
+                                                     ],
+                                           "children":  [
+                                                            {
+                                                                "name":  "left hand",
+                                                                "pivot":  [
+                                                                              6.3,
+                                                                              6,
+                                                                              11
+                                                                          ],
+                                                                "rotation":  [
+                                                                                 0,
+                                                                                 0,
+                                                                                 0
+                                                                             ],
+                                                                "cubes":  [
+
+                                                                          ],
+                                                                "children":  [
+                                                                                 {
+                                                                                     "name":  "left hand__cube_0",
+                                                                                     "pivot":  [
+                                                                                                   5.24619,
+                                                                                                   6,
+                                                                                                   11.15224
+                                                                                               ],
+                                                                                     "rotation":  [
+                                                                                                      -90,
+                                                                                                      0,
+                                                                                                      -7.5
+                                                                                                  ],
+                                                                                     "cubes":  [
+                                                                                                   {
+                                                                                                       "origin":  [
+                                                                                                                      4.2504,
+                                                                                                                      5,
+                                                                                                                      5.08248
+                                                                                                                  ],
+                                                                                                       "size":  [
+                                                                                                                    1.5,
+                                                                                                                    2,
+                                                                                                                    6.0000004768371582
+                                                                                                                ],
+                                                                                                       "uv":  [
+                                                                                                                  10,
+                                                                                                                  12
+                                                                                                              ],
+                                                                                                       "faces":  {
+                                                                                                                     "down":  {
+                                                                                                                                  "uv":  [
+                                                                                                                                             10.5,
+                                                                                                                                             13,
+                                                                                                                                             11.5,
+                                                                                                                                             16
+                                                                                                                                         ],
+                                                                                                                                  "rotation":  0
+                                                                                                                              },
+                                                                                                                     "up":  {
+                                                                                                                                "uv":  [
+                                                                                                                                           9,
+                                                                                                                                           13,
+                                                                                                                                           9.75,
+                                                                                                                                           16
+                                                                                                                                       ],
+                                                                                                                                "rotation":  180
+                                                                                                                            },
+                                                                                                                     "north":  {
+                                                                                                                                   "uv":  [
+                                                                                                                                              10.5,
+                                                                                                                                              12,
+                                                                                                                                              9.75,
+                                                                                                                                              13
+                                                                                                                                          ],
+                                                                                                                                   "rotation":  180
+                                                                                                                               },
+                                                                                                                     "south":  {
+                                                                                                                                   "uv":  [
+                                                                                                                                              9.75,
+                                                                                                                                              12,
+                                                                                                                                              9,
+                                                                                                                                              13
+                                                                                                                                          ],
+                                                                                                                                   "rotation":  0
+                                                                                                                               },
+                                                                                                                     "west":  {
+                                                                                                                                  "uv":  [
+                                                                                                                                             9.75,
+                                                                                                                                             13,
+                                                                                                                                             10.5,
+                                                                                                                                             16
+                                                                                                                                         ],
+                                                                                                                                  "rotation":  90
+                                                                                                                              },
+                                                                                                                     "east":  {
+                                                                                                                                  "uv":  [
+                                                                                                                                             8,
+                                                                                                                                             13,
+                                                                                                                                             9,
+                                                                                                                                             16
+                                                                                                                                         ],
+                                                                                                                                  "rotation":  270
+                                                                                                                              }
+                                                                                                                 }
+                                                                                                   }
+                                                                                               ],
+                                                                                     "children":  [
+
+                                                                                                  ]
+                                                                                 },
+                                                                                 {
+                                                                                     "name":  "left hand__cube_1",
+                                                                                     "pivot":  [
+                                                                                                   5.24619,
+                                                                                                   6,
+                                                                                                   11.15224
+                                                                                               ],
+                                                                                     "rotation":  [
+                                                                                                      -90,
+                                                                                                      0,
+                                                                                                      -7.5
+                                                                                                  ],
+                                                                                     "cubes":  [
+                                                                                                   {
+                                                                                                       "origin":  [
+                                                                                                                      4.05,
+                                                                                                                      4.9,
+                                                                                                                      4.98248
+                                                                                                                  ],
+                                                                                                       "size":  [
+                                                                                                                    1.6999998092651367,
+                                                                                                                    2.1999998092651367,
+                                                                                                                    6.1999998092651367
+                                                                                                                ],
+                                                                                                       "uv":  [
+                                                                                                                  14,
+                                                                                                                  12
+                                                                                                              ],
+                                                                                                       "faces":  {
+                                                                                                                     "down":  {
+                                                                                                                                  "uv":  [
+                                                                                                                                             14.5,
+                                                                                                                                             13,
+                                                                                                                                             15.5,
+                                                                                                                                             16
+                                                                                                                                         ],
+                                                                                                                                  "rotation":  0
+                                                                                                                              },
+                                                                                                                     "up":  {
+                                                                                                                                "uv":  [
+                                                                                                                                           13,
+                                                                                                                                           13,
+                                                                                                                                           13.75,
+                                                                                                                                           16
+                                                                                                                                       ],
+                                                                                                                                "rotation":  180
+                                                                                                                            },
+                                                                                                                     "north":  {
+                                                                                                                                   "uv":  [
+                                                                                                                                              14.5,
+                                                                                                                                              12,
+                                                                                                                                              13.75,
+                                                                                                                                              13
+                                                                                                                                          ],
+                                                                                                                                   "rotation":  180
+                                                                                                                               },
+                                                                                                                     "south":  {
+                                                                                                                                   "uv":  [
+                                                                                                                                              13.75,
+                                                                                                                                              12,
+                                                                                                                                              13,
+                                                                                                                                              13
+                                                                                                                                          ],
+                                                                                                                                   "rotation":  0
+                                                                                                                               },
+                                                                                                                     "west":  {
+                                                                                                                                  "uv":  [
+                                                                                                                                             13.75,
+                                                                                                                                             13,
+                                                                                                                                             14.5,
+                                                                                                                                             16
+                                                                                                                                         ],
+                                                                                                                                  "rotation":  90
+                                                                                                                              },
+                                                                                                                     "east":  {
+                                                                                                                                  "uv":  [
+                                                                                                                                             12,
+                                                                                                                                             13,
+                                                                                                                                             13,
+                                                                                                                                             16
+                                                                                                                                         ],
+                                                                                                                                  "rotation":  270
+                                                                                                                              }
+                                                                                                                 }
+                                                                                                   }
+                                                                                               ],
+                                                                                     "children":  [
+
+                                                                                                  ]
+                                                                                 }
+                                                                             ]
+                                                            },
+                                                            {
+                                                                "name":  "right hand",
+                                                                "pivot":  [
+                                                                              10.3,
+                                                                              6,
+                                                                              11
+                                                                          ],
+                                                                "rotation":  [
+                                                                                 0,
+                                                                                 0,
+                                                                                 0
+                                                                             ],
+                                                                "cubes":  [
+
+                                                                          ],
+                                                                "children":  [
+                                                                                 {
+                                                                                     "name":  "right hand__cube_0",
+                                                                                     "pivot":  [
+                                                                                                   10.84619,
+                                                                                                   6,
+                                                                                                   11.15224
+                                                                                               ],
+                                                                                     "rotation":  [
+                                                                                                      -90,
+                                                                                                      0,
+                                                                                                      7.5
+                                                                                                  ],
+                                                                                     "cubes":  [
+                                                                                                   {
+                                                                                                       "origin":  [
+                                                                                                                      10.25663,
+                                                                                                                      5,
+                                                                                                                      5.04712
+                                                                                                                  ],
+                                                                                                       "size":  [
+                                                                                                                    1.5,
+                                                                                                                    2,
+                                                                                                                    6
+                                                                                                                ],
+                                                                                                       "uv":  [
+                                                                                                                  12,
+                                                                                                                  4
+                                                                                                              ],
+                                                                                                       "faces":  {
+                                                                                                                     "down":  {
+                                                                                                                                  "uv":  [
+                                                                                                                                             12.5,
+                                                                                                                                             5,
+                                                                                                                                             13.5,
+                                                                                                                                             8
+                                                                                                                                         ],
+                                                                                                                                  "rotation":  0
+                                                                                                                              },
+                                                                                                                     "up":  {
+                                                                                                                                "uv":  [
+                                                                                                                                           11,
+                                                                                                                                           5,
+                                                                                                                                           11.75,
+                                                                                                                                           8
+                                                                                                                                       ],
+                                                                                                                                "rotation":  180
+                                                                                                                            },
+                                                                                                                     "north":  {
+                                                                                                                                   "uv":  [
+                                                                                                                                              12.5,
+                                                                                                                                              4,
+                                                                                                                                              11.75,
+                                                                                                                                              5
+                                                                                                                                          ],
+                                                                                                                                   "rotation":  180
+                                                                                                                               },
+                                                                                                                     "south":  {
+                                                                                                                                   "uv":  [
+                                                                                                                                              11.75,
+                                                                                                                                              4,
+                                                                                                                                              11,
+                                                                                                                                              5
+                                                                                                                                          ],
+                                                                                                                                   "rotation":  0
+                                                                                                                               },
+                                                                                                                     "west":  {
+                                                                                                                                  "uv":  [
+                                                                                                                                             11.75,
+                                                                                                                                             5,
+                                                                                                                                             12.5,
+                                                                                                                                             8
+                                                                                                                                         ],
+                                                                                                                                  "rotation":  90
+                                                                                                                              },
+                                                                                                                     "east":  {
+                                                                                                                                  "uv":  [
+                                                                                                                                             10,
+                                                                                                                                             5,
+                                                                                                                                             11,
+                                                                                                                                             8
+                                                                                                                                         ],
+                                                                                                                                  "rotation":  270
+                                                                                                                              }
+                                                                                                                 }
+                                                                                                   }
+                                                                                               ],
+                                                                                     "children":  [
+
+                                                                                                  ]
+                                                                                 },
+                                                                                 {
+                                                                                     "name":  "right hand__cube_1",
+                                                                                     "pivot":  [
+                                                                                                   10.84619,
+                                                                                                   6,
+                                                                                                   11.15224
+                                                                                               ],
+                                                                                     "rotation":  [
+                                                                                                      -90,
+                                                                                                      0,
+                                                                                                      7.5
+                                                                                                  ],
+                                                                                     "cubes":  [
+                                                                                                   {
+                                                                                                       "origin":  [
+                                                                                                                      10.25663,
+                                                                                                                      4.9,
+                                                                                                                      4.94712
+                                                                                                                  ],
+                                                                                                       "size":  [
+                                                                                                                    1.6999998092651367,
+                                                                                                                    2.1999998092651367,
+                                                                                                                    6.2000002861022949
+                                                                                                                ],
+                                                                                                       "uv":  [
+                                                                                                                  12,
+                                                                                                                  8
+                                                                                                              ],
+                                                                                                       "faces":  {
+                                                                                                                     "down":  {
+                                                                                                                                  "uv":  [
+                                                                                                                                             12.5,
+                                                                                                                                             9,
+                                                                                                                                             13.5,
+                                                                                                                                             12
+                                                                                                                                         ],
+                                                                                                                                  "rotation":  0
+                                                                                                                              },
+                                                                                                                     "up":  {
+                                                                                                                                "uv":  [
+                                                                                                                                           11,
+                                                                                                                                           9,
+                                                                                                                                           11.75,
+                                                                                                                                           12
+                                                                                                                                       ],
+                                                                                                                                "rotation":  180
+                                                                                                                            },
+                                                                                                                     "north":  {
+                                                                                                                                   "uv":  [
+                                                                                                                                              12.5,
+                                                                                                                                              8,
+                                                                                                                                              11.75,
+                                                                                                                                              9
+                                                                                                                                          ],
+                                                                                                                                   "rotation":  180
+                                                                                                                               },
+                                                                                                                     "south":  {
+                                                                                                                                   "uv":  [
+                                                                                                                                              11.75,
+                                                                                                                                              8,
+                                                                                                                                              11,
+                                                                                                                                              9
+                                                                                                                                          ],
+                                                                                                                                   "rotation":  0
+                                                                                                                               },
+                                                                                                                     "west":  {
+                                                                                                                                  "uv":  [
+                                                                                                                                             11.75,
+                                                                                                                                             9,
+                                                                                                                                             12.5,
+                                                                                                                                             12
+                                                                                                                                         ],
+                                                                                                                                  "rotation":  90
+                                                                                                                              },
+                                                                                                                     "east":  {
+                                                                                                                                  "uv":  [
+                                                                                                                                             10,
+                                                                                                                                             9,
+                                                                                                                                             11,
+                                                                                                                                             12
+                                                                                                                                         ],
+                                                                                                                                  "rotation":  270
+                                                                                                                              }
+                                                                                                                 }
+                                                                                                   }
+                                                                                               ],
+                                                                                     "children":  [
+
+                                                                                                  ]
+                                                                                 }
+                                                                             ]
+                                                            }
+                                                        ]
+                                       },
+                                       {
+                                           "name":  "right leg",
+                                           "pivot":  [
+                                                         9,
+                                                         1,
+                                                         11
+                                                     ],
+                                           "rotation":  [
+                                                            0,
+                                                            0,
+                                                            0
+                                                        ],
+                                           "cubes":  [
+
+                                                     ],
+                                           "children":  [
+                                                            {
+                                                                "name":  "right leg__cube_0",
+                                                                "pivot":  [
+                                                                              8,
+                                                                              0,
+                                                                              11
+                                                                          ],
+                                                                "rotation":  [
+                                                                                 0,
+                                                                                 -22.5,
+                                                                                 0
+                                                                             ],
+                                                                "cubes":  [
+                                                                              {
+                                                                                  "origin":  [
+                                                                                                 8,
+                                                                                                 0,
+                                                                                                 4
+                                                                                             ],
+                                                                                  "size":  [
+                                                                                               2,
+                                                                                               2,
+                                                                                               6
+                                                                                           ],
+                                                                                  "uv":  [
+                                                                                             2,
+                                                                                             4
+                                                                                         ],
+                                                                                  "faces":  {
+                                                                                                "down":  {
+                                                                                                             "uv":  [
+                                                                                                                        3,
+                                                                                                                        5,
+                                                                                                                        4,
+                                                                                                                        8
+                                                                                                                    ],
+                                                                                                             "rotation":  0
+                                                                                                         },
+                                                                                                "up":  {
+                                                                                                           "uv":  [
+                                                                                                                      1,
+                                                                                                                      8,
+                                                                                                                      2,
+                                                                                                                      5
+                                                                                                                  ],
+                                                                                                           "rotation":  0
+                                                                                                       },
+                                                                                                "north":  {
+                                                                                                              "uv":  [
+                                                                                                                         2,
+                                                                                                                         4,
+                                                                                                                         3,
+                                                                                                                         5
+                                                                                                                     ],
+                                                                                                              "rotation":  0
+                                                                                                          },
+                                                                                                "south":  {
+                                                                                                              "uv":  [
+                                                                                                                         2,
+                                                                                                                         5,
+                                                                                                                         1,
+                                                                                                                         4
+                                                                                                                     ],
+                                                                                                              "rotation":  0
+                                                                                                          },
+                                                                                                "west":  {
+                                                                                                             "uv":  [
+                                                                                                                        2,
+                                                                                                                        5,
+                                                                                                                        3,
+                                                                                                                        8
+                                                                                                                    ],
+                                                                                                             "rotation":  90
+                                                                                                         },
+                                                                                                "east":  {
+                                                                                                             "uv":  [
+                                                                                                                        0,
+                                                                                                                        8,
+                                                                                                                        1,
+                                                                                                                        5
+                                                                                                                    ],
+                                                                                                             "rotation":  90
+                                                                                                         }
+                                                                                            }
+                                                                              }
+                                                                          ],
+                                                                "children":  [
+
+                                                                             ]
+                                                            },
+                                                            {
+                                                                "name":  "right leg__cube_1",
+                                                                "pivot":  [
+                                                                              8,
+                                                                              0,
+                                                                              11
+                                                                          ],
+                                                                "rotation":  [
+                                                                                 0,
+                                                                                 -22.5,
+                                                                                 0
+                                                                             ],
+                                                                "cubes":  [
+                                                                              {
+                                                                                  "origin":  [
+                                                                                                 7.9,
+                                                                                                 -0.1,
+                                                                                                 3.9
+                                                                                             ],
+                                                                                  "size":  [
+                                                                                               2.2000002861022949,
+                                                                                               2.1999999061226845,
+                                                                                               6.2000002861022949
+                                                                                           ],
+                                                                                  "uv":  [
+                                                                                             2,
+                                                                                             8
+                                                                                         ],
+                                                                                  "faces":  {
+                                                                                                "down":  {
+                                                                                                             "uv":  [
+                                                                                                                        3,
+                                                                                                                        9,
+                                                                                                                        4,
+                                                                                                                        12
+                                                                                                                    ],
+                                                                                                             "rotation":  0
+                                                                                                         },
+                                                                                                "up":  {
+                                                                                                           "uv":  [
+                                                                                                                      1,
+                                                                                                                      12,
+                                                                                                                      2,
+                                                                                                                      9
+                                                                                                                  ],
+                                                                                                           "rotation":  0
+                                                                                                       },
+                                                                                                "north":  {
+                                                                                                              "uv":  [
+                                                                                                                         2,
+                                                                                                                         8,
+                                                                                                                         3,
+                                                                                                                         9
+                                                                                                                     ],
+                                                                                                              "rotation":  0
+                                                                                                          },
+                                                                                                "south":  {
+                                                                                                              "uv":  [
+                                                                                                                         2,
+                                                                                                                         9,
+                                                                                                                         1,
+                                                                                                                         8
+                                                                                                                     ],
+                                                                                                              "rotation":  0
+                                                                                                          },
+                                                                                                "west":  {
+                                                                                                             "uv":  [
+                                                                                                                        2,
+                                                                                                                        9,
+                                                                                                                        3,
+                                                                                                                        12
+                                                                                                                    ],
+                                                                                                             "rotation":  90
+                                                                                                         },
+                                                                                                "east":  {
+                                                                                                             "uv":  [
+                                                                                                                        0,
+                                                                                                                        12,
+                                                                                                                        1,
+                                                                                                                        9
+                                                                                                                    ],
+                                                                                                             "rotation":  90
+                                                                                                         }
+                                                                                            }
+                                                                              }
+                                                                          ],
+                                                                "children":  [
+
+                                                                             ]
+                                                            }
+                                                        ]
+                                       },
+                                       {
+                                           "name":  "left leg",
+                                           "pivot":  [
+                                                         7,
+                                                         1,
+                                                         11
+                                                     ],
+                                           "rotation":  [
+                                                            0,
+                                                            0,
+                                                            0
+                                                        ],
+                                           "cubes":  [
+
+                                                     ],
+                                           "children":  [
+                                                            {
+                                                                "name":  "left leg__cube_0",
+                                                                "pivot":  [
+                                                                              8,
+                                                                              0,
+                                                                              11
+                                                                          ],
+                                                                "rotation":  [
+                                                                                 0,
+                                                                                 22.5,
+                                                                                 0
+                                                                             ],
+                                                                "cubes":  [
+                                                                              {
+                                                                                  "origin":  [
+                                                                                                 6,
+                                                                                                 0,
+                                                                                                 4
+                                                                                             ],
+                                                                                  "size":  [
+                                                                                               2,
+                                                                                               2,
+                                                                                               6
+                                                                                           ],
+                                                                                  "uv":  [
+                                                                                             6,
+                                                                                             13
+                                                                                         ],
+                                                                                  "faces":  {
+                                                                                                "down":  {
+                                                                                                             "uv":  [
+                                                                                                                        7,
+                                                                                                                        13,
+                                                                                                                        8,
+                                                                                                                        16
+                                                                                                                    ],
+                                                                                                             "rotation":  0
+                                                                                                         },
+                                                                                                "up":  {
+                                                                                                           "uv":  [
+                                                                                                                      5,
+                                                                                                                      16,
+                                                                                                                      6,
+                                                                                                                      13
+                                                                                                                  ],
+                                                                                                           "rotation":  0
+                                                                                                       },
+                                                                                                "north":  {
+                                                                                                              "uv":  [
+                                                                                                                         6,
+                                                                                                                         13,
+                                                                                                                         7,
+                                                                                                                         12
+                                                                                                                     ],
+                                                                                                              "rotation":  0
+                                                                                                          },
+                                                                                                "south":  {
+                                                                                                              "uv":  [
+                                                                                                                         6,
+                                                                                                                         13,
+                                                                                                                         5,
+                                                                                                                         12
+                                                                                                                     ],
+                                                                                                              "rotation":  0
+                                                                                                          },
+                                                                                                "west":  {
+                                                                                                             "uv":  [
+                                                                                                                        6,
+                                                                                                                        13,
+                                                                                                                        7,
+                                                                                                                        16
+                                                                                                                    ],
+                                                                                                             "rotation":  90
+                                                                                                         },
+                                                                                                "east":  {
+                                                                                                             "uv":  [
+                                                                                                                        4,
+                                                                                                                        16,
+                                                                                                                        5,
+                                                                                                                        13
+                                                                                                                    ],
+                                                                                                             "rotation":  90
+                                                                                                         }
+                                                                                            }
+                                                                              }
+                                                                          ],
+                                                                "children":  [
+
+                                                                             ]
+                                                            },
+                                                            {
+                                                                "name":  "left leg__cube_1",
+                                                                "pivot":  [
+                                                                              8,
+                                                                              0,
+                                                                              11
+                                                                          ],
+                                                                "rotation":  [
+                                                                                 0,
+                                                                                 22.5,
+                                                                                 0
+                                                                             ],
+                                                                "cubes":  [
+                                                                              {
+                                                                                  "origin":  [
+                                                                                                 5.9,
+                                                                                                 -0.1,
+                                                                                                 3.9
+                                                                                             ],
+                                                                                  "size":  [
+                                                                                               2.2000002861022949,
+                                                                                               2.1999999061226845,
+                                                                                               6.2000002861022949
+                                                                                           ],
+                                                                                  "uv":  [
+                                                                                             2,
+                                                                                             13
+                                                                                         ],
+                                                                                  "faces":  {
+                                                                                                "down":  {
+                                                                                                             "uv":  [
+                                                                                                                        3,
+                                                                                                                        13,
+                                                                                                                        4,
+                                                                                                                        16
+                                                                                                                    ],
+                                                                                                             "rotation":  0
+                                                                                                         },
+                                                                                                "up":  {
+                                                                                                           "uv":  [
+                                                                                                                      1,
+                                                                                                                      16,
+                                                                                                                      2,
+                                                                                                                      13
+                                                                                                                  ],
+                                                                                                           "rotation":  0
+                                                                                                       },
+                                                                                                "north":  {
+                                                                                                              "uv":  [
+                                                                                                                         2,
+                                                                                                                         13,
+                                                                                                                         3,
+                                                                                                                         12
+                                                                                                                     ],
+                                                                                                              "rotation":  0
+                                                                                                          },
+                                                                                                "south":  {
+                                                                                                              "uv":  [
+                                                                                                                         2,
+                                                                                                                         13,
+                                                                                                                         1,
+                                                                                                                         12
+                                                                                                                     ],
+                                                                                                              "rotation":  0
+                                                                                                          },
+                                                                                                "west":  {
+                                                                                                             "uv":  [
+                                                                                                                        2,
+                                                                                                                        13,
+                                                                                                                        3,
+                                                                                                                        16
+                                                                                                                    ],
+                                                                                                             "rotation":  90
+                                                                                                         },
+                                                                                                "east":  {
+                                                                                                             "uv":  [
+                                                                                                                        0,
+                                                                                                                        16,
+                                                                                                                        1,
+                                                                                                                        13
+                                                                                                                    ],
+                                                                                                             "rotation":  90
+                                                                                                         }
+                                                                                            }
+                                                                              }
+                                                                          ],
+                                                                "children":  [
+
+                                                                             ]
+                                                            }
+                                                        ]
+                                       },
+                                       {
+                                           "name":  "body",
+                                           "pivot":  [
+                                                         8,
+                                                         0,
+                                                         11
+                                                     ],
+                                           "rotation":  [
+                                                            0,
+                                                            0,
+                                                            0
+                                                        ],
+                                           "cubes":  [
+                                                         {
+                                                             "origin":  [
+                                                                            5.6,
+                                                                            0,
+                                                                            9.6
+                                                                        ],
+                                                             "size":  [
+                                                                          4.7999997138977051,
+                                                                          6,
+                                                                          2.7999992370605469
+                                                                      ],
+                                                             "uv":  [
+                                                                        5,
+                                                                        5
+                                                                    ],
+                                                             "faces":  {
+                                                                           "down":  {
+                                                                                        "uv":  [
+                                                                                                   9,
+                                                                                                   4,
+                                                                                                   7,
+                                                                                                   5
+                                                                                               ],
+                                                                                        "rotation":  0
+                                                                                    },
+                                                                           "up":  {
+                                                                                      "uv":  [
+                                                                                                 7,
+                                                                                                 5,
+                                                                                                 5,
+                                                                                                 4
+                                                                                             ],
+                                                                                      "rotation":  0
+                                                                                  },
+                                                                           "north":  {
+                                                                                         "uv":  [
+                                                                                                    5,
+                                                                                                    5,
+                                                                                                    7,
+                                                                                                    8
+                                                                                                ],
+                                                                                         "rotation":  0
+                                                                                     },
+                                                                           "south":  {
+                                                                                         "uv":  [
+                                                                                                    8,
+                                                                                                    5,
+                                                                                                    10,
+                                                                                                    8
+                                                                                                ],
+                                                                                         "rotation":  0
+                                                                                     },
+                                                                           "west":  {
+                                                                                        "uv":  [
+                                                                                                   7,
+                                                                                                   5,
+                                                                                                   8,
+                                                                                                   8
+                                                                                               ],
+                                                                                        "rotation":  0
+                                                                                    },
+                                                                           "east":  {
+                                                                                        "uv":  [
+                                                                                                   4,
+                                                                                                   5,
+                                                                                                   5,
+                                                                                                   8
+                                                                                               ],
+                                                                                        "rotation":  0
+                                                                                    }
+                                                                       }
+                                                         },
+                                                         {
+                                                             "origin":  [
+                                                                            5.5,
+                                                                            -0.1,
+                                                                            9.5
+                                                                        ],
+                                                             "size":  [
+                                                                          5,
+                                                                          6.1999999061226845,
+                                                                          3
+                                                                      ],
+                                                             "uv":  [
+                                                                        5,
+                                                                        9
+                                                                    ],
+                                                             "faces":  {
+                                                                           "down":  {
+                                                                                        "uv":  [
+                                                                                                   9,
+                                                                                                   8,
+                                                                                                   7,
+                                                                                                   9
+                                                                                               ],
+                                                                                        "rotation":  0
+                                                                                    },
+                                                                           "up":  {
+                                                                                      "uv":  [
+                                                                                                 7,
+                                                                                                 9,
+                                                                                                 5,
+                                                                                                 8
+                                                                                             ],
+                                                                                      "rotation":  0
+                                                                                  },
+                                                                           "north":  {
+                                                                                         "uv":  [
+                                                                                                    5,
+                                                                                                    9,
+                                                                                                    7,
+                                                                                                    12
+                                                                                                ],
+                                                                                         "rotation":  0
+                                                                                     },
+                                                                           "south":  {
+                                                                                         "uv":  [
+                                                                                                    8,
+                                                                                                    9,
+                                                                                                    10,
+                                                                                                    12
+                                                                                                ],
+                                                                                         "rotation":  0
+                                                                                     },
+                                                                           "west":  {
+                                                                                        "uv":  [
+                                                                                                   7,
+                                                                                                   9,
+                                                                                                   8,
+                                                                                                   12
+                                                                                               ],
+                                                                                        "rotation":  0
+                                                                                    },
+                                                                           "east":  {
+                                                                                        "uv":  [
+                                                                                                   4,
+                                                                                                   9,
+                                                                                                   5,
+                                                                                                   12
+                                                                                               ],
+                                                                                        "rotation":  0
+                                                                                    }
+                                                                       }
+                                                         }
+                                                     ],
+                                           "children":  [
+
+                                                        ]
+                                       },
+                                       {
+                                           "name":  "head",
+                                           "pivot":  [
+                                                         8.3,
+                                                         6,
+                                                         11
+                                                     ],
+                                           "rotation":  [
+                                                            0,
+                                                            0,
+                                                            0
+                                                        ],
+                                           "cubes":  [
+                                                         {
+                                                             "origin":  [
+                                                                            4.35,
+                                                                            6,
+                                                                            7.35
+                                                                        ],
+                                                             "size":  [
+                                                                          7.2999997138977051,
+                                                                          7.3000001907348633,
+                                                                          7.2999997138977051
+                                                                      ],
+                                                             "uv":  [
+                                                                        2,
+                                                                        2
+                                                                    ],
+                                                             "faces":  {
+                                                                           "down":  {
+                                                                                        "uv":  [
+                                                                                                   6,
+                                                                                                   0,
+                                                                                                   4,
+                                                                                                   2
+                                                                                               ],
+                                                                                        "rotation":  0
+                                                                                    },
+                                                                           "up":  {
+                                                                                      "uv":  [
+                                                                                                 4,
+                                                                                                 2,
+                                                                                                 2,
+                                                                                                 0
+                                                                                             ],
+                                                                                      "rotation":  0
+                                                                                  },
+                                                                           "north":  {
+                                                                                         "uv":  [
+                                                                                                    2,
+                                                                                                    2,
+                                                                                                    4,
+                                                                                                    4
+                                                                                                ],
+                                                                                         "rotation":  0
+                                                                                     },
+                                                                           "south":  {
+                                                                                         "uv":  [
+                                                                                                    6,
+                                                                                                    2,
+                                                                                                    8,
+                                                                                                    4
+                                                                                                ],
+                                                                                         "rotation":  0
+                                                                                     },
+                                                                           "west":  {
+                                                                                        "uv":  [
+                                                                                                   4,
+                                                                                                   2,
+                                                                                                   6,
+                                                                                                   4
+                                                                                               ],
+                                                                                        "rotation":  0
+                                                                                    },
+                                                                           "east":  {
+                                                                                        "uv":  [
+                                                                                                   0,
+                                                                                                   2,
+                                                                                                   2,
+                                                                                                   4
+                                                                                               ],
+                                                                                        "rotation":  0
+                                                                                    }
+                                                                       }
+                                                         },
+                                                         {
+                                                             "origin":  [
+                                                                            4,
+                                                                            6,
+                                                                            7
+                                                                        ],
+                                                             "size":  [
+                                                                          8,
+                                                                          8,
+                                                                          8
+                                                                      ],
+                                                             "uv":  [
+                                                                        10,
+                                                                        2
+                                                                    ],
+                                                             "faces":  {
+                                                                           "down":  {
+                                                                                        "uv":  [
+                                                                                                   14,
+                                                                                                   0,
+                                                                                                   12,
+                                                                                                   2
+                                                                                               ],
+                                                                                        "rotation":  0
+                                                                                    },
+                                                                           "up":  {
+                                                                                      "uv":  [
+                                                                                                 12,
+                                                                                                 2,
+                                                                                                 10,
+                                                                                                 0
+                                                                                             ],
+                                                                                      "rotation":  0
+                                                                                  },
+                                                                           "north":  {
+                                                                                         "uv":  [
+                                                                                                    10,
+                                                                                                    2,
+                                                                                                    12,
+                                                                                                    4
+                                                                                                ],
+                                                                                         "rotation":  0
+                                                                                     },
+                                                                           "south":  {
+                                                                                         "uv":  [
+                                                                                                    14,
+                                                                                                    2,
+                                                                                                    16,
+                                                                                                    4
+                                                                                                ],
+                                                                                         "rotation":  0
+                                                                                     },
+                                                                           "west":  {
+                                                                                        "uv":  [
+                                                                                                   12,
+                                                                                                   2,
+                                                                                                   14,
+                                                                                                   4
+                                                                                               ],
+                                                                                        "rotation":  0
+                                                                                    },
+                                                                           "east":  {
+                                                                                        "uv":  [
+                                                                                                   8,
+                                                                                                   2,
+                                                                                                   10,
+                                                                                                   4
+                                                                                               ],
+                                                                                        "rotation":  0
+                                                                                    }
+                                                                       }
+                                                         }
+                                                     ],
+                                           "children":  [
+
+                                                        ]
+                                       }
+                                   ]
+                  }
+              ]
+}

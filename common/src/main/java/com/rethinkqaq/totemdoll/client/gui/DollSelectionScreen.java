@@ -39,7 +39,11 @@ public final class DollSelectionScreen extends Screen implements DollScreenParen
 
     @Override
     protected void init() {
-        DollAnimationManager.trigger(TotemDollConfig.selectedStyle(), "on_screen_open");
+        // Every preview card has its own style ID and therefore its own
+        // animation state. Trigger the screen-open action for all styles,
+        // not only for the currently selected gameplay style.
+        DollStyles.all().forEach(style ->
+                DollAnimationManager.trigger(style, "on_screen_open"));
         cards.clear();
         scrollOffset = 0;
         contentHeight = 0;

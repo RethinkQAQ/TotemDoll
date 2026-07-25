@@ -5,13 +5,17 @@ import com.rethinkqaq.totemdoll.doll.bone.DollBoneActionManager;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import net.minecraft.resources.ResourceLocation;
 
 public final class DollAnimationManager {
     private static final Map<String, State> STATES = new HashMap<>();
+    private static final Map<ResourceLocation, Integer> ACTIVATION_TICKS = new HashMap<>();
     private static final Random RANDOM = new Random();
 
     public static synchronized void tick() {
         STATES.values().forEach(State::tick);
+        ACTIVATION_TICKS.replaceAll((id, ticks) -> ticks - 1);
+        ACTIVATION_TICKS.values().removeIf(ticks -> ticks <= 0);
         DollBoneActionManager.tick();
     }
 
@@ -23,13 +27,24 @@ public final class DollAnimationManager {
         return state.frame;
     }
 
+    public static synchronized DollAnimationDefinition displayAnimation(DollStyle style) {
+        if (isTotemActivationActive(style)) {
+            return style.animations().stream()
+                    .filter(animation -> "on_totem_activate".equals(animation.trigger()))
+                    .findFirst().orElse(null);
+        }
+        return style.animations().stream().findFirst().orElse(null);
+    }
+
     public static synchronized void reset(DollStyle style) {
         STATES.keySet().removeIf(key -> key.startsWith(style.id() + "#"));
+        ACTIVATION_TICKS.remove(style.id());
         DollBoneActionManager.reset(style);
     }
 
     public static synchronized void trigger(DollStyle style, String trigger) {
         DollBoneActionManager.trigger(style, trigger);
+        if ("on_totem_activate".equals(trigger)) ACTIVATION_TICKS.put(style.id(), 40);
         for (DollAnimationDefinition animation : style.animations()) {
             if (animation.trigger().equals(trigger)) {
                 state(style, animation).start();
@@ -43,7 +58,15 @@ public final class DollAnimationManager {
         if (animation != null) state(style, animation).start();
     }
 
-    public static synchronized void clear() { STATES.clear(); DollBoneActionManager.clear(); }
+    public static synchronized boolean isTotemActivationActive(DollStyle style) {
+        return ACTIVATION_TICKS.getOrDefault(style.id(), 0) > 0;
+    }
+
+    public static synchronized void clear() {
+        STATES.clear();
+        ACTIVATION_TICKS.clear();
+        DollBoneActionManager.clear();
+    }
 
     private static State state(DollStyle style, DollAnimationDefinition animation) {
         return STATES.computeIfAbsent(style.id() + "#" + animation.id(), ignored -> new State(animation));

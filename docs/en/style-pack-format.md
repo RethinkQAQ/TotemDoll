@@ -100,7 +100,7 @@ Dynamic texture animations use named texture frames:
     "animations": true,
     "dynamic_textures": true
   },
-  "animations": {
+  "texture_animations": {
     "blink": {
       "type": "frame_sequence",
       "frames": ["open", "closed", "open"],
@@ -112,4 +112,6 @@ Dynamic texture animations use named texture frames:
 }
 ```
 
-Supported triggers are `random_idle`, `loop`, `on_screen_open`, `on_totem_activate`, and `manual`.
+`texture_animations` is reserved for texture frame sequences. Each animation name maps to texture-slot keys; it never contains bone action bindings. Supported triggers are `random_idle`, `loop`, `on_screen_open`, `on_totem_activate`, and `manual`.
+
+For bone models, `model.animations` points to the Blockbench-exported bone animation file, while the top-level `animations` object contains only action bindings. Do not put texture frame sequences in that object. A texture animation can be used by both `minecraft_item` and `minecraft_bone` styles.
