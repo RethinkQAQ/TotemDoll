@@ -1,0 +1,58 @@
+name: Build Totem Doll
+
+on:
+  push:
+    branches:
+      - '**'
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: 'Release version, for example 0.1-alpha'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build Minecraft targets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Set build version
+        shell: bash
+        run: |
+          if [[ -n "${{ inputs.release_version }}" ]]; then
+            echo "BUILD_VERSION=${{ inputs.release_version }}" >> "$GITHUB_ENV"
+          else
+            echo "BUILD_VERSION=0.1-alpha.build.${GITHUB_RUN_NUMBER}" >> "$GITHUB_ENV"
+          fi
+
+      - name: Build all targets
+        run: |
+          ./gradlew licenseFormat --no-daemon
+          ./gradlew build -Pversion="$BUILD_VERSION" --no-daemon --stacktrace
+
+      - name: Collect artifacts
+        shell: bash
+        run: |
+          mkdir -p artifacts
+          find versions -type f -path '*/build/libs/*.jar' -print0 \
+            | xargs -0 -r -I{} cp --parents "{}" artifacts/
+          cd artifacts
+          zip -r "../Totem-Doll-${BUILD_VERSION}.zip" .
+
+      - name: Upload build archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: Totem-Doll-${{ env.BUILD_VERSION }}
+          path: Totem-Doll-${{ env.BUILD_VERSION }}.zip

@@ -1,7 +1,10 @@
 plugins {
     id 'java-library'
     id 'idea'
+    id 'com.github.hierynomus.license' version '0.16.1'
 }
+
+apply from: rootProject.file('license.gradle')
 
 java {
     toolchain.languageVersion = JavaLanguageVersion.of(21)

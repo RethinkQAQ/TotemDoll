@@ -1,6 +1,26 @@
 plugins {
     id 'fabric-loom' version '1.8-SNAPSHOT' apply false
     id 'net.neoforged.moddev' version '2.0.49-beta' apply false
+    id 'com.github.hierynomus.license' version '0.16.1' apply false
+}
+
+subprojects {
+    if (name ==~ /.+-(fabric|neoforge)/) {
+        apply plugin: 'com.github.hierynomus.license'
+        apply from: rootProject.file('license.gradle')
+    }
+}
+
+tasks.register('licenseFormat') {
+    group = 'formatting'
+    description = 'Applies LGPL-3.0 headers to all source modules.'
+    dependsOn(subprojects.collect { it.tasks.named('licenseFormat') })
+}
+
+tasks.register('licenseCheck') {
+    group = 'verification'
+    description = 'Checks LGPL-3.0 headers in all source modules.'
+    dependsOn(subprojects.collect { it.tasks.named('license') })
 }
 
 def targetMatcher = (project.name =~ /^(.+)-(fabric|neoforge)$/)
