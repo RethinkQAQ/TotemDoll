@@ -1,4 +1,4 @@
-# Totem Doll 样式包模板
+﻿# Totem Doll 样式包模板
 
 这是 Totem Doll `format: 2` 样式包示例，可以作为 Blockbench 模型、网页编辑器和资源包作者的起始模板。
 
@@ -50,7 +50,8 @@ styles/example/models/main.json
 - `model.type` 当前使用 `minecraft_item`。
 - `model.file` 是相对于当前样式目录的模型路径。
 - `skin.supported` 控制是否可以从该模板创建个人样式。
-- `features.animations` 和 `features.dynamic_textures` 当前只作为预留声明。
+- `features.animations` 和 `features.dynamic_textures` 声明动作或动态纹理能力。
 - 不要在样式包中使用绝对路径或包含 `..` 的路径。
 
-当前运行时第一阶段支持 Minecraft 原版 Item JSON 模型。Entity 模型、动画和动态纹理字段会在后续版本启用。
+当前运行时支持 Minecraft 原版 Item JSON、Totem Doll 骨骼模型、骨骼动作和动态纹理。骨骼示例位于 `styles/animated_example/`。
+

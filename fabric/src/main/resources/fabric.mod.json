@@ -12,10 +12,10 @@
     "environment": "client",
     "entrypoints": {
         "main": [
-            "com.example.examplemod.ExampleMod"
+            "com.rethinkqaq.totemdoll.TotemDollMod"
         ],
         "client": [
-            "com.example.examplemod.TotemDollFabricClient"
+            "com.rethinkqaq.totemdoll.TotemDollFabricClient"
         ]
     },
     "mixins": [

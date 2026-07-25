@@ -5,7 +5,7 @@
   "compatibilityLevel": "JAVA_18",
   "mixins": [],
   "client": [
-    "MixinTitleScreen"
+    "com.rethinkqaq.totemdoll.mixin.MixinTitleScreen"
   ],
   "server": [],
   "injectors": {
