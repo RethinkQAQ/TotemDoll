@@ -60,14 +60,21 @@ public final class DollCardWidget extends AbstractWidget {
 
         graphics.drawString(font, style.label(), getX() + 61, getY() + 11, 0xFFFFFF);
         graphics.drawString(font, originLabel(), getX() + 61, getY() + 27, 0xA0A0A0);
+        int detailY = 42;
         if (style.supportsSkin()) {
             graphics.drawString(
                     font,
                     Component.translatable("screen.totemdoll.skin_supported"),
                     getX() + 61,
-                    getY() + 42,
+                    getY() + detailY,
                     0x80C88A
             );
+            detailY += 15;
+        }
+        if (style.hasAnimations()) {
+            graphics.drawString(font, Component.translatable("screen.totemdoll.dynamic_texture"),
+                    getX() + 61, getY() + detailY, 0x80B8E8);
+            detailY += 15;
         }
         if (style.isLocal() && style.templateId() != null) {
             DollStyle template = DollStyles.get(style.templateId());
@@ -75,7 +82,7 @@ public final class DollCardWidget extends AbstractWidget {
                     font,
                     Component.translatable("screen.totemdoll.from_template", template.label()),
                     getX() + 61,
-                    getY() + 57,
+                    getY() + detailY,
                     0xA0A0A0
             );
         }

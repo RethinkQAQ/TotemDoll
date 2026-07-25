@@ -24,7 +24,8 @@ public final class DollStyles {
             null,
             false,
             null,
-            DollStyleOrigin.BUILTIN
+            DollStyleOrigin.BUILTIN,
+            Map.of(), List.of()
     );
 
     private static final Map<ResourceLocation, DollStyle> STYLES = new LinkedHashMap<>();

@@ -198,12 +198,20 @@ public final class DollLocalStyleStore {
                     Files.readString(metadataFile, StandardCharsets.UTF_8),
                     JsonObject.class
             );
+            if (metadata == null || !metadata.has("format") || metadata.get("format").getAsInt() != 2) {
+                Constants.LOG.warn("Skipping obsolete local style {}: only style format 2 is supported", styleDirectory);
+                return;
+            }
             ResourceLocation id = requireLocation(metadata, "id");
             if (!id.getNamespace().equals(Constants.MOD_ID)
                     || !id.getPath().equals(styleDirectory.getFileName().toString())) {
                 throw new IOException("Style id does not match its directory");
             }
             JsonObject modelObject = metadata.getAsJsonObject("model");
+            if (modelObject == null || !modelObject.has("file")) {
+                Constants.LOG.warn("Skipping invalid local style {}: missing model.file", styleDirectory);
+                return;
+            }
             String modelResourcePath = modelObject.get("file").getAsString();
             if (modelResourcePath.startsWith("/") || modelResourcePath.contains("..") || !modelResourcePath.startsWith("models/")) {
                 throw new IOException("Invalid model file");

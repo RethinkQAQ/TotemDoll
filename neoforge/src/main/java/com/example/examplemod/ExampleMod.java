@@ -3,6 +3,8 @@ package com.example.examplemod;
 import com.example.examplemod.client.TotemDollClient;
 import com.example.examplemod.client.gui.DollSelectionScreen;
 import com.example.examplemod.doll.DollStyleLoader;
+import com.example.examplemod.doll.DollAnimationManager;
+import com.example.examplemod.doll.DollAnimationModels;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -39,7 +41,11 @@ public class ExampleMod {
 
     private void registerAdditionalModels(ModelEvent.RegisterAdditional event) {
         DollStyleLoader.reload(Minecraft.getInstance().getResourceManager())
-                .forEach(style -> event.register(ModelResourceLocation.standalone(style.model())));
+                .forEach(style -> {
+                    event.register(ModelResourceLocation.standalone(style.model()));
+                    DollAnimationModels.modelIds(style).forEach(id ->
+                            event.register(ModelResourceLocation.standalone(id)));
+                });
     }
 
     private void registerKeyMappings(RegisterKeyMappingsEvent event) {
@@ -47,6 +53,7 @@ public class ExampleMod {
     }
 
     private void onClientTick(ClientTickEvent.Post event) {
+        DollAnimationManager.tick();
         TotemDollClient.reloadInitialStylesIfReady();
         while (OPEN_CONFIG.consumeClick()) {
             Minecraft client = Minecraft.getInstance();

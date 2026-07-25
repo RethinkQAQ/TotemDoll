@@ -3,10 +3,13 @@ package com.example.examplemod.mixin;
 import com.example.examplemod.config.TotemDollConfig;
 import com.example.examplemod.client.DollPreviewContext;
 import com.example.examplemod.doll.DollStyle;
+import com.example.examplemod.doll.DollAnimationManager;
+import com.example.examplemod.doll.DollAnimationModels;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -39,21 +42,35 @@ public abstract class ItemRendererMixin {
             return;
         }
 
-        BakedModel model = Minecraft.getInstance()
-                .getModelManager()
-                .getModel(ModelResourceLocation.inventory(style.model()));
-        if (model == Minecraft.getInstance().getModelManager().getMissingModel()) {
-            model = Minecraft.getInstance()
-                    .getModelManager()
-                    .getModel(new ModelResourceLocation(style.model(), "standalone"));
+        if (style.hasAnimations()) {
+            var animation = style.animations().get(0);
+            int frame = DollAnimationManager.currentFrame(style, animation.id());
+            ResourceLocation animatedModelId = DollAnimationModels.frameModelId(
+                    style,
+                    animation.frames().get(Math.min(frame, animation.frames().size() - 1))
+            );
+            BakedModel animatedModel = totemdoll$findModel(animatedModelId);
+            if (animatedModel != Minecraft.getInstance().getModelManager().getMissingModel()) {
+                callback.setReturnValue(animatedModel);
+                return;
+            }
         }
-        if (model == Minecraft.getInstance().getModelManager().getMissingModel()) {
-            model = Minecraft.getInstance()
-                    .getModelManager()
-                    .getModel(new ModelResourceLocation(style.model(), "fabric_resource"));
-        }
+
+        BakedModel model = totemdoll$findModel(style.model());
         if (model != Minecraft.getInstance().getModelManager().getMissingModel()) {
             callback.setReturnValue(model);
         }
+    }
+
+    private static BakedModel totemdoll$findModel(ResourceLocation modelId) {
+        var manager = Minecraft.getInstance().getModelManager();
+        BakedModel model = manager.getModel(ModelResourceLocation.inventory(modelId));
+        if (model == Minecraft.getInstance().getModelManager().getMissingModel()) {
+            model = manager.getModel(new ModelResourceLocation(modelId, "standalone"));
+        }
+        if (model == Minecraft.getInstance().getModelManager().getMissingModel()) {
+            model = manager.getModel(new ModelResourceLocation(modelId, "fabric_resource"));
+        }
+        return model;
     }
 }

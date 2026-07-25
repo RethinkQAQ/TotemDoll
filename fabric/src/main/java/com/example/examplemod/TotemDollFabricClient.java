@@ -3,6 +3,8 @@ package com.example.examplemod;
 import com.example.examplemod.client.TotemDollClient;
 import com.example.examplemod.client.gui.DollSelectionScreen;
 import com.example.examplemod.doll.DollStyleLoader;
+import com.example.examplemod.doll.DollAnimationManager;
+import com.example.examplemod.doll.DollAnimationModels;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -18,9 +20,10 @@ public final class TotemDollFabricClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         ModelLoadingPlugin.register(context -> context.addModels(
-                DollStyleLoader.reload(Minecraft.getInstance().getResourceManager())
-                        .stream()
-                        .map(style -> style.model())
+                DollStyleLoader.reload(Minecraft.getInstance().getResourceManager()).stream()
+                        .flatMap(style -> java.util.stream.Stream.concat(
+                                java.util.stream.Stream.of(style.model()),
+                                DollAnimationModels.modelIds(style).stream()))
                         .toList()
         ));
         TotemDollClient.init(
@@ -35,6 +38,7 @@ public final class TotemDollFabricClient implements ClientModInitializer {
                 "key.categories.totemdoll"
         ));
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            DollAnimationManager.tick();
             TotemDollClient.reloadInitialStylesIfReady();
             while (openConfig.consumeClick()) {
                 client.setScreen(new DollSelectionScreen(client.screen));

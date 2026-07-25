@@ -3,6 +3,7 @@ package com.example.examplemod.client.gui;
 import com.example.examplemod.config.TotemDollConfig;
 import com.example.examplemod.doll.DollStyle;
 import com.example.examplemod.doll.DollStyles;
+import com.example.examplemod.doll.DollAnimationManager;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -37,6 +38,7 @@ public final class DollSelectionScreen extends Screen implements DollScreenParen
 
     @Override
     protected void init() {
+        DollAnimationManager.trigger(TotemDollConfig.selectedStyle(), "on_screen_open");
         cards.clear();
         scrollOffset = 0;
         contentHeight = 0;

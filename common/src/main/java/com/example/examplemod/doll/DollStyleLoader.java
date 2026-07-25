@@ -3,6 +3,7 @@ package com.example.examplemod.doll;
 import com.example.examplemod.Constants;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonArray;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.LinkedHashMap;
 
 /** Loads the format-2 style manifests supplied by built-in resources and packs. */
 public final class DollStyleLoader {
@@ -47,8 +49,10 @@ public final class DollStyleLoader {
             ResourceLocation template = root.has("template") ? requiredId(root, "template") : null;
             DollSkinDefinition skin = readSkin(root);
             DollStyleOrigin origin = readOrigin(root, source);
+            Map<String, ResourceLocation> textures = readTextures(root);
+            List<DollAnimationDefinition> animations = readAnimations(root, textures);
             output.add(new DollStyle(id, name, nameKey, modelId, true, template,
-                    origin == DollStyleOrigin.LOCAL, skin, origin));
+                    origin == DollStyleOrigin.LOCAL, skin, origin, textures, animations));
         } catch (Exception exception) {
             Constants.LOG.error("Could not load style {}", source, exception);
         }
@@ -79,6 +83,50 @@ public final class DollStyleLoader {
                 || !skin.has("format") || !skin.has("target")) return null;
         DollSkinDefinition result = new DollSkinDefinition(skin.get("format").getAsString(), skin.get("target").getAsString());
         return result.supportsImport() ? result : null;
+    }
+
+    private static Map<String, ResourceLocation> readTextures(JsonObject root) {
+        Map<String, ResourceLocation> result = new LinkedHashMap<>();
+        JsonObject textures = root.getAsJsonObject("textures");
+        if (textures == null) return result;
+        for (String key : textures.keySet()) {
+            ResourceLocation id = ResourceLocation.tryParse(textures.get(key).getAsString());
+            if (id != null) result.put(key, id);
+        }
+        return result;
+    }
+
+    private static List<DollAnimationDefinition> readAnimations(JsonObject root, Map<String, ResourceLocation> textures) {
+        List<DollAnimationDefinition> result = new ArrayList<>();
+        JsonObject animations = root.getAsJsonObject("animations");
+        if (animations == null) return result;
+        for (String id : animations.keySet()) {
+            try {
+                JsonObject object = animations.getAsJsonObject(id);
+                if (!"frame_sequence".equals(object.get("type").getAsString())) continue;
+                JsonArray frameArray = object.getAsJsonArray("frames");
+                if (frameArray == null || frameArray.isEmpty() || frameArray.size() > 64) continue;
+                List<String> frames = new ArrayList<>();
+                for (var frame : frameArray) {
+                    String name = frame.getAsString();
+                    if (!textures.containsKey(name)) throw new IllegalArgumentException("Unknown texture frame " + name);
+                    frames.add(name);
+                }
+                int duration = object.get("frame_duration").getAsInt();
+                JsonObject interval = object.getAsJsonObject("interval");
+                int min = interval == null ? 80 : interval.get("min").getAsInt();
+                int max = interval == null ? 180 : interval.get("max").getAsInt();
+                String trigger = object.get("trigger").getAsString();
+                boolean supportedTrigger = "random_idle".equals(trigger)
+                        || "loop".equals(trigger)
+                        || "on_screen_open".equals(trigger)
+                        || "on_totem_activate".equals(trigger)
+                        || "manual".equals(trigger);
+                if (duration <= 0 || min < 0 || max < min || !supportedTrigger) continue;
+                result.add(new DollAnimationDefinition(id, List.copyOf(frames), duration, trigger, min, max));
+            } catch (Exception ignored) { }
+        }
+        return result;
     }
 
     private static ResourceLocation requiredId(JsonObject object, String key) {

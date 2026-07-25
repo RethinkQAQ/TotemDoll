@@ -3,6 +3,9 @@ package com.example.examplemod.doll;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.chat.Component;
 
+import java.util.List;
+import java.util.Map;
+
 public record DollStyle(
         ResourceLocation id,
         String displayName,
@@ -12,7 +15,9 @@ public record DollStyle(
         ResourceLocation templateId,
         boolean userCreated,
         DollSkinDefinition skin,
-        DollStyleOrigin origin
+        DollStyleOrigin origin,
+        Map<String, ResourceLocation> textures,
+        List<DollAnimationDefinition> animations
 ) {
 
     public Component label() {
@@ -31,5 +36,11 @@ public record DollStyle(
 
     public boolean isLocal() {
         return userCreated || origin == DollStyleOrigin.LOCAL;
+    }
+
+    public boolean hasAnimations() { return animations != null && !animations.isEmpty(); }
+
+    public DollAnimationDefinition animation(String id) {
+        return animations.stream().filter(animation -> animation.id().equals(id)).findFirst().orElse(null);
     }
 }
