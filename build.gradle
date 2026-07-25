@@ -44,6 +44,7 @@ if (targetMatcher.matches()) {
     sourceSets.main.resources.setSrcDirs([new File(mergedMain, 'resources')])
     tasks.named('compileJava') { dependsOn(mergeMainSources) }
     tasks.named('processResources') { dependsOn(mergeMainSources) }
+    tasks.named('sourcesJar') { dependsOn(mergeMainSources) }
 
     dependencies {
         compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
