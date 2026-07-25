@@ -19,6 +19,10 @@ public final class TotemDollClient {
         DollLocalStyleStore.initialize(configDirectory, gameDirectory);
         Minecraft client = Minecraft.getInstance();
         enableGeneratedPack(client);
+        // The pack is enabled before Minecraft performs its normal initial
+        // resource load. Do not trigger a second full reload from the first
+        // client tick.
+        initialStylesReloaded = true;
     }
 
     /** Reloads the generated pack once the client resource manager is ready. */

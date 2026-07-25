@@ -1,0 +1,31 @@
+{
+  "format": 1,
+  "animations": {
+    "idle": {
+      "loop": true,
+      "length": 40,
+      "bones": {
+        "body": {
+          "rotation": [
+            { "time": 0, "value": [0, 0, -2], "interpolation": "smooth" },
+            { "time": 20, "value": [0, 0, 2], "interpolation": "smooth" },
+            { "time": 40, "value": [0, 0, -2], "interpolation": "smooth" }
+          ]
+        }
+      }
+    },
+    "totem_activate": {
+      "loop": false,
+      "length": 20,
+      "bones": {
+        "root": {
+          "rotation": [
+            { "time": 0, "value": [0, 0, 0] },
+            { "time": 10, "value": [0, 180, 0], "interpolation": "smooth" },
+            { "time": 20, "value": [0, 360, 0], "interpolation": "smooth" }
+          ]
+        }
+      }
+    }
+  }
+}

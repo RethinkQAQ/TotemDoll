@@ -1,0 +1,43 @@
+﻿{
+    "format":  2,
+    "enabled":  true,
+    "id":  "totemdoll:animated_alex",
+    "origin":  "builtin",
+    "name":  "Animated Alex Doll",
+    "name_key":  "doll.totemdoll.animated_alex",
+    "model":  {
+                  "type":  "minecraft_bone",
+                  "geometry":  "models/geometry.json",
+                  "animations":  "models/animations.json"
+              },
+    "textures":  {
+                     "base":  "totemdoll:textures/item/doll/alex.png"
+                 },
+    "skin":  {
+                  "supported":  true,
+                  "format":  "minecraft_64x64",
+                  "target":  "base",
+                  "mapping":  "minecraft_player"
+              },
+    "features":  {
+                     "animations":  true,
+                     "dynamic_textures":  false
+                 },
+    "animations":  {
+                       "idle_head_shake":  {
+                                               "animation":  "idle_head_shake",
+                                               "trigger":  "loop",
+                                               "priority":  20
+                                           },
+                       "screen_wave":  {
+                                           "animation":  "screen_wave",
+                                           "trigger":  "on_screen_open",
+                                           "priority":  60
+                                       },
+                       "totem_struggle":  {
+                                              "animation":  "animation",
+                                              "trigger":  "on_totem_activate",
+                                              "priority":  100
+                                          }
+                   }
+}

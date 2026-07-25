@@ -1,0 +1,464 @@
+﻿{
+    "format":  1,
+    "animations":  {
+                       "idle_head_shake":  {
+                                               "loop":  true,
+                                               "length":  80,
+                                               "bones":  {
+                                                             "hand":  {
+                                                                          "position":  [
+                                                                                           {
+                                                                                               "time":  0,
+                                                                                               "value":  [
+                                                                                                             0.3,
+                                                                                                             0,
+                                                                                                             0
+                                                                                                         ],
+                                                                                               "interpolation":  "linear"
+                                                                                           },
+                                                                                           {
+                                                                                               "time":  40,
+                                                                                               "value":  [
+                                                                                                             -0.3,
+                                                                                                             0,
+                                                                                                             0
+                                                                                                         ],
+                                                                                               "interpolation":  "linear"
+                                                                                           },
+                                                                                           {
+                                                                                               "time":  80,
+                                                                                               "value":  [
+                                                                                                             0.3,
+                                                                                                             0,
+                                                                                                             0
+                                                                                                         ],
+                                                                                               "interpolation":  "linear"
+                                                                                           }
+                                                                                       ]
+                                                                      },
+                                                             "left hand":  {
+                                                                               "rotation":  [
+                                                                                                {
+                                                                                                    "time":  0,
+                                                                                                    "value":  [
+                                                                                                                  0,
+                                                                                                                  0,
+                                                                                                                  0
+                                                                                                              ],
+                                                                                                    "interpolation":  "linear"
+                                                                                                },
+                                                                                                {
+                                                                                                    "time":  40,
+                                                                                                    "value":  [
+                                                                                                                  0,
+                                                                                                                  0,
+                                                                                                                  -2.5
+                                                                                                              ],
+                                                                                                    "interpolation":  "linear"
+                                                                                                },
+                                                                                                {
+                                                                                                    "time":  80,
+                                                                                                    "value":  [
+                                                                                                                  0,
+                                                                                                                  0,
+                                                                                                                  0
+                                                                                                              ],
+                                                                                                    "interpolation":  "linear"
+                                                                                                }
+                                                                                            ]
+                                                                           },
+                                                             "right hand":  {
+                                                                                "rotation":  [
+                                                                                                 {
+                                                                                                     "time":  0,
+                                                                                                     "value":  [
+                                                                                                                   0,
+                                                                                                                   0,
+                                                                                                                   2.5
+                                                                                                               ],
+                                                                                                     "interpolation":  "linear"
+                                                                                                 },
+                                                                                                 {
+                                                                                                     "time":  40,
+                                                                                                     "value":  [
+                                                                                                                   0,
+                                                                                                                   0,
+                                                                                                                   0
+                                                                                                               ],
+                                                                                                     "interpolation":  "linear"
+                                                                                                 },
+                                                                                                 {
+                                                                                                     "time":  80,
+                                                                                                     "value":  [
+                                                                                                                   0,
+                                                                                                                   0,
+                                                                                                                   2.5
+                                                                                                               ],
+                                                                                                     "interpolation":  "linear"
+                                                                                                 }
+                                                                                             ]
+                                                                            },
+                                                             "right leg":  {
+                                                                               "rotation":  [
+                                                                                                {
+                                                                                                    "time":  0,
+                                                                                                    "value":  [
+                                                                                                                  -2.5,
+                                                                                                                  0,
+                                                                                                                  0
+                                                                                                              ],
+                                                                                                    "interpolation":  "linear"
+                                                                                                },
+                                                                                                {
+                                                                                                    "time":  40,
+                                                                                                    "value":  [
+                                                                                                                  2.5,
+                                                                                                                  0,
+                                                                                                                  0
+                                                                                                              ],
+                                                                                                    "interpolation":  "linear"
+                                                                                                },
+                                                                                                {
+                                                                                                    "time":  80,
+                                                                                                    "value":  [
+                                                                                                                  -2.5,
+                                                                                                                  0,
+                                                                                                                  0
+                                                                                                              ],
+                                                                                                    "interpolation":  "linear"
+                                                                                                }
+                                                                                            ]
+                                                                           },
+                                                             "left leg":  {
+                                                                              "rotation":  [
+                                                                                               {
+                                                                                                   "time":  0,
+                                                                                                   "value":  [
+                                                                                                                 2.5,
+                                                                                                                 0,
+                                                                                                                 0
+                                                                                                             ],
+                                                                                                   "interpolation":  "linear"
+                                                                                               },
+                                                                                               {
+                                                                                                   "time":  40,
+                                                                                                   "value":  [
+                                                                                                                 -2.5,
+                                                                                                                 0,
+                                                                                                                 0
+                                                                                                             ],
+                                                                                                   "interpolation":  "linear"
+                                                                                               },
+                                                                                               {
+                                                                                                   "time":  80,
+                                                                                                   "value":  [
+                                                                                                                 2.5,
+                                                                                                                 0,
+                                                                                                                 0
+                                                                                                             ],
+                                                                                                   "interpolation":  "linear"
+                                                                                               }
+                                                                                           ]
+                                                                          },
+                                                             "body":  {
+                                                                          "rotation":  [
+                                                                                           {
+                                                                                               "time":  0,
+                                                                                               "value":  [
+                                                                                                             0,
+                                                                                                             0,
+                                                                                                             -2.5
+                                                                                                         ],
+                                                                                               "interpolation":  "linear"
+                                                                                           },
+                                                                                           {
+                                                                                               "time":  40,
+                                                                                               "value":  [
+                                                                                                             0,
+                                                                                                             0,
+                                                                                                             2.5
+                                                                                                         ],
+                                                                                               "interpolation":  "linear"
+                                                                                           },
+                                                                                           {
+                                                                                               "time":  80,
+                                                                                               "value":  [
+                                                                                                             0,
+                                                                                                             0,
+                                                                                                             -2.5
+                                                                                                         ],
+                                                                                               "interpolation":  "linear"
+                                                                                           }
+                                                                                       ]
+                                                                      },
+                                                             "head":  {
+                                                                          "rotation":  [
+                                                                                           {
+                                                                                               "time":  0,
+                                                                                               "value":  [
+                                                                                                             0,
+                                                                                                             0,
+                                                                                                             -5.5
+                                                                                                         ],
+                                                                                               "interpolation":  "catmullrom"
+                                                                                           },
+                                                                                           {
+                                                                                               "time":  40,
+                                                                                               "value":  [
+                                                                                                             0,
+                                                                                                             0,
+                                                                                                             5.5
+                                                                                                         ],
+                                                                                               "interpolation":  "catmullrom"
+                                                                                           },
+                                                                                           {
+                                                                                               "time":  80,
+                                                                                               "value":  [
+                                                                                                             0,
+                                                                                                             0,
+                                                                                                             -5.5
+                                                                                                         ],
+                                                                                               "interpolation":  "catmullrom"
+                                                                                           }
+                                                                                       ],
+                                                                          "position":  [
+                                                                                           {
+                                                                                               "time":  0,
+                                                                                               "value":  [
+                                                                                                             0.3,
+                                                                                                             0,
+                                                                                                             0
+                                                                                                         ],
+                                                                                               "interpolation":  "linear"
+                                                                                           },
+                                                                                           {
+                                                                                               "time":  40,
+                                                                                               "value":  [
+                                                                                                             -0.3,
+                                                                                                             0,
+                                                                                                             0
+                                                                                                         ],
+                                                                                               "interpolation":  "linear"
+                                                                                           },
+                                                                                           {
+                                                                                               "time":  80,
+                                                                                               "value":  [
+                                                                                                             0.3,
+                                                                                                             0,
+                                                                                                             0
+                                                                                                         ],
+                                                                                               "interpolation":  "linear"
+                                                                                           }
+                                                                                       ]
+                                                                      }
+                                                         }
+                                           },
+                       "screen_wave":  {
+                                           "loop":  false,
+                                           "length":  10,
+                                           "bones":  {
+                                                         "hand":  {
+                                                                      "position":  {
+                                                                                       "time":  0,
+                                                                                       "value":  [
+                                                                                                     -0.4,
+                                                                                                     0,
+                                                                                                     0
+                                                                                                 ],
+                                                                                       "interpolation":  "linear"
+                                                                                   }
+                                                                  },
+                                                         "right hand":  {
+                                                                            "rotation":  [
+                                                                                             {
+                                                                                                 "time":  10,
+                                                                                                 "value":  [
+                                                                                                               180,
+                                                                                                               0,
+                                                                                                               -22.5
+                                                                                                           ],
+                                                                                                 "interpolation":  "linear"
+                                                                                             },
+                                                                                             {
+                                                                                                 "time":  0,
+                                                                                                 "value":  [
+                                                                                                               180,
+                                                                                                               0,
+                                                                                                               -22.5
+                                                                                                           ],
+                                                                                                 "interpolation":  "linear"
+                                                                                             },
+                                                                                             {
+                                                                                                 "time":  2.5,
+                                                                                                 "value":  [
+                                                                                                               180,
+                                                                                                               0,
+                                                                                                               -12.5
+                                                                                                           ],
+                                                                                                 "interpolation":  "linear"
+                                                                                             },
+                                                                                             {
+                                                                                                 "time":  7.5,
+                                                                                                 "value":  [
+                                                                                                               180,
+                                                                                                               0,
+                                                                                                               -12.5
+                                                                                                           ],
+                                                                                                 "interpolation":  "linear"
+                                                                                             },
+                                                                                             {
+                                                                                                 "time":  5,
+                                                                                                 "value":  [
+                                                                                                               180,
+                                                                                                               0,
+                                                                                                               -22.5
+                                                                                                           ],
+                                                                                                 "interpolation":  "linear"
+                                                                                             }
+                                                                                         ]
+                                                                        },
+                                                         "body":  {
+                                                                      "rotation":  {
+                                                                                       "time":  0,
+                                                                                       "value":  [
+                                                                                                     0,
+                                                                                                     0,
+                                                                                                     5
+                                                                                                 ],
+                                                                                       "interpolation":  "linear"
+                                                                                   }
+                                                                  },
+                                                         "head":  {
+                                                                      "rotation":  {
+                                                                                       "time":  0,
+                                                                                       "value":  [
+                                                                                                     0,
+                                                                                                     0,
+                                                                                                     7.5
+                                                                                                 ],
+                                                                                       "interpolation":  "linear"
+                                                                                   },
+                                                                      "position":  {
+                                                                                       "time":  0,
+                                                                                       "value":  [
+                                                                                                     -0.6,
+                                                                                                     0,
+                                                                                                     0
+                                                                                                 ],
+                                                                                       "interpolation":  "linear"
+                                                                                   }
+                                                                  }
+                                                     }
+                                       },
+                       "animation":  {
+                                         "loop":  false,
+                                         "length":  5,
+                                         "bones":  {
+                                                       "hand":  {
+                                                                    "position":  {
+                                                                                     "time":  0,
+                                                                                     "value":  [
+                                                                                                   0,
+                                                                                                   -1,
+                                                                                                   0
+                                                                                               ],
+                                                                                     "interpolation":  "linear"
+                                                                                 }
+                                                                },
+                                                       "left hand":  {
+                                                                         "rotation":  [
+                                                                                          {
+                                                                                              "time":  0,
+                                                                                              "value":  [
+                                                                                                            180,
+                                                                                                            0,
+                                                                                                            20
+                                                                                                        ],
+                                                                                              "interpolation":  "linear"
+                                                                                          },
+                                                                                          {
+                                                                                              "time":  2.5,
+                                                                                              "value":  [
+                                                                                                            180,
+                                                                                                            0,
+                                                                                                            12.5
+                                                                                                        ],
+                                                                                              "interpolation":  "linear"
+                                                                                          },
+                                                                                          {
+                                                                                              "time":  5,
+                                                                                              "value":  [
+                                                                                                            180,
+                                                                                                            0,
+                                                                                                            20
+                                                                                                        ],
+                                                                                              "interpolation":  "linear"
+                                                                                          }
+                                                                                      ]
+                                                                     },
+                                                       "right hand":  {
+                                                                          "rotation":  [
+                                                                                           {
+                                                                                               "time":  0,
+                                                                                               "value":  [
+                                                                                                             175.3001,
+                                                                                                             -1.7082,
+                                                                                                             -19.9299
+                                                                                                         ],
+                                                                                               "interpolation":  "linear"
+                                                                                           },
+                                                                                           {
+                                                                                               "time":  2.5,
+                                                                                               "value":  [
+                                                                                                             175.1179,
+                                                                                                             -1.0809,
+                                                                                                             -12.4539
+                                                                                                         ],
+                                                                                               "interpolation":  "linear"
+                                                                                           },
+                                                                                           {
+                                                                                               "time":  5,
+                                                                                               "value":  [
+                                                                                                             175.3001,
+                                                                                                             -1.7082,
+                                                                                                             -19.9299
+                                                                                                         ],
+                                                                                               "interpolation":  "linear"
+                                                                                           }
+                                                                                       ]
+                                                                      },
+                                                       "head":  {
+                                                                    "rotation":  [
+                                                                                     {
+                                                                                         "time":  0,
+                                                                                         "value":  [
+                                                                                                       0,
+                                                                                                       -2.5,
+                                                                                                       0
+                                                                                                   ],
+                                                                                         "interpolation":  "linear"
+                                                                                     },
+                                                                                     {
+                                                                                         "time":  2.5,
+                                                                                         "value":  [
+                                                                                                       0,
+                                                                                                       2.5,
+                                                                                                       0
+                                                                                                   ],
+                                                                                         "interpolation":  "linear"
+                                                                                     },
+                                                                                     {
+                                                                                         "time":  5,
+                                                                                         "value":  [
+                                                                                                       0,
+                                                                                                       -2.5,
+                                                                                                       0
+                                                                                                   ],
+                                                                                         "interpolation":  "linear"
+                                                                                     }
+                                                                                 ]
+                                                                }
+                                                   }
+                                     }
+                   }
+}

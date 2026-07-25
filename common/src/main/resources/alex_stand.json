@@ -1,17 +1,16 @@
 {
+	"format_version": "1.21.11",
 	"credit": "Made with Blockbench",
 	"textures": {
-		"0": "totemdoll:item/doll/alex",
-		"particle": "totemdoll:item/doll/alex",
-		"layer0": "minecraft:item/totem_of_undying",
-		"missing": "minecraft:item/totem_of_undying"
+		"0": "totemdoll:Pictures/skin/aether127",
+		"particle": "totemdoll:Pictures/skin/aether127"
 	},
 	"elements": [
 		{
 			"name": "left hand",
-			"from": [5.0504, 4, 7.08248],
-			"to": [6.5504, 6, 13.08248],
-			"rotation": {"angle": -22.5, "axis": "x", "origin": [8.04619, 5, 9.15224]},
+			"from": [4.2504, 5, 5.08248],
+			"to": [5.7504, 7, 11.08248],
+			"rotation": {"x": -90, "y": 0, "z": -7.5, "origin": [5.24619, 6, 11.15224]},
 			"faces": {
 				"north": {"uv": [10.5, 12, 9.75, 13], "rotation": 180, "texture": "#0"},
 				"east": {"uv": [8, 13, 9, 16], "rotation": 270, "texture": "#0"},
@@ -23,9 +22,9 @@
 		},
 		{
 			"name": "left hand layer",
-			"from": [4.85, 3.9, 6.98248],
-			"to": [6.55, 6.1, 13.18248],
-			"rotation": {"angle": -22.5, "axis": "x", "origin": [7.84619, 5, 9.15224]},
+			"from": [4.05, 4.9, 4.98248],
+			"to": [5.75, 7.1, 11.18248],
+			"rotation": {"x": -90, "y": 0, "z": -7.5, "origin": [5.24619, 6, 11.15224]},
 			"faces": {
 				"north": {"uv": [14.5, 12, 13.75, 13], "rotation": 180, "texture": "#0"},
 				"east": {"uv": [12, 13, 13, 16], "rotation": 270, "texture": "#0"},
@@ -36,10 +35,9 @@
 			}
 		},
 		{
-			"name": "right hand",
-			"from": [9.45663, 4, 7.04712],
-			"to": [10.95663, 6, 13.04712],
-			"rotation": {"angle": -22.5, "axis": "x", "origin": [8.04619, 5, 9.15224]},
+			"from": [10.25663, 5, 5.04712],
+			"to": [11.75663, 7, 11.04712],
+			"rotation": {"x": -90, "y": 0, "z": 7.5, "origin": [10.84619, 6, 11.15224]},
 			"faces": {
 				"north": {"uv": [12.5, 4, 11.75, 5], "rotation": 180, "texture": "#0"},
 				"east": {"uv": [10, 5, 11, 8], "rotation": 270, "texture": "#0"},
@@ -50,10 +48,9 @@
 			}
 		},
 		{
-			"name": "right hand layer",
-			"from": [9.45663, 3.9, 6.94712],
-			"to": [11.15663, 6.1, 13.14712],
-			"rotation": {"angle": -22.5, "axis": "x", "origin": [8.04619, 5, 9.15224]},
+			"from": [10.25663, 4.9, 4.94712],
+			"to": [11.95663, 7.1, 11.14712],
+			"rotation": {"x": -90, "y": 0, "z": 7.5, "origin": [10.84619, 6, 11.15224]},
 			"faces": {
 				"north": {"uv": [12.5, 8, 11.75, 9], "rotation": 180, "texture": "#0"},
 				"east": {"uv": [10, 9, 11, 12], "rotation": 270, "texture": "#0"},
@@ -61,20 +58,6 @@
 				"west": {"uv": [11.75, 9, 12.5, 12], "rotation": 90, "texture": "#0"},
 				"up": {"uv": [11, 9, 11.75, 12], "rotation": 180, "texture": "#0"},
 				"down": {"uv": [12.5, 9, 13.5, 12], "texture": "#0"}
-			}
-		},
-		{
-			"name": "totem",
-			"from": [6, 3, 6.75],
-			"to": [10, 7, 6.75],
-			"rotation": {"angle": 0, "axis": "z", "origin": [8, 5, 7]},
-			"faces": {
-				"north": {"uv": [0, 0, 16, 16], "texture": "#layer0"},
-				"east": {"uv": [0, 0, 0, 3], "texture": "#missing"},
-				"south": {"uv": [0, 0, 3, 3], "texture": "#missing"},
-				"west": {"uv": [0, 0, 0, 3], "texture": "#missing"},
-				"up": {"uv": [0, 0, 3, 0], "texture": "#missing"},
-				"down": {"uv": [0, 0, 3, 0], "texture": "#missing"}
 			}
 		},
 		{
@@ -247,8 +230,7 @@
 							"scope": 0,
 							"color": 0,
 							"children": [2, 3]
-						},
-						4
+						}
 					]
 				},
 				{
@@ -256,28 +238,28 @@
 					"origin": [0, 0, 0],
 					"scope": 0,
 					"color": 0,
-					"children": [5, 6]
+					"children": [4, 5]
 				},
 				{
 					"name": "left leg",
 					"origin": [0, 0, 0],
 					"scope": 0,
 					"color": 0,
-					"children": [7, 8]
+					"children": [6, 7]
 				},
 				{
 					"name": "body",
 					"origin": [0, 0, 0],
 					"scope": 0,
 					"color": 0,
-					"children": [9, 10]
+					"children": [8, 9]
 				},
 				{
 					"name": "head",
 					"origin": [0, 0, 0],
 					"scope": 0,
 					"color": 0,
-					"children": [11, 12]
+					"children": [10, 11]
 				}
 			]
 		}

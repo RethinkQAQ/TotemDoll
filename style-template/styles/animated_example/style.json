@@ -1,0 +1,26 @@
+{
+  "format": 2,
+  "id": "example:animated_example",
+  "name": "Animated Example",
+  "model": {
+    "type": "minecraft_bone",
+    "geometry": "models/geometry.json",
+    "animations": "models/animations.json"
+  },
+  "textures": { "base": "example:styles/animated_example/textures/base.png" },
+  "skin": {
+    "supported": true,
+    "format": "minecraft_64x64",
+    "target": "base",
+    "mapping": "minecraft_player"
+  },
+  "features": { "animations": true, "dynamic_textures": false },
+  "animations": {
+    "idle": { "animation": "idle", "trigger": "loop", "priority": 20 },
+    "activate": {
+      "animation": "totem_activate",
+      "trigger": "on_totem_activate",
+      "priority": 100
+    }
+  }
+}

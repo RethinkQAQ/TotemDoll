@@ -1,5 +1,7 @@
 package com.example.examplemod.doll;
 
+import com.example.examplemod.doll.bone.DollBoneActionManager;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -10,6 +12,7 @@ public final class DollAnimationManager {
 
     public static synchronized void tick() {
         STATES.values().forEach(State::tick);
+        DollBoneActionManager.tick();
     }
 
     public static synchronized int currentFrame(DollStyle style, String animationId) {
@@ -22,9 +25,11 @@ public final class DollAnimationManager {
 
     public static synchronized void reset(DollStyle style) {
         STATES.keySet().removeIf(key -> key.startsWith(style.id() + "#"));
+        DollBoneActionManager.reset(style);
     }
 
     public static synchronized void trigger(DollStyle style, String trigger) {
+        DollBoneActionManager.trigger(style, trigger);
         for (DollAnimationDefinition animation : style.animations()) {
             if (animation.trigger().equals(trigger)) {
                 state(style, animation).start();
@@ -33,11 +38,12 @@ public final class DollAnimationManager {
     }
 
     public static synchronized void triggerAnimation(DollStyle style, String animationId) {
+        DollBoneActionManager.triggerAnimation(style, animationId);
         DollAnimationDefinition animation = style.animation(animationId);
         if (animation != null) state(style, animation).start();
     }
 
-    public static synchronized void clear() { STATES.clear(); }
+    public static synchronized void clear() { STATES.clear(); DollBoneActionManager.clear(); }
 
     private static State state(DollStyle style, DollAnimationDefinition animation) {
         return STATES.computeIfAbsent(style.id() + "#" + animation.id(), ignored -> new State(animation));

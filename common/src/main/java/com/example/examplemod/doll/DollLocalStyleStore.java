@@ -52,6 +52,10 @@ public final class DollLocalStyleStore {
         }
         validateSkin(sourceSkin);
 
+        if (template.isBoneModel()) {
+            return importBoneSkin(template, sourceSkin, displayName, resourceManager);
+        }
+
         String key = "user_" + UUID.randomUUID().toString().replace("-", "");
         ResourceLocation id = ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, key);
         ResourceLocation modelId = ResourceLocation.fromNamespaceAndPath(
@@ -101,6 +105,72 @@ public final class DollLocalStyleStore {
                 GSON.toJson(model),
                 StandardCharsets.UTF_8
         );
+        Files.copy(sourceSkin, styleDirectory.resolve("skin.png"), StandardCopyOption.REPLACE_EXISTING);
+        rebuildGeneratedPack();
+        return id;
+    }
+
+    private static ResourceLocation importBoneSkin(
+            DollStyle template,
+            Path sourceSkin,
+            String displayName,
+            ResourceManager resourceManager
+    ) throws IOException {
+        if (template.definitionSource() == null) {
+            throw new IOException("Bone template has no source style definition");
+        }
+        JsonObject templateStyle = readResourceJson(resourceManager, template.definitionSource());
+        JsonObject templateModel = templateStyle.getAsJsonObject("model");
+        if (templateModel == null || !"minecraft_bone".equals(string(templateModel, "type"))) {
+            throw new IOException("Template is not a bone model");
+        }
+        String geometryPath = safeRelativePath(templateModel, "geometry");
+        String animationsPath = templateModel.has("animations")
+                ? safeRelativePath(templateModel, "animations") : null;
+        JsonObject geometry = readResourceJson(
+                resourceManager, resolveRelative(template.definitionSource(), geometryPath));
+        JsonObject animations = animationsPath == null ? null : readResourceJson(
+                resourceManager, resolveRelative(template.definitionSource(), animationsPath));
+
+        String key = "user_" + UUID.randomUUID().toString().replace("-", "");
+        ResourceLocation id = ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, key);
+        ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(
+                Constants.MOD_ID, "textures/item/generated/" + key + "/skin.png");
+
+        JsonObject style = new JsonObject();
+        style.addProperty("format", 2);
+        style.addProperty("id", id.toString());
+        style.addProperty("name", normalizeName(displayName, sourceSkin));
+        style.addProperty("template", template.id().toString());
+        style.addProperty("user_created", true);
+        style.addProperty("origin", DollStyleOrigin.LOCAL.name().toLowerCase());
+
+        JsonObject model = new JsonObject();
+        model.addProperty("type", "minecraft_bone");
+        model.addProperty("geometry", "models/geometry.json");
+        if (animations != null) model.addProperty("animations", "models/animations.json");
+        style.add("model", model);
+
+        JsonObject textures = new JsonObject();
+        textures.addProperty("base", texture.toString());
+        style.add("textures", textures);
+        JsonObject skin = new JsonObject();
+        skin.addProperty("supported", true);
+        skin.addProperty("format", DollSkinDefinition.MINECRAFT_64X64);
+        skin.addProperty("target", "base");
+        skin.addProperty("mapping", "minecraft_player");
+        style.add("skin", skin);
+        if (templateStyle.has("features"))
+            style.add("features", templateStyle.get("features").deepCopy());
+        if (templateStyle.has("animations"))
+            style.add("animations", templateStyle.get("animations").deepCopy());
+
+        Path styleDirectory = stylesDirectory.resolve(key);
+        Files.createDirectories(styleDirectory);
+        Files.writeString(styleDirectory.resolve("style.json"), GSON.toJson(style), StandardCharsets.UTF_8);
+        Files.writeString(styleDirectory.resolve("geometry.json"), GSON.toJson(geometry), StandardCharsets.UTF_8);
+        if (animations != null)
+            Files.writeString(styleDirectory.resolve("animations.json"), GSON.toJson(animations), StandardCharsets.UTF_8);
         Files.copy(sourceSkin, styleDirectory.resolve("skin.png"), StandardCopyOption.REPLACE_EXISTING);
         rebuildGeneratedPack();
         return id;
@@ -186,12 +256,9 @@ public final class DollLocalStyleStore {
     private static void copyStyleToGeneratedPack(Path styleDirectory) {
         try {
             Path metadataFile = styleDirectory.resolve("style.json");
-            Path modelFile = styleDirectory.resolve("model.json");
             Path skinFile = styleDirectory.resolve("skin.png");
-            if (!Files.isRegularFile(metadataFile)
-                    || !Files.isRegularFile(modelFile)
-                    || !Files.isRegularFile(skinFile)) {
-                throw new IOException("Missing style.json, model.json, or skin.png");
+            if (!Files.isRegularFile(metadataFile) || !Files.isRegularFile(skinFile)) {
+                throw new IOException("Missing style.json or skin.png");
             }
             validateSkin(skinFile);
             JsonObject metadata = GSON.fromJson(
@@ -208,32 +275,49 @@ public final class DollLocalStyleStore {
                 throw new IOException("Style id does not match its directory");
             }
             JsonObject modelObject = metadata.getAsJsonObject("model");
-            if (modelObject == null || !modelObject.has("file")) {
-                Constants.LOG.warn("Skipping invalid local style {}: missing model.file", styleDirectory);
-                return;
-            }
-            String modelResourcePath = modelObject.get("file").getAsString();
-            if (modelResourcePath.startsWith("/") || modelResourcePath.contains("..") || !modelResourcePath.startsWith("models/")) {
-                throw new IOException("Invalid model file");
-            }
+            String modelType = string(modelObject, "type");
 
             Path assets = generatedPackDirectory.resolve("assets");
             Path styleTarget = assets.resolve(id.getNamespace()).resolve("styles/generated")
                     .resolve(id.getPath()).resolve("style.json");
-            Path modelTarget = assets.resolve(id.getNamespace()).resolve(modelResourcePath);
             Path skinTarget = assets.resolve(id.getNamespace())
                     .resolve("textures/item/generated")
                     .resolve(id.getPath())
                     .resolve("skin.png");
             Files.createDirectories(styleTarget.getParent());
-            Files.createDirectories(modelTarget.getParent());
             Files.createDirectories(skinTarget.getParent());
             Files.copy(metadataFile, styleTarget, StandardCopyOption.REPLACE_EXISTING);
-            Files.copy(modelFile, modelTarget, StandardCopyOption.REPLACE_EXISTING);
             Files.copy(skinFile, skinTarget, StandardCopyOption.REPLACE_EXISTING);
+
+            if ("minecraft_item".equals(modelType)) {
+                String modelResourcePath = safeRelativePath(modelObject, "file");
+                if (!modelResourcePath.startsWith("models/")) throw new IOException("Invalid model file");
+                Path modelFile = styleDirectory.resolve("model.json");
+                if (!Files.isRegularFile(modelFile)) throw new IOException("Missing model.json");
+                Path modelTarget = assets.resolve(id.getNamespace()).resolve(modelResourcePath);
+                Files.createDirectories(modelTarget.getParent());
+                Files.copy(modelFile, modelTarget, StandardCopyOption.REPLACE_EXISTING);
+            } else if ("minecraft_bone".equals(modelType)) {
+                String geometryPath = safeRelativePath(modelObject, "geometry");
+                copyBoneResource(styleDirectory.resolve("geometry.json"), styleTarget.getParent(), geometryPath);
+                if (modelObject.has("animations")) {
+                    String animationPath = safeRelativePath(modelObject, "animations");
+                    copyBoneResource(styleDirectory.resolve("animations.json"), styleTarget.getParent(), animationPath);
+                }
+            } else {
+                throw new IOException("Unsupported local model type " + modelType);
+            }
         } catch (Exception exception) {
             Constants.LOG.error("Could not load local doll style {}", styleDirectory, exception);
         }
+    }
+
+    private static void copyBoneResource(Path source, Path styleTargetDirectory, String relative) throws IOException {
+        if (!Files.isRegularFile(source)) throw new IOException("Missing " + source.getFileName());
+        Path target = styleTargetDirectory.resolve(relative).normalize();
+        if (!target.startsWith(styleTargetDirectory.normalize())) throw new IOException("Invalid bone model path");
+        Files.createDirectories(target.getParent());
+        Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
     }
 
     private static JsonObject readTemplateModel(
@@ -253,6 +337,33 @@ public final class DollLocalStyleStore {
             }
             return model;
         }
+    }
+
+    private static JsonObject readResourceJson(ResourceManager manager, ResourceLocation location) throws IOException {
+        Resource resource = manager.getResource(location)
+                .orElseThrow(() -> new IOException("Missing template resource " + location));
+        try (Reader reader = resource.openAsReader()) {
+            JsonObject value = GSON.fromJson(reader, JsonObject.class);
+            if (value == null) throw new IOException("Template resource is empty " + location);
+            return value;
+        }
+    }
+
+    private static ResourceLocation resolveRelative(ResourceLocation source, String relative) {
+        String parent = source.getPath().substring(0, source.getPath().lastIndexOf('/') + 1);
+        return ResourceLocation.fromNamespaceAndPath(source.getNamespace(), parent + relative);
+    }
+
+    private static String safeRelativePath(JsonObject object, String member) throws IOException {
+        String value = string(object, member).replace('\\', '/');
+        if (value.isBlank() || value.startsWith("/") || value.contains(".."))
+            throw new IOException("Invalid relative path in " + member);
+        return value;
+    }
+
+    private static String string(JsonObject object, String member) throws IOException {
+        if (object == null || !object.has(member)) throw new IOException("Missing " + member);
+        return object.get(member).getAsString();
     }
 
     private static void replaceTexture(JsonObject model, String slot, String texture) throws IOException {

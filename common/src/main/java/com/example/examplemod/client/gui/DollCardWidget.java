@@ -58,45 +58,48 @@ public final class DollCardWidget extends AbstractWidget {
         );
         graphics.pose().popPose();
 
-        graphics.drawString(font, style.label(), getX() + 61, getY() + 11, 0xFFFFFF);
-        graphics.drawString(font, originLabel(), getX() + 61, getY() + 27, 0xA0A0A0);
+        int textX = getX() + 61;
+        int textWidth = getRight() - textX - 7;
+        graphics.drawString(font, trim(style.label(), textWidth), textX, getY() + 11, 0xFFFFFF);
+        graphics.drawString(font, trim(originLabel(), textWidth), textX, getY() + 27, 0xA0A0A0);
         int detailY = 42;
         if (style.supportsSkin()) {
-            graphics.drawString(
-                    font,
-                    Component.translatable("screen.totemdoll.skin_supported"),
-                    getX() + 61,
-                    getY() + detailY,
-                    0x80C88A
-            );
+            drawDetail(graphics, Component.translatable("screen.totemdoll.skin_supported"), textX, detailY, textWidth, 0x80C88A);
             detailY += 15;
         }
-        if (style.hasAnimations()) {
-            graphics.drawString(font, Component.translatable("screen.totemdoll.dynamic_texture"),
-                    getX() + 61, getY() + detailY, 0x80B8E8);
+        if (style.hasDynamicModel() || style.hasDynamicTextures()) {
+            Component capability = style.hasDynamicModel() && style.hasDynamicTextures()
+                    ? Component.translatable("screen.totemdoll.dynamic_both")
+                    : style.hasDynamicModel()
+                    ? Component.translatable("screen.totemdoll.dynamic_model")
+                    : Component.translatable("screen.totemdoll.dynamic_texture");
+            drawDetail(graphics, capability, textX, detailY, textWidth, 0x80B8E8);
             detailY += 15;
         }
         if (style.isLocal() && style.templateId() != null) {
             DollStyle template = DollStyles.get(style.templateId());
-            graphics.drawString(
-                    font,
+            drawDetail(graphics,
                     Component.translatable("screen.totemdoll.from_template", template.label()),
-                    getX() + 61,
-                    getY() + detailY,
-                    0xA0A0A0
-            );
+                    textX, 72, textWidth, 0xA0A0A0);
         }
-        if (selected) {
-            graphics.drawString(
-                    font,
-                    Component.translatable("screen.totemdoll.current"),
-                    getX() + 61,
-                    getY() + 72,
-                    0x70E088
-            );
+        if (selected && !(style.isLocal() && style.templateId() != null)) {
+            drawDetail(graphics, Component.translatable("screen.totemdoll.current"),
+                    textX, 72, textWidth, 0x70E088);
         }
 
         renderActions(graphics, mouseX, mouseY);
+    }
+
+    private void drawDetail(GuiGraphics graphics, Component text, int x, int y, int width, int color) {
+        graphics.drawString(font, trim(text, width), x, getY() + y, color);
+    }
+
+    private Component trim(Component text, int width) {
+        if (font.width(text) <= width) return text;
+        String value = text.getString();
+        while (!value.isEmpty() && font.width(value + "...") > width)
+            value = value.substring(0, value.length() - 1);
+        return Component.literal(value + "...");
     }
 
     private void renderActions(GuiGraphics graphics, int mouseX, int mouseY) {

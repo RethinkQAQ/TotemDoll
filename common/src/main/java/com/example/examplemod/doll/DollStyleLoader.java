@@ -7,6 +7,11 @@ import com.google.gson.JsonArray;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
+import com.example.examplemod.doll.bone.DollBoneModel;
+import com.example.examplemod.doll.bone.DollBoneModelLoader;
+import com.example.examplemod.doll.bone.DollBoneModels;
+import com.example.examplemod.doll.bone.DollBoneActionManager;
+import com.example.examplemod.client.DollBoneRenderer;
 
 import java.io.Reader;
 import java.util.ArrayList;
@@ -20,6 +25,9 @@ public final class DollStyleLoader {
     private static final Gson GSON = new Gson();
 
     public static List<DollStyle> reload(ResourceManager manager) {
+        DollBoneRenderer.clear();
+        DollBoneActionManager.clear();
+        DollBoneModels.clear();
         Map<ResourceLocation, Resource> resources = manager.listResources(
                 "styles", id -> id.getPath().endsWith("/style.json"));
         List<DollStyle> styles = new ArrayList<>();
@@ -37,22 +45,34 @@ public final class DollStyleLoader {
             if (root == null || !root.has("format") || root.get("format").getAsInt() != 2) {
                 throw new IllegalArgumentException("Expected style format 2");
             }
+            if (root.has("enabled") && !root.get("enabled").getAsBoolean()) {
+                return;
+            }
             ResourceLocation id = requiredId(root, "id");
             JsonObject model = root.getAsJsonObject("model");
-            if (model == null || !"minecraft_item".equals(model.get("type").getAsString())) {
-                throw new IllegalArgumentException("Only minecraft_item models are supported");
+            if (model == null || !model.has("type")) throw new IllegalArgumentException("Missing model.type");
+            String modelType = model.get("type").getAsString();
+            boolean boneModel = "minecraft_bone".equals(modelType);
+            if (!boneModel && !"minecraft_item".equals(modelType))
+                throw new IllegalArgumentException("Unsupported model type " + modelType);
+            ResourceLocation modelId;
+            if (boneModel) {
+                DollBoneModel loadedModel = DollBoneModelLoader.load(manager, source, root, model);
+                DollBoneModels.put(id, loadedModel);
+                modelId = ResourceLocation.withDefaultNamespace("item/totem_of_undying");
+            } else {
+                modelId = resolveAsset(source, requiredPath(model, "file"));
             }
-            String file = requiredPath(model, "file");
-            ResourceLocation modelId = resolveAsset(source, file);
             String name = root.has("name") ? root.get("name").getAsString() : id.toString();
             String nameKey = root.has("name_key") ? root.get("name_key").getAsString() : null;
             ResourceLocation template = root.has("template") ? requiredId(root, "template") : null;
             DollSkinDefinition skin = readSkin(root);
             DollStyleOrigin origin = readOrigin(root, source);
             Map<String, ResourceLocation> textures = readTextures(root);
-            List<DollAnimationDefinition> animations = readAnimations(root, textures);
-            output.add(new DollStyle(id, name, nameKey, modelId, true, template,
-                    origin == DollStyleOrigin.LOCAL, skin, origin, textures, animations));
+            List<DollAnimationDefinition> animations = boneModel ? List.of() : readAnimations(root, textures);
+            output.add(new DollStyle(id, name, nameKey, modelId, !boneModel, template,
+                    origin == DollStyleOrigin.LOCAL, skin, origin, textures, animations,
+                    modelType, source));
         } catch (Exception exception) {
             Constants.LOG.error("Could not load style {}", source, exception);
         }
