@@ -3,8 +3,26 @@ plugins {
     id 'maven-publish'
 }
 
+def targetMatcher = (project.name =~ /^(.+)-(fabric|neoforge)$/)
+if (!targetMatcher.matches()) {
+    throw new GradleException("Unsupported Totem Doll Stonecutter target: ${project.name}")
+}
+def totemDollMinecraftVersion = targetMatcher.group(1)
+def artifactPlatform = targetMatcher.group(2)
+def versionPropertiesFile = project.file('gradle.properties')
+if (!versionPropertiesFile.exists()) {
+    throw new GradleException("Missing target properties: ${versionPropertiesFile}")
+}
+def versionProperties = new Properties()
+versionPropertiesFile.withInputStream { versionProperties.load(it) }
+versionProperties.each { key, value ->
+    project.ext.set(key.toString(), value.toString())
+}
+project.ext.set('totemDollMinecraftVersion', totemDollMinecraftVersion)
+project.ext.set('totemDollLoader', artifactPlatform)
+
 base {
-    archivesName = "${mod_id}-${project.name}-${minecraft_version}"
+    archivesName = "Totem-Doll-${artifactPlatform}-${minecraft_version}"
 }
 
 java {
@@ -87,20 +105,21 @@ processResources {
             'group'                        : project.group, //Else we target the task's group.
             'minecraft_version'            : minecraft_version,
             'minecraft_version_range'      : minecraft_version_range,
-            'fabric_version'               : fabric_version,
-            'fabric_loader_version'        : fabric_loader_version,
             'mod_name'                     : mod_name,
             'mod_author'                   : mod_author,
             'mod_id'                       : mod_id,
             'license'                      : license,
             'description'                  : project.description,
-            'neoforge_version'             : neoforge_version,
-            'neoforge_loader_version_range': neoforge_loader_version_range,
-            "forge_version": forge_version,
-            "forge_loader_version_range": forge_loader_version_range,
             'credits'                      : credits,
             'java_version'                 : java_version
     ]
+    if (artifactPlatform == 'fabric') {
+        expandProps.fabric_version = fabric_version
+        expandProps.fabric_loader_version = fabric_loader_version
+    } else {
+        expandProps.neoforge_version = neoforge_version
+        expandProps.neoforge_loader_version_range = neoforge_loader_version_range
+    }
 
     filesMatching(['pack.mcmeta', 'fabric.mod.json', 'META-INF/mods.toml', 'META-INF/neoforge.mods.toml', '*.mixins.json']) {
         expand expandProps

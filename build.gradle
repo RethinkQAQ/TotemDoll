@@ -1,6 +1,95 @@
 plugins {
-    // see https://fabricmc.net/develop/ for new versions
     id 'fabric-loom' version '1.8-SNAPSHOT' apply false
-    // see https://projects.neoforged.net/neoforged/moddevgradle for new versions
     id 'net.neoforged.moddev' version '2.0.49-beta' apply false
+}
+
+def targetMatcher = (project.name =~ /^(.+)-(fabric|neoforge)$/)
+if (targetMatcher.matches()) {
+    def targetLoader = targetMatcher.group(2)
+    def repositoryRootProject = rootProject
+
+    apply plugin: 'multiloader-common'
+    apply plugin: targetLoader == 'fabric' ? 'fabric-loom' : 'net.neoforged.moddev'
+
+    def mergedMain = file("${buildDir}/generated/totemdoll/main")
+    def mergeMainSources = tasks.register('mergeTotemDollSources', Sync) {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+        from(repositoryRootProject.file('common/src/main'))
+        from(repositoryRootProject.file("${targetLoader}/src/main"))
+        from(project.file('src/main'))
+        into(mergedMain)
+    }
+
+    sourceSets.main.java.setSrcDirs([new File(mergedMain, 'java')])
+    sourceSets.main.resources.setSrcDirs([new File(mergedMain, 'resources')])
+    tasks.named('compileJava') { dependsOn(mergeMainSources) }
+    tasks.named('processResources') { dependsOn(mergeMainSources) }
+
+    dependencies {
+        compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
+        compileOnly group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.3.5'
+        annotationProcessor group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.3.5'
+    }
+
+    if (targetLoader == 'fabric') {
+        dependencies {
+            minecraft "com.mojang:minecraft:${minecraft_version}"
+            mappings loom.layered {
+                officialMojangMappings()
+                parchment("org.parchmentmc.data:parchment-${parchment_minecraft}:${parchment_version}@zip")
+            }
+            modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+            modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+        }
+
+        loom {
+            def aw = repositoryRootProject.file("common/src/main/resources/${mod_id}.accesswidener")
+            if (aw.exists()) {
+                accessWidenerPath.set(aw)
+            }
+            mixin {
+                defaultRefmapName.set("${mod_id}.refmap.json")
+            }
+            runs {
+                def defaultServer = findByName('server')
+                if (defaultServer != null) {
+                    remove(defaultServer)
+                }
+                client {
+                    client()
+                    setConfigName("Fabric Client ${minecraft_version}")
+                    ideConfigGenerated(true)
+                    runDir('runs/client')
+                }
+            }
+        }
+        tasks.matching { it.name == 'runServer' }.configureEach {
+            enabled = false
+            group = null
+            description = 'Disabled: Totem Doll is a client-only mod.'
+        }
+    } else {
+        neoForge {
+            version = neoforge_version
+            def at = repositoryRootProject.file('common/src/main/resources/META-INF/accesstransformer.cfg')
+            if (at.exists()) {
+                accessTransformers.from(at.absolutePath)
+            }
+            parchment {
+                minecraftVersion = parchment_minecraft
+                mappingsVersion = parchment_version
+            }
+            runs {
+                client {
+                    client()
+                    ideName = "NeoForge Client ${minecraft_version}"
+                }
+            }
+            mods {
+                "${mod_id}" {
+                    sourceSet sourceSets.main
+                }
+            }
+        }
+    }
 }

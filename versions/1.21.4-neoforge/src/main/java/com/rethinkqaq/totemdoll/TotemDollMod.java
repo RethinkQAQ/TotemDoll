@@ -1,14 +1,13 @@
 package com.rethinkqaq.totemdoll;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.rethinkqaq.totemdoll.client.TotemDollClient;
 import com.rethinkqaq.totemdoll.client.gui.DollSelectionScreen;
-import com.rethinkqaq.totemdoll.doll.DollStyleLoader;
 import com.rethinkqaq.totemdoll.doll.DollAnimationManager;
 import com.rethinkqaq.totemdoll.doll.DollAnimationModels;
-import com.mojang.blaze3d.platform.InputConstants;
+import com.rethinkqaq.totemdoll.doll.DollStyleLoader;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.loading.FMLEnvironment;
@@ -21,7 +20,6 @@ import org.lwjgl.glfw.GLFW;
 
 @Mod(Constants.MOD_ID)
 public class TotemDollMod {
-
     private static final KeyMapping OPEN_CONFIG = new KeyMapping(
             "key.totemdoll.open_config",
             InputConstants.Type.KEYSYM,
@@ -42,9 +40,8 @@ public class TotemDollMod {
     private void registerAdditionalModels(ModelEvent.RegisterAdditional event) {
         DollStyleLoader.reload(Minecraft.getInstance().getResourceManager())
                 .forEach(style -> {
-                    event.register(new ModelResourceLocation(style.model(), "standalone"));
-                    DollAnimationModels.modelIds(style).forEach(id ->
-                            event.register(new ModelResourceLocation(id, "standalone")));
+                    event.register(style.model());
+                    DollAnimationModels.modelIds(style).forEach(event::register);
                 });
     }
 

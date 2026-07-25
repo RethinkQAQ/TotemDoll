@@ -1,12 +1,12 @@
 # Importing, Testing, and Troubleshooting
 
-Press `F9`, open the import page, and choose either **Import ZIP** or **Import Folder**. Imported packs are copied to:
+Press `F9`, open the import page, and choose **Import ZIP**. The UI intentionally exposes ZIP as the player-facing format. Imported packs are copied to:
 
 ```text
 config/totemdoll/styles/imported/
 ```
 
-Folders are copied as well, so re-import the folder after changing the source files. Deletion is performed at pack level.
+For development, unpacked packs can still be placed directly in the local styles directory; this is intentionally a developer workflow rather than a player-facing import option. Deletion is performed at pack level.
 
 ## Common errors
 

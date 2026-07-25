@@ -6,3 +6,5 @@
 - [Blockbench 骨骼动画工作流](blockbench-animation.md)
 
 English documentation is available in [`docs/en/`](../en/README.md).
+
+多版本开发说明见 [`multiversion-development.md`](multiversion-development.md)。
