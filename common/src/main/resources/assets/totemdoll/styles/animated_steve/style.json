@@ -1,17 +1,16 @@
 ﻿{
     "format":  2,
-    "enabled":  true,
-    "id":  "totemdoll:animated_alex",
+    "id":  "totemdoll:animated_steve",
     "origin":  "builtin",
-    "name":  "Animated Alex Doll",
-    "name_key":  "doll.totemdoll.animated_alex",
+    "name":  "Animated Steve Doll",
+    "name_key":  "doll.totemdoll.animated_steve",
     "model":  {
                   "type":  "minecraft_bone",
                   "geometry":  "models/geometry.json",
                   "animations":  "models/animations.json"
               },
     "textures":  {
-                     "base":  "totemdoll:textures/item/doll/alex.png"
+                     "base":  "totemdoll:textures/item/doll/steve.png"
                  },
     "skin":  {
                  "supported":  true,

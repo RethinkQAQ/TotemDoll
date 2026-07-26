@@ -1,37 +1,58 @@
-{
-  "format": 2,
-  "id": "totemdoll:animated_blink_alex",
-  "origin": "builtin",
-  "name": "Animated Blinking Alex Doll",
-  "name_key": "doll.totemdoll.animated_blink_alex",
-  "model": {
-    "type": "minecraft_bone",
-    "geometry": "models/geometry.json",
-    "animations": "models/animations.json"
-  },
-  "textures": {
-    "base": "totemdoll:textures/item/doll/blink_alex/open.png",
-    "open": "totemdoll:textures/item/doll/blink_alex/open.png",
-    "half": "totemdoll:textures/item/doll/blink_alex/half.png",
-    "close": "totemdoll:textures/item/doll/blink_alex/close.png",
-    "activate": "totemdoll:textures/item/doll/blink_alex/activate.png"
-  },
-  "features": {
-    "animations": true,
-    "dynamic_textures": true
-  },
-  "texture_animations": {
-    "blink": {
-      "type": "frame_sequence",
-      "frames": ["open", "half", "close", "half", "open"],
-      "frame_duration": 3,
-      "trigger": "random_idle",
-      "interval": { "min": 80, "max": 180 }
-    }
-  },
-  "animations": {
-    "idle_head_shake": { "animation": "idle_head_shake", "trigger": "loop", "priority": 20 },
-    "screen_wave": { "animation": "screen_wave", "trigger": "on_screen_open", "priority": 60 },
-    "totem_struggle": { "animation": "animation", "trigger": "on_totem_activate", "priority": 100 }
-  }
+﻿{
+    "format":  2,
+    "id":  "totemdoll:animated_blink_alex",
+    "origin":  "builtin",
+    "name":  "Animated Blinking Alex Doll",
+    "name_key":  "doll.totemdoll.animated_blink_alex",
+    "model":  {
+                  "type":  "minecraft_bone",
+                  "geometry":  "models/geometry.json",
+                  "animations":  "models/animations.json"
+              },
+    "textures":  {
+                     "base":  "totemdoll:textures/item/doll/blink_alex/open.png",
+                     "open":  "totemdoll:textures/item/doll/blink_alex/open.png",
+                     "half":  "totemdoll:textures/item/doll/blink_alex/half.png",
+                     "close":  "totemdoll:textures/item/doll/blink_alex/close.png",
+                     "activate":  "totemdoll:textures/item/doll/blink_alex/activate.png"
+                 },
+    "features":  {
+                     "animations":  true,
+                     "dynamic_textures":  true
+                 },
+    "texture_animations":  {
+                               "blink":  {
+                                             "type":  "frame_sequence",
+                                             "frames":  [
+                                                            "open",
+                                                            "half",
+                                                            "close",
+                                                            "half",
+                                                            "open"
+                                                        ],
+                                             "frame_duration":  3,
+                                             "trigger":  "random_idle",
+                                             "interval":  {
+                                                              "min":  80,
+                                                              "max":  180
+                                                          }
+                                         }
+                           },
+    "animations":  {
+                       "idle_head_shake":  {
+                                               "animation":  "idle_head_shake",
+                                               "trigger":  "loop",
+                                               "priority":  20
+                                           },
+                       "screen_wave":  {
+                                           "animation":  "screen_wave",
+                                           "trigger":  "on_screen_open",
+                                           "priority":  60
+                                       },
+                       "totem_struggle":  {
+                                              "animation":  "struggle",
+                                              "trigger":  "on_totem_activate",
+                                              "priority":  100
+                                          }
+                   }
 }

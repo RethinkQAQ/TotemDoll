@@ -39,7 +39,7 @@ public final class DollSelectionScreen extends Screen implements DollScreenParen
     private static final int SIDEBAR_WIDTH = 104;
     private static final int HEADER_HEIGHT = 92;
     private static final int CARD_GAP = 10;
-    private static final int FOOTER_HEIGHT = 28;
+    private static final int FOOTER_HEIGHT = 36;
 
     private final Screen parent;
     private final Tab tab;
@@ -85,6 +85,7 @@ public final class DollSelectionScreen extends Screen implements DollScreenParen
                             : Component.translatable("screen.totemdoll.create_short")
             );
             cards.add(card);
+            card.setHeight(cardHeight());
             this.addRenderableWidget(card);
         }
         this.addRenderableWidget(Button.builder(
@@ -98,11 +99,11 @@ public final class DollSelectionScreen extends Screen implements DollScreenParen
         this.addRenderableWidget(Button.builder(
                 Component.translatable("gui.done"),
                 button -> onClose()
-        ).bounds(this.width - 108, this.height - 24, 96, 20).build());
+        ).bounds(this.width - 108, this.height - 30, 96, 20).build());
         this.addRenderableWidget(Button.builder(
                 Component.translatable("screen.totemdoll.import_pack"),
                 button -> DollPackScreen.chooseZipAndImport(this)
-        ).bounds(this.width - 220, this.height - 24, 104, 20).build());
+        ).bounds(this.width - 220, this.height - 30, 104, 20).build());
         layoutCards();
     }
 
@@ -167,12 +168,19 @@ public final class DollSelectionScreen extends Screen implements DollScreenParen
             int column = index % columns;
             DollCardWidget card = cards.get(index);
             card.setX(startX + column * (DollCardWidget.CARD_WIDTH + CARD_GAP));
-            card.setY(top + row * (DollCardWidget.CARD_HEIGHT + CARD_GAP) - scrollOffset);
+            card.setY(top + row * (cardHeight() + CARD_GAP) - scrollOffset);
             card.visible = card.getBottom() > top && card.getY() < viewportBottom;
         }
 
         int rows = (cards.size() + columns - 1) / columns;
-        contentHeight = rows * DollCardWidget.CARD_HEIGHT + Math.max(0, rows - 1) * CARD_GAP;
+        contentHeight = rows * cardHeight() + Math.max(0, rows - 1) * CARD_GAP;
+    }
+
+    private int cardHeight() {
+        // Reserve enough space for the footer on short GUI scales. A full
+        // card would otherwise extend below the viewport and be covered by
+        // the import/done buttons.
+        return this.height < 300 ? 100 : DollCardWidget.CARD_HEIGHT;
     }
 
     @Override

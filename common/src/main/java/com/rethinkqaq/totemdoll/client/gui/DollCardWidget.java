@@ -127,7 +127,7 @@ public final class DollCardWidget extends AbstractWidget {
         int left = getX() + 5;
         int right = getRight() - 5;
         boolean hasSecondary = onSecondary != null;
-        int split = hasSecondary ? getX() + CARD_WIDTH / 2 : right;
+        int split = hasSecondary ? getX() + getWidth() / 2 : right;
 
         boolean useHovered = mouseX >= left && mouseX < split
                 && mouseY >= top && mouseY < getBottom() - 4;
@@ -169,7 +169,7 @@ public final class DollCardWidget extends AbstractWidget {
         double relativeX = mouseX - getX();
         double relativeY = mouseY - getY();
         int actionTop = getHeight() - ACTION_HEIGHT - 4;
-        if (relativeY >= actionTop && onSecondary != null && relativeX >= CARD_WIDTH / 2.0D) {
+        if (relativeY >= actionTop && onSecondary != null && relativeX >= getWidth() / 2.0D) {
             onSecondary.run();
             return;
         }
