@@ -30,6 +30,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import com.mojang.blaze3d.platform.NativeImage;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.chat.Component;
@@ -39,6 +40,11 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 public final class DollCreateScreen extends Screen {
+
+    /*? if >=1.21.4 {*/
+    private static final ResourceLocation PREVIEW_TEXTURE =
+            ResourceLocation.fromNamespaceAndPath("totemdoll", "skin_preview");
+    /*?}*/
 
     private final Screen parent;
     private final DollStyle template;
@@ -97,10 +103,18 @@ public final class DollCreateScreen extends Screen {
             skinPath = selected;
             releasePreviewTexture();
             try (var input = java.nio.file.Files.newInputStream(selected)) {
+                /*? if >=1.21.4 {*/
+                this.minecraft.getTextureManager().register(
+                        PREVIEW_TEXTURE,
+                        new DynamicTexture(NativeImage.read(input))
+                );
+                previewTexture = PREVIEW_TEXTURE;
+                /*?} else {*/
                 previewTexture = this.minecraft.getTextureManager().register(
                         "totemdoll_skin_preview",
                         new DynamicTexture(NativeImage.read(input))
                 );
+                /*?}*/
             }
             if (nameBox.getValue().isBlank()) {
                 String fileName = selected.getFileName().toString();
@@ -201,7 +215,12 @@ public final class DollCreateScreen extends Screen {
         if (previewTexture != null) {
             int previewX = Math.min(this.width - 72, this.width / 2 + 140);
             int previewCenter = previewX + 32;
+            /*? if >=1.21.4 {*/
+            graphics.blit(RenderType::guiTextured, previewTexture,
+                    previewX, 104, 0.0F, 0.0F, 64, 64, 64, 64);
+            /*?} else {*/
             graphics.blit(previewTexture, previewX, 104, 0, 0, 64, 64, 64, 64);
+            /*?}*/
             graphics.drawCenteredString(
                     this.font,
                     Component.translatable("screen.totemdoll.skin_preview"),

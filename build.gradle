@@ -31,20 +31,63 @@ if (targetMatcher.matches()) {
     apply plugin: 'multiloader-common'
     apply plugin: targetLoader == 'fabric' ? 'fabric-loom' : 'net.neoforged.moddev'
 
+    // Keep the retained common/platform source layout while applying the
+    // Stonecutter condition syntax before javac sees the files. Stonecutter
+    // 0.7.x only wires its built-in merge task to the default src tree, so the
+    // custom roots are merged here using the same target version selected by
+    // Stonecutter.
+    def sharedMain = [
+            repositoryRootProject.file('common/src/main'),
+            repositoryRootProject.file("${targetLoader}/src/main"),
+            project.file('src/main')
+    ]
     def mergedMain = file("${buildDir}/generated/totemdoll/main")
-    def mergeMainSources = tasks.register('mergeTotemDollSources', Sync) {
-        duplicatesStrategy = DuplicatesStrategy.INCLUDE
-        from(repositoryRootProject.file('common/src/main'))
-        from(repositoryRootProject.file("${targetLoader}/src/main"))
-        from(project.file('src/main'))
-        into(mergedMain)
+    def modernMinecraft = targetMatcher.group(1) == '1.21.4'
+    def mergeMainSources = tasks.register('mergeTotemDollSources') {
+        inputs.files(sharedMain)
+        outputs.dir(mergedMain)
+        doLast {
+            delete(mergedMain)
+            sharedMain.each { root ->
+                fileTree(root).files.each { sourceFile ->
+                    def relative = root.toPath().relativize(sourceFile.toPath()).toString()
+                    def destination = new File(mergedMain, relative)
+                    destination.parentFile.mkdirs()
+                    if (sourceFile.name.endsWith('.java')) {
+                        def output = []
+                        def states = []
+                        def enabled = true
+                        sourceFile.eachLine('UTF-8') { line ->
+                            if (line ==~ /\s*\/\*\?\s*if\s+>=1\.21\.4\s*\{\*\/\s*/) {
+                                states << enabled
+                                enabled = enabled && modernMinecraft
+                            } else if (line ==~ /\s*\/\*\?\}\s*else\s*\{\*\/\s*/) {
+                                enabled = states[-1] && !modernMinecraft
+                            } else if (line ==~ /\s*\/\*\?\}\s*\*\/\s*/) {
+                                enabled = states.remove(states.size() - 1)
+                            } else if (enabled) {
+                                output << line
+                            }
+                        }
+                        if (!states.isEmpty()) {
+                            throw new GradleException("Unclosed Stonecutter condition in ${sourceFile}")
+                        }
+                        destination.setText(output.join(System.lineSeparator()) + System.lineSeparator(), 'UTF-8')
+                    } else {
+                        destination.bytes = sourceFile.bytes
+                    }
+                }
+            }
+        }
     }
-
     sourceSets.main.java.setSrcDirs([new File(mergedMain, 'java')])
     sourceSets.main.resources.setSrcDirs([new File(mergedMain, 'resources')])
     tasks.named('compileJava') { dependsOn(mergeMainSources) }
-    tasks.named('processResources') { dependsOn(mergeMainSources) }
     tasks.named('sourcesJar') { dependsOn(mergeMainSources) }
+    tasks.named('processResources') {
+        dependsOn(mergeMainSources)
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    }
 
     dependencies {
         compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
