@@ -1,0 +1,3 @@
+.dynamic-frame-thumb{width:34px;height:34px;object-fit:contain;image-rendering:pixelated;background:#111613;border:1px solid #465346;flex:none}
+.dynamic-frame-thumb.missing{display:grid;place-items:center;color:#d36b6b;font:14px "DM Mono"}
+.base-texture-row button{border:0;background:transparent;color:#e2da8b;padding:4px;display:grid;place-items:center;cursor:pointer}

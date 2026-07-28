@@ -23,3 +23,9 @@ build
 eclipse
 run
 runs
+
+# web
+web/node_modules/
+web/dist/
+.pnpm-store/
+*.tsbuildinfo

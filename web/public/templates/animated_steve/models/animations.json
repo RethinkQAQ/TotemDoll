@@ -1,0 +1,923 @@
+﻿{
+    "format":  1,
+    "animations":  {
+                       "screen_wave":  {
+                                           "loop":  false,
+                                           "length":  25,
+                                           "bones":  {
+                                                         "head":  {
+                                                                      "rotation":  [
+                                                                                       {
+                                                                                           "time":  0,
+                                                                                           "value":  [
+                                                                                                         0,
+                                                                                                         0,
+                                                                                                         0
+                                                                                                     ],
+                                                                                           "interpolation":  "catmullrom"
+                                                                                       },
+                                                                                       {
+                                                                                           "time":  5,
+                                                                                           "value":  [
+                                                                                                         6.5133,
+                                                                                                         14.3474,
+                                                                                                         5.8435
+                                                                                                     ],
+                                                                                           "interpolation":  "catmullrom"
+                                                                                       },
+                                                                                       {
+                                                                                           "time":  25,
+                                                                                           "value":  [
+                                                                                                         0,
+                                                                                                         0,
+                                                                                                         0
+                                                                                                     ],
+                                                                                           "interpolation":  "catmullrom"
+                                                                                       },
+                                                                                       {
+                                                                                           "time":  20,
+                                                                                           "value":  [
+                                                                                                         6.5133,
+                                                                                                         14.3474,
+                                                                                                         5.8435
+                                                                                                     ],
+                                                                                           "interpolation":  "catmullrom"
+                                                                                       }
+                                                                                   ]
+                                                                  },
+                                                         "body":  {
+                                                                      "rotation":  [
+                                                                                       {
+                                                                                           "time":  0,
+                                                                                           "value":  [
+                                                                                                         0,
+                                                                                                         0,
+                                                                                                         0
+                                                                                                     ],
+                                                                                           "interpolation":  "catmullrom"
+                                                                                       },
+                                                                                       {
+                                                                                           "time":  5,
+                                                                                           "value":  [
+                                                                                                         12.5,
+                                                                                                         12.5,
+                                                                                                         0
+                                                                                                     ],
+                                                                                           "interpolation":  "catmullrom"
+                                                                                       },
+                                                                                       {
+                                                                                           "time":  25,
+                                                                                           "value":  [
+                                                                                                         0,
+                                                                                                         0,
+                                                                                                         0
+                                                                                                     ],
+                                                                                           "interpolation":  "catmullrom"
+                                                                                       },
+                                                                                       {
+                                                                                           "time":  20,
+                                                                                           "value":  [
+                                                                                                         12.5,
+                                                                                                         12.5,
+                                                                                                         0
+                                                                                                     ],
+                                                                                           "interpolation":  "catmullrom"
+                                                                                       }
+                                                                                   ]
+                                                                  },
+                                                         "left_arm":  {
+                                                                          "rotation":  [
+                                                                                           {
+                                                                                               "time":  5,
+                                                                                               "value":  [
+                                                                                                             -22.3774,
+                                                                                                             -1.936,
+                                                                                                             -7.2472
+                                                                                                         ],
+                                                                                               "interpolation":  "catmullrom"
+                                                                                           },
+                                                                                           {
+                                                                                               "time":  0,
+                                                                                               "value":  [
+                                                                                                             0,
+                                                                                                             0,
+                                                                                                             0
+                                                                                                         ],
+                                                                                               "interpolation":  "catmullrom"
+                                                                                           },
+                                                                                           {
+                                                                                               "time":  25,
+                                                                                               "value":  [
+                                                                                                             0,
+                                                                                                             0,
+                                                                                                             0
+                                                                                                         ],
+                                                                                               "interpolation":  "catmullrom"
+                                                                                           },
+                                                                                           {
+                                                                                               "time":  20,
+                                                                                               "value":  [
+                                                                                                             -22.3774,
+                                                                                                             -1.936,
+                                                                                                             -7.2472
+                                                                                                         ],
+                                                                                               "interpolation":  "catmullrom"
+                                                                                           }
+                                                                                       ]
+                                                                      },
+                                                         "right_arm":  {
+                                                                           "rotation":  [
+                                                                                            {
+                                                                                                "time":  0,
+                                                                                                "value":  [
+                                                                                                              0,
+                                                                                                              0,
+                                                                                                              0
+                                                                                                          ],
+                                                                                                "interpolation":  "catmullrom"
+                                                                                            },
+                                                                                            {
+                                                                                                "time":  5,
+                                                                                                "value":  [
+                                                                                                              110,
+                                                                                                              0,
+                                                                                                              0
+                                                                                                          ],
+                                                                                                "interpolation":  "catmullrom"
+                                                                                            },
+                                                                                            {
+                                                                                                "time":  7.5,
+                                                                                                "value":  [
+                                                                                                              97.5,
+                                                                                                              0,
+                                                                                                              0
+                                                                                                          ],
+                                                                                                "interpolation":  "catmullrom"
+                                                                                            },
+                                                                                            {
+                                                                                                "time":  10,
+                                                                                                "value":  [
+                                                                                                              110,
+                                                                                                              0,
+                                                                                                              0
+                                                                                                          ],
+                                                                                                "interpolation":  "catmullrom"
+                                                                                            },
+                                                                                            {
+                                                                                                "time":  12.5,
+                                                                                                "value":  [
+                                                                                                              97.5,
+                                                                                                              0,
+                                                                                                              0
+                                                                                                          ],
+                                                                                                "interpolation":  "catmullrom"
+                                                                                            },
+                                                                                            {
+                                                                                                "time":  17.5,
+                                                                                                "value":  [
+                                                                                                              97.5,
+                                                                                                              0,
+                                                                                                              0
+                                                                                                          ],
+                                                                                                "interpolation":  "catmullrom"
+                                                                                            },
+                                                                                            {
+                                                                                                "time":  15,
+                                                                                                "value":  [
+                                                                                                              110,
+                                                                                                              0,
+                                                                                                              0
+                                                                                                          ],
+                                                                                                "interpolation":  "catmullrom"
+                                                                                            },
+                                                                                            {
+                                                                                                "time":  25,
+                                                                                                "value":  [
+                                                                                                              0,
+                                                                                                              0,
+                                                                                                              0
+                                                                                                          ],
+                                                                                                "interpolation":  "catmullrom"
+                                                                                            },
+                                                                                            {
+                                                                                                "time":  20,
+                                                                                                "value":  [
+                                                                                                              110,
+                                                                                                              0,
+                                                                                                              0
+                                                                                                          ],
+                                                                                                "interpolation":  "catmullrom"
+                                                                                            }
+                                                                                        ],
+                                                                           "position":  [
+                                                                                            {
+                                                                                                "time":  0,
+                                                                                                "value":  [
+                                                                                                              0,
+                                                                                                              0,
+                                                                                                              0
+                                                                                                          ],
+                                                                                                "interpolation":  "catmullrom"
+                                                                                            },
+                                                                                            {
+                                                                                                "time":  5,
+                                                                                                "value":  [
+                                                                                                              0,
+                                                                                                              0,
+                                                                                                              -1
+                                                                                                          ],
+                                                                                                "interpolation":  "catmullrom"
+                                                                                            },
+                                                                                            {
+                                                                                                "time":  25,
+                                                                                                "value":  [
+                                                                                                              0,
+                                                                                                              0,
+                                                                                                              0
+                                                                                                          ],
+                                                                                                "interpolation":  "catmullrom"
+                                                                                            },
+                                                                                            {
+                                                                                                "time":  20,
+                                                                                                "value":  [
+                                                                                                              0,
+                                                                                                              0,
+                                                                                                              -1
+                                                                                                          ],
+                                                                                                "interpolation":  "catmullrom"
+                                                                                            }
+                                                                                        ]
+                                                                       }
+                                                     }
+                                       },
+                       "idle_head_shake":  {
+                                               "loop":  true,
+                                               "length":  80,
+                                               "bones":  {
+                                                             "head":  {
+                                                                          "rotation":  [
+                                                                                           {
+                                                                                               "time":  0,
+                                                                                               "value":  [
+                                                                                                             0,
+                                                                                                             0,
+                                                                                                             0
+                                                                                                         ],
+                                                                                               "interpolation":  "bezier"
+                                                                                           },
+                                                                                           {
+                                                                                               "time":  10,
+                                                                                               "value":  [
+                                                                                                             0,
+                                                                                                             0,
+                                                                                                             -2.5
+                                                                                                         ],
+                                                                                               "interpolation":  "bezier"
+                                                                                           },
+                                                                                           {
+                                                                                               "time":  20,
+                                                                                               "value":  [
+                                                                                                             0,
+                                                                                                             0,
+                                                                                                             0
+                                                                                                         ],
+                                                                                               "interpolation":  "bezier"
+                                                                                           },
+                                                                                           {
+                                                                                               "time":  30,
+                                                                                               "value":  [
+                                                                                                             0,
+                                                                                                             0,
+                                                                                                             2.5
+                                                                                                         ],
+                                                                                               "interpolation":  "bezier"
+                                                                                           },
+                                                                                           {
+                                                                                               "time":  40,
+                                                                                               "value":  [
+                                                                                                             0,
+                                                                                                             0,
+                                                                                                             0
+                                                                                                         ],
+                                                                                               "interpolation":  "bezier"
+                                                                                           },
+                                                                                           {
+                                                                                               "time":  60,
+                                                                                               "value":  [
+                                                                                                             0,
+                                                                                                             0,
+                                                                                                             0
+                                                                                                         ],
+                                                                                               "interpolation":  "bezier"
+                                                                                           },
+                                                                                           {
+                                                                                               "time":  80,
+                                                                                               "value":  [
+                                                                                                             0,
+                                                                                                             0,
+                                                                                                             0
+                                                                                                         ],
+                                                                                               "interpolation":  "bezier"
+                                                                                           },
+                                                                                           {
+                                                                                               "time":  50,
+                                                                                               "value":  [
+                                                                                                             0,
+                                                                                                             0,
+                                                                                                             -2.5
+                                                                                                         ],
+                                                                                               "interpolation":  "bezier"
+                                                                                           },
+                                                                                           {
+                                                                                               "time":  70,
+                                                                                               "value":  [
+                                                                                                             0,
+                                                                                                             0,
+                                                                                                             2.5
+                                                                                                         ],
+                                                                                               "interpolation":  "bezier"
+                                                                                           }
+                                                                                       ]
+                                                                      },
+                                                             "body":  {
+                                                                          "rotation":  [
+                                                                                           {
+                                                                                               "time":  80,
+                                                                                               "value":  [
+                                                                                                             0,
+                                                                                                             0,
+                                                                                                             0
+                                                                                                         ],
+                                                                                               "interpolation":  "catmullrom"
+                                                                                           },
+                                                                                           {
+                                                                                               "time":  10,
+                                                                                               "value":  [
+                                                                                                             0,
+                                                                                                             0,
+                                                                                                             -5
+                                                                                                         ],
+                                                                                               "interpolation":  "catmullrom"
+                                                                                           },
+                                                                                           {
+                                                                                               "time":  20,
+                                                                                               "value":  [
+                                                                                                             0,
+                                                                                                             0,
+                                                                                                             0
+                                                                                                         ],
+                                                                                               "interpolation":  "catmullrom"
+                                                                                           },
+                                                                                           {
+                                                                                               "time":  30,
+                                                                                               "value":  [
+                                                                                                             0,
+                                                                                                             0,
+                                                                                                             5
+                                                                                                         ],
+                                                                                               "interpolation":  "catmullrom"
+                                                                                           },
+                                                                                           {
+                                                                                               "time":  40,
+                                                                                               "value":  [
+                                                                                                             0,
+                                                                                                             0,
+                                                                                                             0
+                                                                                                         ],
+                                                                                               "interpolation":  "catmullrom"
+                                                                                           },
+                                                                                           {
+                                                                                               "time":  60,
+                                                                                               "value":  [
+                                                                                                             0,
+                                                                                                             0,
+                                                                                                             0
+                                                                                                         ],
+                                                                                               "interpolation":  "catmullrom"
+                                                                                           },
+                                                                                           {
+                                                                                               "time":  50,
+                                                                                               "value":  [
+                                                                                                             0,
+                                                                                                             0,
+                                                                                                             -5
+                                                                                                         ],
+                                                                                               "interpolation":  "catmullrom"
+                                                                                           },
+                                                                                           {
+                                                                                               "time":  70,
+                                                                                               "value":  [
+                                                                                                             0,
+                                                                                                             0,
+                                                                                                             5
+                                                                                                         ],
+                                                                                               "interpolation":  "catmullrom"
+                                                                                           },
+                                                                                           {
+                                                                                               "time":  0,
+                                                                                               "value":  [
+                                                                                                             0,
+                                                                                                             0,
+                                                                                                             0
+                                                                                                         ],
+                                                                                               "interpolation":  "catmullrom"
+                                                                                           }
+                                                                                       ]
+                                                                      },
+                                                             "left_arm":  {
+                                                                              "rotation":  [
+                                                                                               {
+                                                                                                   "time":  0,
+                                                                                                   "value":  [
+                                                                                                                 0,
+                                                                                                                 0,
+                                                                                                                 0
+                                                                                                             ],
+                                                                                                   "interpolation":  "catmullrom"
+                                                                                               },
+                                                                                               {
+                                                                                                   "time":  20,
+                                                                                                   "value":  [
+                                                                                                                 0,
+                                                                                                                 0,
+                                                                                                                 0
+                                                                                                             ],
+                                                                                                   "interpolation":  "catmullrom"
+                                                                                               },
+                                                                                               {
+                                                                                                   "time":  40,
+                                                                                                   "value":  [
+                                                                                                                 0,
+                                                                                                                 0,
+                                                                                                                 0
+                                                                                                             ],
+                                                                                                   "interpolation":  "catmullrom"
+                                                                                               },
+                                                                                               {
+                                                                                                   "time":  60,
+                                                                                                   "value":  [
+                                                                                                                 0,
+                                                                                                                 0,
+                                                                                                                 0
+                                                                                                             ],
+                                                                                                   "interpolation":  "catmullrom"
+                                                                                               },
+                                                                                               {
+                                                                                                   "time":  80,
+                                                                                                   "value":  [
+                                                                                                                 0,
+                                                                                                                 0,
+                                                                                                                 0
+                                                                                                             ],
+                                                                                                   "interpolation":  "catmullrom"
+                                                                                               },
+                                                                                               {
+                                                                                                   "time":  10,
+                                                                                                   "value":  [
+                                                                                                                 0,
+                                                                                                                 0,
+                                                                                                                 5
+                                                                                                             ],
+                                                                                                   "interpolation":  "catmullrom"
+                                                                                               },
+                                                                                               {
+                                                                                                   "time":  30,
+                                                                                                   "value":  [
+                                                                                                                 0,
+                                                                                                                 0,
+                                                                                                                 -5
+                                                                                                             ],
+                                                                                                   "interpolation":  "catmullrom"
+                                                                                               },
+                                                                                               {
+                                                                                                   "time":  50,
+                                                                                                   "value":  [
+                                                                                                                 0,
+                                                                                                                 0,
+                                                                                                                 5
+                                                                                                             ],
+                                                                                                   "interpolation":  "catmullrom"
+                                                                                               },
+                                                                                               {
+                                                                                                   "time":  70,
+                                                                                                   "value":  [
+                                                                                                                 0,
+                                                                                                                 0,
+                                                                                                                 -5
+                                                                                                             ],
+                                                                                                   "interpolation":  "catmullrom"
+                                                                                               }
+                                                                                           ]
+                                                                          },
+                                                             "right_arm":  {
+                                                                               "rotation":  [
+                                                                                                {
+                                                                                                    "time":  0,
+                                                                                                    "value":  [
+                                                                                                                  0,
+                                                                                                                  0,
+                                                                                                                  0
+                                                                                                              ],
+                                                                                                    "interpolation":  "bezier"
+                                                                                                },
+                                                                                                {
+                                                                                                    "time":  10,
+                                                                                                    "value":  [
+                                                                                                                  0,
+                                                                                                                  0,
+                                                                                                                  5
+                                                                                                              ],
+                                                                                                    "interpolation":  "bezier"
+                                                                                                },
+                                                                                                {
+                                                                                                    "time":  20,
+                                                                                                    "value":  [
+                                                                                                                  0,
+                                                                                                                  0,
+                                                                                                                  0
+                                                                                                              ],
+                                                                                                    "interpolation":  "bezier"
+                                                                                                },
+                                                                                                {
+                                                                                                    "time":  40,
+                                                                                                    "value":  [
+                                                                                                                  0,
+                                                                                                                  0,
+                                                                                                                  0
+                                                                                                              ],
+                                                                                                    "interpolation":  "bezier"
+                                                                                                },
+                                                                                                {
+                                                                                                    "time":  60,
+                                                                                                    "value":  [
+                                                                                                                  0,
+                                                                                                                  0,
+                                                                                                                  0
+                                                                                                              ],
+                                                                                                    "interpolation":  "bezier"
+                                                                                                },
+                                                                                                {
+                                                                                                    "time":  80,
+                                                                                                    "value":  [
+                                                                                                                  0,
+                                                                                                                  0,
+                                                                                                                  0
+                                                                                                              ],
+                                                                                                    "interpolation":  "bezier"
+                                                                                                },
+                                                                                                {
+                                                                                                    "time":  30,
+                                                                                                    "value":  [
+                                                                                                                  0,
+                                                                                                                  0,
+                                                                                                                  -5
+                                                                                                              ],
+                                                                                                    "interpolation":  "bezier"
+                                                                                                },
+                                                                                                {
+                                                                                                    "time":  50,
+                                                                                                    "value":  [
+                                                                                                                  0,
+                                                                                                                  0,
+                                                                                                                  5
+                                                                                                              ],
+                                                                                                    "interpolation":  "bezier"
+                                                                                                },
+                                                                                                {
+                                                                                                    "time":  70,
+                                                                                                    "value":  [
+                                                                                                                  0,
+                                                                                                                  0,
+                                                                                                                  -5
+                                                                                                              ],
+                                                                                                    "interpolation":  "bezier"
+                                                                                                }
+                                                                                            ]
+                                                                           },
+                                                             "left_leg":  {
+                                                                              "rotation":  [
+                                                                                               {
+                                                                                                   "time":  0,
+                                                                                                   "value":  [
+                                                                                                                 0,
+                                                                                                                 0,
+                                                                                                                 0
+                                                                                                             ],
+                                                                                                   "interpolation":  "bezier"
+                                                                                               },
+                                                                                               {
+                                                                                                   "time":  10,
+                                                                                                   "value":  [
+                                                                                                                 5,
+                                                                                                                 0,
+                                                                                                                 0
+                                                                                                             ],
+                                                                                                   "interpolation":  "bezier"
+                                                                                               },
+                                                                                               {
+                                                                                                   "time":  20,
+                                                                                                   "value":  [
+                                                                                                                 0,
+                                                                                                                 0,
+                                                                                                                 0
+                                                                                                             ],
+                                                                                                   "interpolation":  "bezier"
+                                                                                               },
+                                                                                               {
+                                                                                                   "time":  30,
+                                                                                                   "value":  [
+                                                                                                                 -5,
+                                                                                                                 0,
+                                                                                                                 0
+                                                                                                             ],
+                                                                                                   "interpolation":  "bezier"
+                                                                                               },
+                                                                                               {
+                                                                                                   "time":  40,
+                                                                                                   "value":  [
+                                                                                                                 0,
+                                                                                                                 0,
+                                                                                                                 0
+                                                                                                             ],
+                                                                                                   "interpolation":  "bezier"
+                                                                                               },
+                                                                                               {
+                                                                                                   "time":  50,
+                                                                                                   "value":  [
+                                                                                                                 5,
+                                                                                                                 0,
+                                                                                                                 0
+                                                                                                             ],
+                                                                                                   "interpolation":  "bezier"
+                                                                                               },
+                                                                                               {
+                                                                                                   "time":  60,
+                                                                                                   "value":  [
+                                                                                                                 0,
+                                                                                                                 0,
+                                                                                                                 0
+                                                                                                             ],
+                                                                                                   "interpolation":  "bezier"
+                                                                                               },
+                                                                                               {
+                                                                                                   "time":  80,
+                                                                                                   "value":  [
+                                                                                                                 0,
+                                                                                                                 0,
+                                                                                                                 0
+                                                                                                             ],
+                                                                                                   "interpolation":  "bezier"
+                                                                                               },
+                                                                                               {
+                                                                                                   "time":  70,
+                                                                                                   "value":  [
+                                                                                                                 -5,
+                                                                                                                 0,
+                                                                                                                 0
+                                                                                                             ],
+                                                                                                   "interpolation":  "bezier"
+                                                                                               }
+                                                                                           ]
+                                                                          },
+                                                             "right_leg":  {
+                                                                               "rotation":  [
+                                                                                                {
+                                                                                                    "time":  0,
+                                                                                                    "value":  [
+                                                                                                                  0,
+                                                                                                                  0,
+                                                                                                                  0
+                                                                                                              ],
+                                                                                                    "interpolation":  "bezier"
+                                                                                                },
+                                                                                                {
+                                                                                                    "time":  10,
+                                                                                                    "value":  [
+                                                                                                                  -5,
+                                                                                                                  0,
+                                                                                                                  0
+                                                                                                              ],
+                                                                                                    "interpolation":  "bezier"
+                                                                                                },
+                                                                                                {
+                                                                                                    "time":  20,
+                                                                                                    "value":  [
+                                                                                                                  0,
+                                                                                                                  0,
+                                                                                                                  0
+                                                                                                              ],
+                                                                                                    "interpolation":  "bezier"
+                                                                                                },
+                                                                                                {
+                                                                                                    "time":  30,
+                                                                                                    "value":  [
+                                                                                                                  5,
+                                                                                                                  0,
+                                                                                                                  0
+                                                                                                              ],
+                                                                                                    "interpolation":  "bezier"
+                                                                                                },
+                                                                                                {
+                                                                                                    "time":  40,
+                                                                                                    "value":  [
+                                                                                                                  0,
+                                                                                                                  0,
+                                                                                                                  0
+                                                                                                              ],
+                                                                                                    "interpolation":  "bezier"
+                                                                                                },
+                                                                                                {
+                                                                                                    "time":  60,
+                                                                                                    "value":  [
+                                                                                                                  0,
+                                                                                                                  0,
+                                                                                                                  0
+                                                                                                              ],
+                                                                                                    "interpolation":  "bezier"
+                                                                                                },
+                                                                                                {
+                                                                                                    "time":  80,
+                                                                                                    "value":  [
+                                                                                                                  0,
+                                                                                                                  0,
+                                                                                                                  0
+                                                                                                              ],
+                                                                                                    "interpolation":  "bezier"
+                                                                                                },
+                                                                                                {
+                                                                                                    "time":  50,
+                                                                                                    "value":  [
+                                                                                                                  -5,
+                                                                                                                  0,
+                                                                                                                  0
+                                                                                                              ],
+                                                                                                    "interpolation":  "bezier"
+                                                                                                },
+                                                                                                {
+                                                                                                    "time":  70,
+                                                                                                    "value":  [
+                                                                                                                  5,
+                                                                                                                  0,
+                                                                                                                  0
+                                                                                                              ],
+                                                                                                    "interpolation":  "bezier"
+                                                                                                }
+                                                                                            ]
+                                                                           }
+                                                         }
+                                           },
+                       "struggle":  {
+                                        "loop":  false,
+                                        "length":  10,
+                                        "bones":  {
+                                                      "head":  {
+                                                                   "rotation":  [
+                                                                                    {
+                                                                                        "time":  0,
+                                                                                        "value":  [
+                                                                                                      0,
+                                                                                                      -12.5,
+                                                                                                      0
+                                                                                                  ],
+                                                                                        "interpolation":  "linear"
+                                                                                    },
+                                                                                    {
+                                                                                        "time":  5,
+                                                                                        "value":  [
+                                                                                                      0,
+                                                                                                      12.5,
+                                                                                                      0
+                                                                                                  ],
+                                                                                        "interpolation":  "linear"
+                                                                                    },
+                                                                                    {
+                                                                                        "time":  10,
+                                                                                        "value":  [
+                                                                                                      0,
+                                                                                                      -12.5,
+                                                                                                      0
+                                                                                                  ],
+                                                                                        "interpolation":  "linear"
+                                                                                    }
+                                                                                ]
+                                                               },
+                                                      "left_arm":  {
+                                                                       "rotation":  [
+                                                                                        {
+                                                                                            "time":  0,
+                                                                                            "value":  [
+                                                                                                          180,
+                                                                                                          0,
+                                                                                                          27.5
+                                                                                                      ],
+                                                                                            "interpolation":  "linear"
+                                                                                        },
+                                                                                        {
+                                                                                            "time":  2.5,
+                                                                                            "value":  [
+                                                                                                          180,
+                                                                                                          0,
+                                                                                                          17.5
+                                                                                                      ],
+                                                                                            "interpolation":  "linear"
+                                                                                        },
+                                                                                        {
+                                                                                            "time":  5,
+                                                                                            "value":  [
+                                                                                                          180,
+                                                                                                          0,
+                                                                                                          27.5
+                                                                                                      ],
+                                                                                            "interpolation":  "linear"
+                                                                                        },
+                                                                                        {
+                                                                                            "time":  7.5,
+                                                                                            "value":  [
+                                                                                                          180,
+                                                                                                          0,
+                                                                                                          17.5
+                                                                                                      ],
+                                                                                            "interpolation":  "linear"
+                                                                                        },
+                                                                                        {
+                                                                                            "time":  10,
+                                                                                            "value":  [
+                                                                                                          180,
+                                                                                                          0,
+                                                                                                          27.5
+                                                                                                      ],
+                                                                                            "interpolation":  "linear"
+                                                                                        }
+                                                                                    ],
+                                                                       "position":  {
+                                                                                        "time":  0,
+                                                                                        "value":  [
+                                                                                                      0,
+                                                                                                      -1,
+                                                                                                      0
+                                                                                                  ],
+                                                                                        "interpolation":  "linear"
+                                                                                    }
+                                                                   },
+                                                      "right_arm":  {
+                                                                        "rotation":  [
+                                                                                         {
+                                                                                             "time":  0,
+                                                                                             "value":  [
+                                                                                                           177.7823,
+                                                                                                           -1.154,
+                                                                                                           -27.4776
+                                                                                                       ],
+                                                                                             "interpolation":  "linear"
+                                                                                         },
+                                                                                         {
+                                                                                             "time":  2.5,
+                                                                                             "value":  [
+                                                                                                           177.6157,
+                                                                                                           -0.7515,
+                                                                                                           -17.4843
+                                                                                                       ],
+                                                                                             "interpolation":  "linear"
+                                                                                         },
+                                                                                         {
+                                                                                             "time":  5,
+                                                                                             "value":  [
+                                                                                                           177.7823,
+                                                                                                           -1.154,
+                                                                                                           -27.4776
+                                                                                                       ],
+                                                                                             "interpolation":  "linear"
+                                                                                         },
+                                                                                         {
+                                                                                             "time":  7.5,
+                                                                                             "value":  [
+                                                                                                           177.6157,
+                                                                                                           -0.7515,
+                                                                                                           -17.4843
+                                                                                                       ],
+                                                                                             "interpolation":  "linear"
+                                                                                         },
+                                                                                         {
+                                                                                             "time":  10,
+                                                                                             "value":  [
+                                                                                                           177.7823,
+                                                                                                           -1.154,
+                                                                                                           -27.4776
+                                                                                                       ],
+                                                                                             "interpolation":  "linear"
+                                                                                         }
+                                                                                     ],
+                                                                        "position":  {
+                                                                                         "time":  0,
+                                                                                         "value":  [
+                                                                                                       0,
+                                                                                                       -1,
+                                                                                                       0
+                                                                                                   ],
+                                                                                         "interpolation":  "linear"
+                                                                                     }
+                                                                    }
+                                                  }
+                                    }
+                   }
+}
