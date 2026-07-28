@@ -34,7 +34,7 @@ jobs:
           if [[ -n "${{ inputs.release_version }}" ]]; then
             echo "BUILD_VERSION=${{ inputs.release_version }}" >> "$GITHUB_ENV"
           else
-            echo "BUILD_VERSION=0.1-alpha.build.${GITHUB_RUN_NUMBER}" >> "$GITHUB_ENV"
+            echo "BUILD_VERSION=0.1.1-alpha.build.${GITHUB_RUN_NUMBER}" >> "$GITHUB_ENV"
           fi
 
       - name: Build all targets
@@ -46,7 +46,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p artifacts
-          find versions -type f -path '*/build/libs/*.jar' -print0 \
+          find fabric neoforge -type f -path '*/build/libs/*.jar' -print0 \
             | xargs -0 -r -I{} cp --parents "{}" artifacts/
           cd artifacts
           zip -r "../Totem-Doll-${BUILD_VERSION}.zip" .

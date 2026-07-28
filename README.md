@@ -27,11 +27,11 @@ List the generated version/loader projects with:
 Build a specific target with:
 
 ```powershell
-.\gradlew.bat :1.21.1-fabric:build
-.\gradlew.bat :1.21.1-neoforge:build
-.\gradlew.bat :1.21.4-fabric:build
-.\gradlew.bat :1.21.4-neoforge:build
+.\gradlew.bat :fabric:1.21.1:build
+.\gradlew.bat :neoforge:1.21.1:build
+.\gradlew.bat :fabric:1.21.4:build
+.\gradlew.bat :neoforge:1.21.4:build
 ```
 
-Each Stonecutter target lives under `versions/<minecraft-version>-<loader>/` and contains its target properties and optional source overrides. The root `common/`, `fabric/`, and `neoforge/` directories remain shared. Forge and dedicated-server run configurations are not supported.
+Each Minecraft version keeps its properties and optional overrides under `versions/<minecraft-version>/`. Stonecutter exposes the shared `common`, `fabric`, and `neoforge` branches as indexed Gradle modules; runnable targets use paths such as `:fabric:1.21.1` and `:neoforge:1.21.1`. Forge and dedicated-server run configurations are not supported.
 

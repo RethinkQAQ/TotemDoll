@@ -9,36 +9,50 @@ common/
 fabric/
 neoforge/
 versions/
-├── 1.21.1-fabric/
-├── 1.21.1-neoforge/
-├── 1.21.4-fabric/
-└── 1.21.4-neoforge/
+├── 1.21.1/
+└── 1.21.4/
 ```
 
-根目录保存共享源码。`versions/` 下的每个目录都是一个 Stonecutter 构建目标。目录内的 `gradle.properties` 保存映射与平台依赖，`src/main/` 只保存该版本与平台需要覆盖的文件。
+`versions/` 下的目录只代表 Minecraft 版本，保存该版本的依赖属性和可选版本覆盖。Fabric 与 NeoForge 代码分别位于 `fabric/` 和 `neoforge/`。
 
-## 处理版本差异
+## 版本差异
 
-同一文件只有少量 API 差异时，优先使用 Stonecutter 预处理。整份实现结构差异较大时，将替代文件放入：
+少量 Minecraft API 差异优先使用 Stonecutter 预处理：
 
-```text
-versions/<版本>-<平台>/src/main/
+```java
+//? >=1.21.4 {
+新版本代码
+//?} else {
+旧版本代码
+//?}
 ```
 
-实际源码组合顺序为：
+只涉及平台的差异使用：
+
+```java
+//? if fabric {
+Fabric 代码
+//?} else {
+NeoForge 代码
+//?}
+```
+
+只有完整实现差异很大时，才将覆盖文件放入 `versions/<版本>/src/main/`。
+
+实际源码组合为：
 
 ```text
-common + fabric + versions/<版本>-fabric/src/main
-common + neoforge + versions/<版本>-neoforge/src/main
+common + fabric + versions/<版本>/src/main
+common + neoforge + versions/<版本>/src/main
 ```
 
 ## 构建目标
 
 ```powershell
-.\gradlew.bat :1.21.1-fabric:build
-.\gradlew.bat :1.21.1-neoforge:build
-.\gradlew.bat :1.21.4-fabric:build
-.\gradlew.bat :1.21.4-neoforge:build
+.\gradlew.bat :fabric:1.21.1:build
+.\gradlew.bat :neoforge:1.21.1:build
+.\gradlew.bat :fabric:1.21.4:build
+.\gradlew.bat :neoforge:1.21.4:build
 ```
 
 产物命名格式为 `Totem-Doll-<平台>-<Minecraft版本>.jar`。

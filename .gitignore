@@ -19,6 +19,13 @@ build
 .gradle
 .gradle-home
 
+# Stonecutter generated module projects. The source of truth is the root
+# versions/<minecraft-version>/ directory; these module-local projects are
+# recreated by Stonecutter and must not be committed.
+/common/versions/
+/fabric/versions/
+/neoforge/versions/
+
 # other
 eclipse
 run

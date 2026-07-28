@@ -1,6 +1,6 @@
 # Multi-version development
 
-Totem Doll uses Stonecutter to build the Fabric and NeoForge variants for each supported Minecraft version.
+Totem Doll uses Stonecutter to build Fabric and NeoForge variants for each supported Minecraft version.
 
 ## Source layout
 
@@ -9,32 +9,30 @@ common/
 fabric/
 neoforge/
 versions/
-├── 1.21.1-fabric/
-├── 1.21.1-neoforge/
-├── 1.21.4-fabric/
-└── 1.21.4-neoforge/
+├── 1.21.1/
+└── 1.21.4/
 ```
 
-The root directories contain shared sources. Every directory under `versions/` is a real Stonecutter build target. Its `gradle.properties` supplies mappings and loader dependencies, while `src/main/` contains only files that override the shared implementation for that exact version and loader.
+Each directory under `versions/` represents one Minecraft version and supplies shared properties and optional version overrides. The `common`, `fabric`, and `neoforge` directories are Stonecutter branches; runnable Gradle projects are exposed below the loader branches, for example `:fabric:1.21.1`.
 
 ## Version differences
 
-Use a Stonecutter preprocessor for a small API difference in an otherwise shared file. Put a complete replacement file in `versions/<version>-<loader>/src/main/` when the implementation is structurally different.
+Use a Stonecutter preprocessor for a small API difference in an otherwise shared file. Use `//? >=1.21.4 {` for Minecraft API changes and `//? if fabric {` for platform-only changes. Put a complete replacement file in `versions/<version>/src/main/` only when the implementation is structurally different.
 
 The effective source order is:
 
 ```text
-common + fabric + versions/<version>-fabric/src/main
-common + neoforge + versions/<version>-neoforge/src/main
+common + fabric + versions/<version>/src/main
+common + neoforge + versions/<version>/src/main
 ```
 
 ## Build targets
 
 ```powershell
-.\gradlew.bat :1.21.1-fabric:build
-.\gradlew.bat :1.21.1-neoforge:build
-.\gradlew.bat :1.21.4-fabric:build
-.\gradlew.bat :1.21.4-neoforge:build
+.\gradlew.bat :fabric:1.21.1:build
+.\gradlew.bat :neoforge:1.21.1:build
+.\gradlew.bat :fabric:1.21.4:build
+.\gradlew.bat :neoforge:1.21.4:build
 ```
 
 Artifacts use the form `Totem-Doll-<loader>-<minecraft-version>.jar`.

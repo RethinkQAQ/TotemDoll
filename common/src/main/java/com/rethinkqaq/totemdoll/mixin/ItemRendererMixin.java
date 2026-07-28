@@ -56,13 +56,13 @@ public abstract class ItemRendererMixin {
         DollStyle style = DollPreviewContext.current();
         if (style == null) style = TotemDollConfig.selectedStyle();
         if (!DollBoneModels.contains(style.id())) return;
-        /*? if >=1.21.4 {*/
-        float partialTick = Minecraft.getInstance().getDeltaTracker()
-                .getGameTimeDeltaPartialTick(false);
-        /*?} else {*/
+        //? >=1.21.4 {
+        /*float partialTick = Minecraft.getInstance().getDeltaTracker()
+                .getGameTimeDeltaPartialTick(false);*/
+        //?} else {
         float partialTick = Minecraft.getInstance().getTimer()
                 .getGameTimeDeltaPartialTick(false);
-        /*?}*/
+        //?}
         if (DollBoneRenderer.render(style, context, leftHand, poseStack, buffers, light, overlay,
                 referenceModel, partialTick)) callback.cancel();
     }
@@ -110,11 +110,11 @@ public abstract class ItemRendererMixin {
 
     private static BakedModel totemdoll$findModel(ResourceLocation modelId) {
         var manager = Minecraft.getInstance().getModelManager();
-        /*? if >=1.21.4 {*/
-        BakedModel model = manager.getModel(new ModelResourceLocation(modelId, "inventory"));
-        /*?} else {*/
+        //? >=1.21.4 {
+        /*BakedModel model = manager.getModel(new ModelResourceLocation(modelId, "inventory"));*/
+        //?} else {
         BakedModel model = manager.getModel(ModelResourceLocation.inventory(modelId));
-        /*?}*/
+        //?}
         if (model == manager.getMissingModel()) {
             model = manager.getModel(new ModelResourceLocation(modelId, "standalone"));
         }
