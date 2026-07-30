@@ -1,33 +1,22 @@
 {
-    "schemaVersion": 1,
-    "id": "${mod_id}",
-    "version": "${version}",
-    "name": "${mod_name}",
-    "description": "${description}",
-    "authors": [
-        "${mod_author}"
-    ],
-    "license": "${license}",
-    "icon": "${mod_id}.png",
-    "environment": "client",
-    "entrypoints": {
-        "main": [
-            "com.rethinkqaq.totemdoll.TotemDollMod"
-        ],
-        "client": [
-            "com.rethinkqaq.totemdoll.TotemDollFabricClient"
-        ]
-    },
-    "mixins": [
-        "${mod_id}.mixins.json",
-        "${mod_id}.fabric.mixins.json"
-    ],
-    "depends": {
-        "fabricloader": ">=${fabric_loader_version}",
-        "fabric-api": "*",
-        "minecraft": "${minecraft_version}",
-        "java": ">=${java_version}"
-    },
-    "suggests": {}
+  "schemaVersion": 1,
+  "id": "${modId}",
+  "version": "${modVersion}",
+  "name": "${modName}",
+  "description": "${modDescription}",
+  "authors": ["${modAuthor}"],
+  "license": "${modLicense}",
+  "icon": "itemdoll.png",
+  "environment": "client",
+  "entrypoints": {
+    "main": ["com.rethinkqaq.totemdoll.TotemDollMod"],
+    "client": ["com.rethinkqaq.totemdoll.TotemDollFabricClient"]
+  },
+  "mixins": ["${modId}.mixins.json", "${modId}.fabric.mixins.json"],
+  "depends": {
+    "fabricloader": ">=${fabricLoaderVersion}",
+    "fabric-api": "*",
+    "minecraft": "${minecraftVersion}",
+    "java": ">=${javaVersion}"
+  }
 }
-  

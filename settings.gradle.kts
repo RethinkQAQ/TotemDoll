@@ -1,3 +1,8 @@
+val isCi = System.getenv("CI") == "true"
+gradle.startParameter.isParallelProjectExecutionEnabled = !isCi
+gradle.startParameter.isBuildCacheEnabled = !isCi
+gradle.startParameter.isConfigureOnDemand = !isCi
+
 pluginManagement {
     repositories {
         gradlePluginPortal()
@@ -5,7 +10,6 @@ pluginManagement {
         maven("https://maven.fabricmc.net/")
         maven("https://maven.neoforged.net/releases/")
         maven("https://maven.kikugie.dev/releases")
-        maven("https://repo.spongepowered.org/repository/maven-public")
     }
 }
 
@@ -14,29 +18,48 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
 }
 
-val commonVersions = listOf(
-    "1.21.1",
-    "1.21.4"
-)
-val fabricVersions = commonVersions
-val neoForgeVersions = commonVersions
+fun enabledVersions(property: String) = providers.gradleProperty(property).orNull
+    ?.split(',')?.map(String::trim)?.filter(String::isNotEmpty).orEmpty()
+
+val commonVersions = enabledVersions("stonecutter_enabled_common_versions")
+val fabricVersions = enabledVersions("stonecutter_enabled_fabric_versions")
+val neoForgeVersions = enabledVersions("stonecutter_enabled_neoforge_versions")
+val allVersions = (commonVersions + fabricVersions + neoForgeVersions).distinct()
 
 stonecutter {
     kotlinController = true
     centralScript = "build.gradle.kts"
 
     create(rootProject) {
-        versions(*commonVersions.toTypedArray())
-        branch("common") {
-            versions(*commonVersions.toTypedArray())
-        }
-        branch("fabric") {
-            versions(*fabricVersions.toTypedArray())
-        }
-        branch("neoforge") {
-            versions(*neoForgeVersions.toTypedArray())
-        }
+        versions(*allVersions.toTypedArray())
+        branch("common") { versions(*commonVersions.toTypedArray()) }
+        branch("fabric") { versions(*fabricVersions.toTypedArray()) }
+        branch("neoforge") { versions(*neoForgeVersions.toTypedArray()) }
     }
 }
 
 rootProject.name = "TotemDoll"
+
+gradle.projectsLoaded {
+    rootProject.pluginManager.apply("base")
+    rootProject.group = providers.gradleProperty("mod.group").get()
+    rootProject.version = providers.gradleProperty("mod.version").get()
+}
+
+gradle.projectsEvaluated {
+    val targets = listOf(":fabric:1.21.1", ":neoforge:1.21.1")
+    val licenseTargets = listOf(":common:1.21.1", ":fabric:1.21.1", ":neoforge:1.21.1")
+    rootProject.tasks.named("build") {
+        dependsOn(targets.map { rootProject.project(it).tasks.named("build") })
+    }
+    rootProject.tasks.register("licenseFormat") {
+        group = "formatting"
+        description = "Applies LGPL-3.0 headers to Java source files."
+        dependsOn(licenseTargets.map { rootProject.project(it).tasks.named("licenseFormat") })
+    }
+    rootProject.tasks.register("licenseCheck") {
+        group = "verification"
+        description = "Checks LGPL-3.0 headers in Java source files."
+        dependsOn(licenseTargets.map { rootProject.project(it).tasks.named("license") })
+    }
+}

@@ -2,7 +2,7 @@
 	"credit": "Made with Blockbench",
 	"textures": {
 		"0": "totemdoll:item/doll/alex",
-		"1": "item/totem_of_undying",
+		"1": "minecraft:item/totem_of_undying",
 		"particle": "totemdoll:item/doll/alex"
 	},
 	"elements": [

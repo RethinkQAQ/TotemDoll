@@ -7,23 +7,19 @@ plugins {
 apply(from = rootProject.file("license.gradle"))
 
 neoForge {
-    version = requiredProperty("neoforge_version")
-    val accessTransformer = rootProject.file("common/src/main/resources/META-INF/accesstransformer.cfg")
-    if (accessTransformer.exists()) {
-        accessTransformers.from(accessTransformer.absolutePath)
-    }
+    version = commonMod.dep("neoforge")
     parchment {
-        minecraftVersion = requiredProperty("parchment_minecraft")
-        mappingsVersion = requiredProperty("parchment_version")
+        minecraftVersion = commonMod.mc
+        mappingsVersion = commonMod.dep("parchment")
     }
     runs {
         register("client") {
             client()
-            ideName = "NeoForge Client $minecraftVersion"
+            ideName = "NeoForge Client ${commonMod.mc}"
         }
     }
     mods {
-        register(requiredProperty("mod_id")) {
+        register(commonMod.id) {
             sourceSet(sourceSets.main.get())
         }
     }

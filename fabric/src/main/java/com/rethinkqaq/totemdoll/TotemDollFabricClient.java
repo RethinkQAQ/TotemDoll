@@ -43,13 +43,15 @@ public final class TotemDollFabricClient implements ClientModInitializer {
                 FabricLoader.getInstance().getConfigDir(),
                 FabricLoader.getInstance().getGameDir()
         );
-        ModelLoadingPlugin.register(context -> context.addModels(
-                DollStyleLoader.reload(Minecraft.getInstance().getResourceManager()).stream()
-                        .flatMap(style -> java.util.stream.Stream.concat(
-                                java.util.stream.Stream.of(style.model()),
-                                DollAnimationModels.modelIds(style).stream()))
-                        .toList()
-        ));
+        ModelLoadingPlugin.register(context -> {
+            context.addModels(
+                    DollStyleLoader.reload(Minecraft.getInstance().getResourceManager()).stream()
+                            .flatMap(style -> java.util.stream.Stream.concat(
+                                    java.util.stream.Stream.of(style.model()),
+                                    DollAnimationModels.modelIds(style).stream()))
+                            .toList()
+            );
+        });
         KeyMapping openConfig = KeyBindingHelper.registerKeyBinding(new KeyMapping(
                 "key.totemdoll.open_config",
                 InputConstants.Type.KEYSYM,

@@ -40,19 +40,22 @@ jobs:
       - name: Build all targets
         run: |
           ./gradlew licenseFormat --no-daemon
-          ./gradlew build -Pversion="$BUILD_VERSION" --no-daemon --stacktrace
+          ./gradlew build -Pmod.version="$BUILD_VERSION" --no-daemon --stacktrace
 
       - name: Collect artifacts
         shell: bash
         run: |
           mkdir -p artifacts
-          find fabric neoforge -type f -path '*/build/libs/*.jar' -print0 \
-            | xargs -0 -r -I{} cp --parents "{}" artifacts/
-          cd artifacts
-          zip -r "../Totem-Doll-${BUILD_VERSION}.zip" .
+          find fabric neoforge -type f -path '*/build/libs/*.jar' \
+            \( -name 'totemdoll-fabric-*.jar' -o -name 'totemdoll-neoforge-*.jar' \) \
+            ! -name '*-sources.jar' \
+            ! -name '*-javadoc.jar' \
+            ! -name '*-dev.jar' \
+            -exec cp {} artifacts/ \;
 
-      - name: Upload build archive
+      - name: Upload mod jars
         uses: actions/upload-artifact@v4
         with:
           name: Totem-Doll-${{ env.BUILD_VERSION }}
-          path: Totem-Doll-${{ env.BUILD_VERSION }}.zip
+          path: artifacts/*.jar
+          if-no-files-found: error

@@ -22,7 +22,7 @@ license {
         java = 'SLASHSTAR_STYLE_NEWLINE'
     }
     ext {
-        name = project.findProperty('mod_name') ?: 'Totem Doll'
+        name = project.findProperty('mod.name') ?: 'Totem Doll'
         author = 'Rethink_QAQ'
         year = Calendar.getInstance().get(Calendar.YEAR).toString()
     }

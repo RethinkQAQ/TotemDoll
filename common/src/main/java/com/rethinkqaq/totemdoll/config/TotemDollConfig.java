@@ -49,8 +49,18 @@ public final class TotemDollConfig {
     }
 
     public static void select(ResourceLocation styleId) {
-        selectedStyle = DollStyles.get(styleId).id();
+        selectedStyle = DollStyles.contains(styleId) ? styleId : fallbackStyle();
+        Constants.LOG.info("Selected Totem Doll style {}", selectedStyle);
         save();
+    }
+
+    /** Keeps a valid selection across a temporary empty style registry during reload. */
+    public static void reconcileSelectedStyle() {
+        if (!DollStyles.contains(selectedStyle)) {
+            selectedStyle = fallbackStyle();
+            Constants.LOG.warn("Selected Totem Doll style was unavailable; fell back to {}", selectedStyle);
+            save();
+        }
     }
 
     private static void load() {
@@ -88,6 +98,10 @@ public final class TotemDollConfig {
         } catch (IOException exception) {
             Constants.LOG.error("Could not save {}", file, exception);
         }
+    }
+
+    private static ResourceLocation fallbackStyle() {
+        return DollStyles.contains(DollStyles.ALEX_ID) ? DollStyles.ALEX_ID : DollStyles.VANILLA_ID;
     }
 
     private TotemDollConfig() {

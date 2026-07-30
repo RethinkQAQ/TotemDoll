@@ -27,6 +27,7 @@ import java.util.List;
 
 public final class DollAnimationModels {
     public static List<ResourceLocation> modelIds(DollStyle style) {
+        if (style.isBoneModel()) return List.of();
         List<ResourceLocation> ids = new ArrayList<>();
         for (DollAnimationDefinition animation : style.animations()) {
             for (String frame : animation.frames()) {

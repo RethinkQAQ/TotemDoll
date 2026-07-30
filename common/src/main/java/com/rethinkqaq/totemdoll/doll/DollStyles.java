@@ -66,6 +66,10 @@ public final class DollStyles {
         return List.copyOf(STYLES.values());
     }
 
+    public static synchronized boolean contains(ResourceLocation id) {
+        return STYLES.containsKey(id);
+    }
+
     public static synchronized void replaceDiscovered(Collection<DollStyle> styles) {
         STYLES.clear();
         register(VANILLA);

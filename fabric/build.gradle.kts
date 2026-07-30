@@ -7,38 +7,27 @@ plugins {
 apply(from = rootProject.file("license.gradle"))
 
 dependencies {
-    minecraft("com.mojang:minecraft:$minecraftVersion")
+    minecraft("com.mojang:minecraft:${commonMod.mc}")
     mappings(loom.layered {
         officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-${requiredProperty("parchment_minecraft")}:${requiredProperty("parchment_version")}@zip")
+        parchment("org.parchmentmc.data:parchment-${commonMod.mc}:${commonMod.dep("parchment")}@zip")
     })
-    modImplementation("net.fabricmc:fabric-loader:${requiredProperty("fabric_loader_version")}")
-    modImplementation("net.fabricmc.fabric-api:fabric-api:${requiredProperty("fabric_version")}")
+    modImplementation("net.fabricmc:fabric-loader:${commonMod.dep("fabric-loader")}")
+    modImplementation("net.fabricmc.fabric-api:fabric-api:${commonMod.dep("fabric-api")}+${commonMod.mc}")
+    modImplementation("com.terraformersmc:modmenu:${commonMod.dep("modmenu")}")
 }
 
 loom {
-    val accessWidener = rootProject.file("common/src/main/resources/${requiredProperty("mod_id")}.accesswidener")
-    if (accessWidener.exists()) {
-        accessWidenerPath.set(accessWidener)
-    }
-    mixin {
-        defaultRefmapName.set("${requiredProperty("mod_id")}.refmap.json")
-    }
+    mixin { defaultRefmapName.set("${commonMod.id}.refmap.json") }
     runs {
         named("client") {
             client()
-            configName = "Fabric Client $minecraftVersion"
+            configName = "Fabric Client ${commonMod.mc}"
             ideConfigGenerated(true)
             runDir("runs/client")
         }
-        named("server") {
-            isIdeConfigGenerated = false
-        }
+        named("server") { isIdeConfigGenerated = false }
     }
 }
 
-tasks.matching { it.name == "runServer" }.configureEach {
-    enabled = false
-    group = null
-    description = "Disabled: Totem Doll is a client-only mod."
-}
+tasks.matching { it.name == "runServer" }.configureEach { enabled = false }

@@ -151,6 +151,7 @@ public final class StylePackStore {
         write(styleTarget, style);
     }
 
+
     public static void exportLocal(DollStyle style, Path zip) throws IOException {
         if (!style.isLocal()) throw new IOException("Only local styles can be exported");
         Path source = stylesDirectory.resolve(style.id().getPath()).normalize();

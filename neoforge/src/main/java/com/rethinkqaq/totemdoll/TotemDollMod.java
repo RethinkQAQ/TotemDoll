@@ -62,17 +62,9 @@ public class TotemDollMod {
     private void registerAdditionalModels(ModelEvent.RegisterAdditional event) {
         DollStyleLoader.reload(Minecraft.getInstance().getResourceManager())
                 .forEach(style -> {
-                    //? >=1.21.4 {
-                    /*event.register(style.model());*/
-                    //?} else {
                     event.register(new ModelResourceLocation(style.model(), "standalone"));
-                    //?}
                     DollAnimationModels.modelIds(style).forEach(id -> {
-                        //? >=1.21.4 {
-                        /*event.register(id);*/
-                        //?} else {
                         event.register(new ModelResourceLocation(id, "standalone"));
-                        //?}
                     });
                 });
     }

@@ -13,7 +13,7 @@ Press `F9` in game to open the Totem Doll style screen. Published style packs ar
 ## Development
 
 - Java 21
-- Minecraft 1.21.1 and 1.21.4
+- Minecraft 1.21.1
 - Fabric API (Fabric only)
 - NeoForge
 - Stonecutter
@@ -29,9 +29,7 @@ Build a specific target with:
 ```powershell
 .\gradlew.bat :fabric:1.21.1:build
 .\gradlew.bat :neoforge:1.21.1:build
-.\gradlew.bat :fabric:1.21.4:build
-.\gradlew.bat :neoforge:1.21.4:build
 ```
 
-Each Minecraft version keeps its properties and optional overrides under `versions/<minecraft-version>/`. Stonecutter exposes the shared `common`, `fabric`, and `neoforge` branches as indexed Gradle modules; runnable targets use paths such as `:fabric:1.21.1` and `:neoforge:1.21.1`. Forge and dedicated-server run configurations are not supported.
+The enabled version keeps its properties under `versions/1.21.1/`. Stonecutter exposes the shared `common`, `fabric`, and `neoforge` branches as indexed Gradle modules; runnable targets use `:fabric:1.21.1` and `:neoforge:1.21.1`. Forge and dedicated-server run configurations are not supported.
 
