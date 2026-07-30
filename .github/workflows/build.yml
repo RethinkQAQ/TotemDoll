@@ -33,14 +33,18 @@ jobs:
         run: |
           if [[ -n "${{ inputs.release_version }}" ]]; then
             echo "BUILD_VERSION=${{ inputs.release_version }}" >> "$GITHUB_ENV"
+            echo "BUILD_SUFFIX=" >> "$GITHUB_ENV"
+            echo "ARTIFACT_VERSION=${{ inputs.release_version }}" >> "$GITHUB_ENV"
           else
-            echo "BUILD_VERSION=0.1.1-alpha.build.${GITHUB_RUN_NUMBER}" >> "$GITHUB_ENV"
+            echo "BUILD_VERSION=0.1.1-alpha" >> "$GITHUB_ENV"
+            echo "BUILD_SUFFIX=build.${GITHUB_RUN_NUMBER}" >> "$GITHUB_ENV"
+            echo "ARTIFACT_VERSION=0.1.1-alpha.build.${GITHUB_RUN_NUMBER}" >> "$GITHUB_ENV"
           fi
 
       - name: Build all targets
         run: |
           ./gradlew licenseFormat --no-daemon
-          ./gradlew build -Pmod.version="$BUILD_VERSION" --no-daemon --stacktrace
+          ./gradlew build -Pmod.version="$BUILD_VERSION" -Pbuild.number="$BUILD_SUFFIX" --no-daemon --stacktrace
 
       - name: Collect artifacts
         shell: bash
@@ -56,6 +60,6 @@ jobs:
       - name: Upload mod jars
         uses: actions/upload-artifact@v4
         with:
-          name: Totem-Doll-${{ env.BUILD_VERSION }}
+          name: Totem-Doll-${{ env.ARTIFACT_VERSION }}
           path: artifacts/*.jar
           if-no-files-found: error

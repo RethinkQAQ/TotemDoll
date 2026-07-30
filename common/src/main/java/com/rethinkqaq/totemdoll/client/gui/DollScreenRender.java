@@ -22,7 +22,10 @@ package com.rethinkqaq.totemdoll.client.gui;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
+
+import java.util.function.Predicate;
 
 final class DollScreenRender {
 
@@ -33,8 +36,19 @@ final class DollScreenRender {
             int mouseY,
             float partialTick
     ) {
+        renderChildren(screen, graphics, mouseX, mouseY, partialTick, child -> true);
+    }
+
+    static void renderChildren(
+            Screen screen,
+            GuiGraphics graphics,
+            int mouseX,
+            int mouseY,
+            float partialTick,
+            Predicate<GuiEventListener> filter
+    ) {
         for (var child : screen.children()) {
-            if (child instanceof Renderable renderable) {
+            if (filter.test(child) && child instanceof Renderable renderable) {
                 renderable.render(graphics, mouseX, mouseY, partialTick);
             }
         }

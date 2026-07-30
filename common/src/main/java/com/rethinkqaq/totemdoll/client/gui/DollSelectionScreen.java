@@ -212,8 +212,6 @@ public final class DollSelectionScreen extends Screen implements DollScreenParen
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         this.renderTransparentBackground(graphics);
-        renderHeader(graphics);
-        renderSidebar(graphics);
         if (cards.isEmpty()) {
             Component emptyTitle = Component.translatable("screen.totemdoll.empty_title");
             Component emptyHint = Component.translatable("screen.totemdoll.empty_hint");
@@ -221,7 +219,36 @@ public final class DollSelectionScreen extends Screen implements DollScreenParen
             graphics.drawCenteredString(this.font, emptyTitle, centerX, HEADER_HEIGHT + 72, 0xFFFFFF);
             graphics.drawCenteredString(this.font, emptyHint, centerX, HEADER_HEIGHT + 88, 0xA0A0A0);
         }
-        DollScreenRender.renderChildren(this, graphics, mouseX, mouseY, partialTick);
+        int cardTop = HEADER_HEIGHT + 22;
+        int cardBottom = this.height - FOOTER_HEIGHT;
+        graphics.enableScissor(0, cardTop, this.width, cardBottom);
+        DollScreenRender.renderChildren(
+                this,
+                graphics,
+                mouseX,
+                mouseY,
+                partialTick,
+                child -> child instanceof DollCardWidget
+        );
+        graphics.disableScissor();
+
+        DollScreenRender.renderChildren(
+                this,
+                graphics,
+                mouseX,
+                mouseY,
+                partialTick,
+                child -> !(child instanceof DollCardWidget)
+        );
+
+        // Draw fixed panels after the scrollable cards. Card previews can extend
+        // beyond their widget bounds, so the opaque header/sidebar must be the
+        // final layer to mask any overlap.
+        graphics.pose().pushPose();
+        graphics.pose().translate(0.0F, 0.0F, 200.0F);
+        renderHeader(graphics);
+        renderSidebar(graphics);
+        graphics.pose().popPose();
     }
 
     private void renderHeader(GuiGraphics graphics) {

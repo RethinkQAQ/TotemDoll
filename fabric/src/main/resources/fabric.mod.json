@@ -1,22 +1,22 @@
 {
   "schemaVersion": 1,
-  "id": "${modId}",
-  "version": "${modVersion}",
-  "name": "${modName}",
-  "description": "${modDescription}",
-  "authors": ["${modAuthor}"],
-  "license": "${modLicense}",
+  "id": "${mod_id}",
+  "version": "${version}",
+  "name": "${mod_name}",
+  "description": "${description}",
+  "authors": ["${mod_author}"],
+  "license": "${license}",
   "icon": "itemdoll.png",
   "environment": "client",
   "entrypoints": {
     "main": ["com.rethinkqaq.totemdoll.TotemDollMod"],
     "client": ["com.rethinkqaq.totemdoll.TotemDollFabricClient"]
   },
-  "mixins": ["${modId}.mixins.json", "${modId}.fabric.mixins.json"],
+  "mixins": ["${mod_id}.mixins.json", "${mod_id}.fabric.mixins.json"],
   "depends": {
-    "fabricloader": ">=${fabricLoaderVersion}",
+    "fabricloader": ">=${fabric_loader_version}",
     "fabric-api": "*",
-    "minecraft": "${minecraftVersion}",
-    "java": ">=${javaVersion}"
+    "minecraft": "${minecraft_version_range_fabric}",
+    "java": ">=${java_version}"
   }
 }

@@ -1,12 +1,14 @@
 modLoader="javafml"
 loaderVersion="[4,)"
 license="${modLicense}"
+issueTrackerURL="https://github.com/${modGitHub}/issues"
 
 [[mods]]
 modId="${modId}"
 version="${modVersion}"
 displayName="${modName}"
 logoFile="itemdoll.png"
+logoBlur=false
 authors="${modAuthor}"
 description='''${modDescription}'''
 
@@ -25,6 +27,6 @@ side="CLIENT"
 [[dependencies.${modId}]]
 modId="minecraft"
 type="required"
-versionRange="[${minMinecraftVersion},${minecraftVersion}]"
+versionRange="${minecraftVersionRangeNeoForge}"
 ordering="NONE"
 side="CLIENT"

@@ -5,4 +5,4 @@ plugins {
 
 apply(from = rootProject.file("build.gradle.kts"))
 
-stonecutter.active("1.21.1")
+stonecutter.active("1.21.4")

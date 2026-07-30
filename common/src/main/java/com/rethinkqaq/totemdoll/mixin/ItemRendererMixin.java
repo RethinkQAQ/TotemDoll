@@ -57,7 +57,11 @@ public abstract class ItemRendererMixin {
         if (style == null) style = TotemDollConfig.selectedStyle();
         if (!DollBoneModels.contains(style.id())) return;
 
-        float partialTick = Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(false);
+        //? >= 1.21.3 {
+        float partialTick = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
+        //?} else {
+        /*float partialTick = Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(false);
+        *///?}
         if (DollBoneRenderer.render(style, context, leftHand, poseStack, buffers, light, overlay,
                 referenceModel, partialTick)) {
             callback.cancel();

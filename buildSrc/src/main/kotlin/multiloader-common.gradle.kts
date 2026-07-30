@@ -4,7 +4,12 @@ plugins {
     `java-library`
 }
 
-version = "${loader}-${commonMod.version}+mc${stonecutterBuild.current.version}"
+val buildSuffix = commonMod.propOrNull("build.number")
+    ?.trim()
+    ?.takeIf { it.isNotEmpty() }
+
+version = listOfNotNull("${commonMod.version}-${loader}", buildSuffix)
+    .joinToString("-")
 
 base { archivesName = commonMod.id }
 
@@ -19,8 +24,9 @@ repositories {
     maven("https://maven.terraformersmc.com/releases/") { name = "TerraformersMC" }
 }
 
-tasks.processResources {
-    val values = mapOf(
+tasks {
+    processResources {
+        val expandProps = mapOf(
         "modId" to commonMod.id,
         "modName" to commonMod.name,
         "modVersion" to commonMod.version,
@@ -34,10 +40,37 @@ tasks.processResources {
         "fabricLoaderVersion" to commonMod.dep("fabric-loader"),
         "fabricApiVersion" to commonMod.dep("fabric-api"),
         "neoForgeVersion" to commonMod.dep("neoforge"),
-        "javaVersion" to commonMod.prop("java.version")
-    )
-    filesMatching(listOf("pack.mcmeta", "fabric.mod.json", "META-INF/neoforge.mods.toml", "*.mixins.json")) {
-        expand(values)
+        "javaVersion" to commonMod.prop("java.version"),
+        // Standard placeholder names used by the Stonecutter multiloader template.
+        "mod_id" to commonMod.id,
+        "version" to commonMod.version,
+        "mod_name" to commonMod.name,
+        "description" to commonMod.description,
+        "mod_author" to commonMod.author,
+        "license" to commonMod.license,
+        "minecraft_version" to commonMod.prop("minecraft_version"),
+        "minecraft_version_range_fabric" to commonMod.prop("minecraft_version_range_fabric"),
+        "java_version" to commonMod.prop("java.version"),
+        "fabric_loader_version" to commonMod.dep("fabric-loader"),
+        "fabric_api_version" to commonMod.dep("fabric-api"),
+        "neoforge_version" to commonMod.dep("neoforge"),
+        "minecraftVersionRangeNeoForge" to commonMod.prop("minecraft_version_range_neoforge")
+        ).filterValues { !it.isNullOrEmpty() }.mapValues { (_, value) -> value }
+
+        val jsonExpandProps = expandProps.mapValues { (_, value) ->
+            value.replace("\n", "\\\\n")
+        }
+
+        filesMatching(listOf("META-INF/neoforge.mods.toml")) {
+            expand(expandProps)
+        }
+        filesMatching(listOf("pack.mcmeta", "fabric.mod.json", "*.mixins.json")) {
+            expand(jsonExpandProps)
+        }
+        inputs.properties(expandProps)
     }
-    inputs.properties(values)
+}
+
+tasks.named("processResources") {
+    dependsOn(":common:${commonMod.prop("minecraft_version")}:stonecutterGenerate")
 }
