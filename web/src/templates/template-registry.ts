@@ -17,12 +17,10 @@ export interface TextureAnimation {
 }
 
 export interface StyleDefinition {
-  format: 2;
+  format: 3;
   id: string;
   name: string;
-  model:
-    | { type: "minecraft_item"; file: string }
-    | { type: "minecraft_bone"; geometry: string; animations?: string };
+  model: { type: "mesh"; geometry: string; animations?: string };
   textures: Record<string, string>;
   skin?: {
     supported: boolean;
@@ -89,13 +87,13 @@ function item(id: "alex" | "steve", character: "Alex" | "Steve"): OfficialTempla
     source: "builtin",
     preview: "item",
     root: `templates/${id}`,
-    files: ["models/main.json", "textures/base.png"],
+    files: ["models/geometry.json", "textures/base.png"],
     editable: ["skin"],
     style: {
-      format: 2,
+      format: 3,
       id: `template:${id}`,
       name: `${character} Doll`,
-      model: { type: "minecraft_item", file: "models/main.json" },
+      model: { type: "mesh", geometry: "models/geometry.json" },
       textures: { base: "textures/base.png" },
       skin,
       features: { animations: false, dynamic_textures: false }
@@ -115,11 +113,11 @@ function animated(id: "animated_alex" | "animated_steve", character: "Alex" | "S
     files: ["models/geometry.json", "models/animations.json", "textures/base.png"],
     editable: ["skin", "actions"],
     style: {
-      format: 2,
+      format: 3,
       id: `template:${id}`,
       name: `Animated ${character} Doll`,
       model: {
-        type: "minecraft_bone",
+        type: "mesh",
         geometry: "models/geometry.json",
         animations: "models/animations.json"
       },
@@ -143,7 +141,7 @@ export const officialTemplates: OfficialTemplate[] = [
     preview: "item",
     root: "templates/blink_alex",
     files: [
-      "models/main.json",
+      "models/geometry.json",
       "textures/open.png",
       "textures/half.png",
       "textures/close.png",
@@ -151,10 +149,10 @@ export const officialTemplates: OfficialTemplate[] = [
     ],
     editable: ["texture_frames"],
     style: {
-      format: 2,
+      format: 3,
       id: "template:blink_alex",
       name: "Blinking Alex Doll",
-      model: { type: "minecraft_item", file: "models/main.json" },
+      model: { type: "mesh", geometry: "models/geometry.json" },
       textures: {
         base: "textures/open.png",
         open: "textures/open.png",
@@ -187,11 +185,11 @@ export const officialTemplates: OfficialTemplate[] = [
     ],
     editable: ["actions", "texture_frames"],
     style: {
-      format: 2,
+      format: 3,
       id: "template:animated_blink_alex",
       name: "Animated Blinking Alex Doll",
       model: {
-        type: "minecraft_bone",
+        type: "mesh",
         geometry: "models/geometry.json",
         animations: "models/animations.json"
       },

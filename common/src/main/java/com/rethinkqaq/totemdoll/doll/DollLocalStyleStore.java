@@ -73,65 +73,10 @@ public final class DollLocalStyleStore {
         }
         validateSkin(sourceSkin);
 
-        if (template.isBoneModel()) {
-            return importBoneSkin(template, sourceSkin, displayName, resourceManager);
-        }
-
-        String key = "user_" + UUID.randomUUID().toString().replace("-", "");
-        ResourceLocation id = ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, key);
-        ResourceLocation modelId = ResourceLocation.fromNamespaceAndPath(
-                Constants.MOD_ID,
-                "generated/" + key
-        );
-        ResourceLocation textureId = ResourceLocation.fromNamespaceAndPath(
-                Constants.MOD_ID,
-                "item/generated/" + key + "/skin"
-        );
-
-        JsonObject model = readTemplateModel(template, resourceManager);
-        replaceTexture(model, template.skin().textureSlot(), textureId.toString());
-
-        JsonObject style = new JsonObject();
-        style.addProperty("format", 2);
-        style.addProperty("id", id.toString());
-        style.addProperty("name", normalizeName(displayName, sourceSkin));
-        style.addProperty("template", template.id().toString());
-        style.addProperty("user_created", true);
-        style.addProperty("origin", DollStyleOrigin.LOCAL.name().toLowerCase());
-
-        JsonObject modelDeclaration = new JsonObject();
-        modelDeclaration.addProperty("type", "minecraft_item");
-        modelDeclaration.addProperty("file", "models/generated/" + key + ".json");
-        style.add("model", modelDeclaration);
-
-        JsonObject textures = new JsonObject();
-        textures.addProperty("base", textureId.toString());
-        style.add("textures", textures);
-        JsonObject skin = new JsonObject();
-        skin.addProperty("supported", true);
-        skin.addProperty("format", DollSkinDefinition.MINECRAFT_64X64);
-        skin.addProperty("target", template.skin().textureSlot());
-        skin.addProperty("mapping", "minecraft_player");
-        style.add("skin", skin);
-
-        Path styleDirectory = stylesDirectory.resolve(key);
-        Files.createDirectories(styleDirectory);
-        Files.writeString(
-                styleDirectory.resolve("style.json"),
-                GSON.toJson(style),
-                StandardCharsets.UTF_8
-        );
-        Files.writeString(
-                styleDirectory.resolve("model.json"),
-                GSON.toJson(model),
-                StandardCharsets.UTF_8
-        );
-        Files.copy(sourceSkin, styleDirectory.resolve("skin.png"), StandardCopyOption.REPLACE_EXISTING);
-        rebuildGeneratedPack();
-        return id;
+        return importMeshSkin(template, sourceSkin, displayName, resourceManager);
     }
 
-    private static ResourceLocation importBoneSkin(
+    private static ResourceLocation importMeshSkin(
             DollStyle template,
             Path sourceSkin,
             String displayName,
@@ -142,8 +87,8 @@ public final class DollLocalStyleStore {
         }
         JsonObject templateStyle = readResourceJson(resourceManager, template.definitionSource());
         JsonObject templateModel = templateStyle.getAsJsonObject("model");
-        if (templateModel == null || !"minecraft_bone".equals(string(templateModel, "type"))) {
-            throw new IOException("Template is not a bone model");
+        if (templateModel == null || !"mesh".equals(string(templateModel, "type"))) {
+            throw new IOException("Template is not a mesh model");
         }
         String geometryPath = safeRelativePath(templateModel, "geometry");
         String animationsPath = templateModel.has("animations")
@@ -155,11 +100,8 @@ public final class DollLocalStyleStore {
 
         String key = "user_" + UUID.randomUUID().toString().replace("-", "");
         ResourceLocation id = ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, key);
-        ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(
-                Constants.MOD_ID, "textures/item/generated/" + key + "/skin.png");
-
         JsonObject style = new JsonObject();
-        style.addProperty("format", 2);
+        style.addProperty("format", 3);
         style.addProperty("id", id.toString());
         style.addProperty("name", normalizeName(displayName, sourceSkin));
         style.addProperty("template", template.id().toString());
@@ -167,13 +109,13 @@ public final class DollLocalStyleStore {
         style.addProperty("origin", DollStyleOrigin.LOCAL.name().toLowerCase());
 
         JsonObject model = new JsonObject();
-        model.addProperty("type", "minecraft_bone");
+        model.addProperty("type", "mesh");
         model.addProperty("geometry", "models/geometry.json");
         if (animations != null) model.addProperty("animations", "models/animations.json");
         style.add("model", model);
 
         JsonObject textures = new JsonObject();
-        textures.addProperty("base", texture.toString());
+        textures.addProperty("base", "textures/skin.png");
         style.add("textures", textures);
         JsonObject skin = new JsonObject();
         skin.addProperty("supported", true);
@@ -307,8 +249,8 @@ public final class DollLocalStyleStore {
                     Files.readString(metadataFile, StandardCharsets.UTF_8),
                     JsonObject.class
             );
-            if (metadata == null || !metadata.has("format") || metadata.get("format").getAsInt() != 2) {
-                Constants.LOG.warn("Skipping obsolete local style {}: only style format 2 is supported", styleDirectory);
+            if (metadata == null || !metadata.has("format") || metadata.get("format").getAsInt() != 3) {
+                Constants.LOG.warn("Skipping obsolete local style {}: only style format 3 is supported", styleDirectory);
                 return;
             }
             ResourceLocation id = requireLocation(metadata, "id");
@@ -322,24 +264,13 @@ public final class DollLocalStyleStore {
             Path assets = generatedPackDirectory.resolve("assets");
             Path styleTarget = assets.resolve(id.getNamespace()).resolve("styles/generated")
                     .resolve(id.getPath()).resolve("style.json");
-            Path skinTarget = assets.resolve(id.getNamespace())
-                    .resolve("textures/item/generated")
-                    .resolve(id.getPath())
-                    .resolve("skin.png");
+            Path skinTarget = styleTarget.getParent().resolve("textures/skin.png");
             Files.createDirectories(styleTarget.getParent());
             Files.createDirectories(skinTarget.getParent());
             Files.copy(metadataFile, styleTarget, StandardCopyOption.REPLACE_EXISTING);
             Files.copy(skinFile, skinTarget, StandardCopyOption.REPLACE_EXISTING);
 
-            if ("minecraft_item".equals(modelType)) {
-                String modelResourcePath = safeRelativePath(modelObject, "file");
-                if (!modelResourcePath.startsWith("models/")) throw new IOException("Invalid model file");
-                Path modelFile = styleDirectory.resolve("model.json");
-                if (!Files.isRegularFile(modelFile)) throw new IOException("Missing model.json");
-                Path modelTarget = assets.resolve(id.getNamespace()).resolve(modelResourcePath);
-                Files.createDirectories(modelTarget.getParent());
-                Files.copy(modelFile, modelTarget, StandardCopyOption.REPLACE_EXISTING);
-            } else if ("minecraft_bone".equals(modelType)) {
+            if ("mesh".equals(modelType)) {
                 String geometryPath = safeRelativePath(modelObject, "geometry");
                 copyBoneResource(styleDirectory.resolve("geometry.json"), styleTarget.getParent(), geometryPath);
                 if (modelObject.has("animations")) {
@@ -362,25 +293,6 @@ public final class DollLocalStyleStore {
         if (!target.startsWith(styleTargetDirectory.normalize())) throw new IOException("Invalid bone model path");
         Files.createDirectories(target.getParent());
         Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
-    }
-
-    private static JsonObject readTemplateModel(
-            DollStyle template,
-            ResourceManager resourceManager
-    ) throws IOException {
-        ResourceLocation modelFile = ResourceLocation.fromNamespaceAndPath(
-                template.model().getNamespace(),
-                "models/" + template.model().getPath() + ".json"
-        );
-        Resource resource = resourceManager.getResource(modelFile)
-                .orElseThrow(() -> new IOException("Missing template model " + modelFile));
-        try (Reader reader = resource.openAsReader()) {
-            JsonObject model = GSON.fromJson(reader, JsonObject.class);
-            if (model == null) {
-                throw new IOException("Template model is empty");
-            }
-            return model;
-        }
     }
 
     private static JsonObject readResourceJson(ResourceManager manager, ResourceLocation location) throws IOException {
@@ -408,21 +320,6 @@ public final class DollLocalStyleStore {
     private static String string(JsonObject object, String member) throws IOException {
         if (object == null || !object.has(member)) throw new IOException("Missing " + member);
         return object.get(member).getAsString();
-    }
-
-    private static void replaceTexture(JsonObject model, String slot, String texture) throws IOException {
-        JsonObject textures = model.getAsJsonObject("textures");
-        if (textures == null || !textures.has(slot)) {
-            throw new IOException("Template model is missing texture slot " + slot);
-        }
-        String previous = textures.get(slot).getAsString();
-        for (String key : textures.keySet()) {
-            JsonElement value = textures.get(key);
-            if (value.isJsonPrimitive() && previous.equals(value.getAsString())) {
-                textures.addProperty(key, texture);
-            }
-        }
-        textures.addProperty(slot, texture);
     }
 
     private static void validateSkin(Path path) throws IOException {

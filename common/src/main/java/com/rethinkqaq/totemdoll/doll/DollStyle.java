@@ -62,15 +62,16 @@ public record DollStyle(
     }
 
     public boolean hasAnimations() {
-        return (animations != null && !animations.isEmpty()) || DollBoneModels.contains(id);
+        return hasDynamicTextures() || hasDynamicModel();
     }
 
     public boolean isBoneModel() {
-        return "minecraft_bone".equals(modelType);
+        return "mesh".equals(modelType);
     }
 
     public boolean hasDynamicModel() {
-        return isBoneModel() && DollBoneModels.contains(id);
+        var model = DollBoneModels.get(id);
+        return model != null && !model.animations().isEmpty();
     }
 
     public boolean hasDynamicTextures() {

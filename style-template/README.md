@@ -1,6 +1,6 @@
 ﻿# Totem Doll 样式包模板
 
-这是 Totem Doll `format: 2` 样式包示例，可以作为 Blockbench 模型、网页编辑器和资源包作者的起始模板。
+这是 Totem Doll `format: 3` 跨版本 mesh 样式包示例，可以作为 Blockbench、网页编辑器和样式包作者的起始模板。
 
 ## 目录结构
 
@@ -11,7 +11,7 @@ style-template/
     └── example/
         ├── style.json
         ├── models/
-        │   └── main.json
+        │   └── geometry.json
         └── textures/
             └── base.png
 ```
@@ -23,7 +23,7 @@ style-template/
 使用 Blockbench 打开：
 
 ```text
-styles/example/models/main.json
+styles/example/models/geometry.json
 ```
 
 选择 Minecraft Java Item/Block 模型格式进行编辑。模型使用 `#skin` 纹理槽：
@@ -46,13 +46,13 @@ styles/example/models/main.json
 
 ## style.json 要点
 
-- `format` 必须为 `2`。
-- `model.type` 当前使用 `minecraft_item`。
-- `model.file` 是相对于当前样式目录的模型路径。
+- `format` 必须为 `3`。
+- `model.type` 固定使用 `mesh`。
+- `model.geometry` 是相对于当前样式目录的 geometry 路径。
 - `skin.supported` 控制是否可以从该模板创建个人样式。
 - `features.animations` 和 `features.dynamic_textures` 声明动作或动态纹理能力。
 - `texture_animations` 只描述纹理帧动画；顶层 `animations` 只描述骨骼动作触发绑定。
 - 不要在样式包中使用绝对路径或包含 `..` 的路径。
 
-当前运行时支持 Minecraft 原版 Item JSON、Totem Doll 骨骼模型、骨骼动作和动态纹理。骨骼示例位于 `styles/animated_example/`。
+运行时只读取 TotemDoll `format:3` mesh 格式，不直接读取 Minecraft 原版 Item Model JSON。Blockbench 的 Java Item/Block 格式只作为创作输入，发布前必须转换为 `geometry.json`。骨骼动画示例位于 `styles/animated_example/`。
 

@@ -1,13 +1,18 @@
 param(
-    [Parameter(Mandatory = $true)][string]$GeometryFile,
-    [Parameter(Mandatory = $true)][string]$AnimationFile,
+    [Parameter(Mandatory = $true)][string]$InputFile,
     [Parameter(Mandatory = $true)][string]$OutputDirectory,
-    [string]$Texture = "totemdoll:textures/item/doll/alex.png"
+    [string]$StyleId = "example:my_doll",
+    [string]$StyleName = "My Totem Doll",
+    [string]$Texture = "textures/base.png"
 )
 
 $ErrorActionPreference = "Stop"
-$geometry = Get-Content -LiteralPath $GeometryFile -Raw | ConvertFrom-Json
-$project = Get-Content -LiteralPath $AnimationFile -Raw | ConvertFrom-Json
+$project = Get-Content -LiteralPath $InputFile -Raw | ConvertFrom-Json
+$geometry = $project.geometry
+if ($null -eq $geometry) { $geometry = $project }
+if ($project.parent -or $project.overrides) {
+    throw "Minecraft parent/overrides are not supported by format:3 mesh export"
+}
 
 function Vector3($value, $fallback = @(0, 0, 0)) {
     if ($null -eq $value -or @($value).Count -lt 3) { return $fallback }
@@ -243,6 +248,35 @@ if ($struggleAnimation) {
 
 $targetModels = Join-Path $OutputDirectory "models"
 New-Item -ItemType Directory -Force -Path $targetModels | Out-Null
+$textureOutput = Join-Path $OutputDirectory $Texture
+New-Item -ItemType Directory -Force -Path (Split-Path -Parent $textureOutput) | Out-Null
+
+function CopyTexture($bbmodel, $inputFile, $destination) {
+    $textureEntry = @($bbmodel.textures)[0]
+    if ($null -eq $textureEntry) {
+        throw "The .bbmodel does not contain a texture. Add a PNG texture before exporting format:3."
+    }
+
+    $source = [string]$textureEntry.source
+    if ($source -match '^data:image/png;base64,(.+)$') {
+        [IO.File]::WriteAllBytes($destination, [Convert]::FromBase64String($Matches[1]))
+        return
+    }
+
+    $texturePath = [string]$textureEntry.path
+    if ([string]::IsNullOrWhiteSpace($texturePath)) { $texturePath = [string]$textureEntry.name }
+    if ([string]::IsNullOrWhiteSpace($texturePath)) {
+        throw "The .bbmodel texture has no source or path."
+    }
+    $sourcePath = Join-Path (Split-Path -Parent (Resolve-Path $inputFile)) $texturePath
+    if (-not (Test-Path -LiteralPath $sourcePath -PathType Leaf)) {
+        throw "Texture file was not found: $sourcePath"
+    }
+    if (-not ([IO.Path]::GetExtension($sourcePath) -ieq ".png")) {
+        throw "format:3 textures must be PNG files: $sourcePath"
+    }
+    Copy-Item -LiteralPath $sourcePath -Destination $destination -Force
+}
 $rootGroup = @($geometry.groups)[0]
 $rootName = [string]$rootGroup.name
 $rootBone = $null
@@ -261,17 +295,29 @@ $geometryOutput = [ordered]@{
 }
 $animationOutput = [ordered]@{ format = 1; animations = $convertedAnimations }
 $geometryOutput | ConvertTo-Json -Depth 32 | Set-Content -LiteralPath (Join-Path $targetModels "geometry.json") -Encoding UTF8
-$animationOutput | ConvertTo-Json -Depth 32 | Set-Content -LiteralPath (Join-Path $targetModels "animations.json") -Encoding UTF8
+$hasAnimations = $convertedAnimations.Count -gt 0
+if ($hasAnimations) {
+    $animationOutput | ConvertTo-Json -Depth 32 | Set-Content -LiteralPath (Join-Path $targetModels "animations.json") -Encoding UTF8
+}
 
 $styleFile = Join-Path $OutputDirectory "style.json"
-$style = Get-Content -LiteralPath $styleFile -Raw | ConvertFrom-Json
-if ($style.PSObject.Properties.Name -contains "enabled") {
-    $style.enabled = $true
+$model = [ordered]@{ type = "mesh"; geometry = "models/geometry.json" }
+if ($hasAnimations) { $model.animations = "models/animations.json" }
+$style = [ordered]@{
+    format = 3
+    id = $StyleId
+    name = $StyleName
+    model = $model
+    textures = [ordered]@{ base = $Texture }
+    features = [ordered]@{ animations = $hasAnimations; dynamic_textures = $false }
 }
-$style.textures.base = $Texture
-$style.animations = [ordered]@{
-    idle_head_shake = [ordered]@{ animation = "idle_head_shake"; trigger = "loop"; priority = 20 }
-    screen_wave = [ordered]@{ animation = "screen_wave"; trigger = "on_screen_open"; priority = 60 }
-    totem_struggle = [ordered]@{ animation = $struggleAnimation; trigger = "on_totem_activate"; priority = 100 }
+if ($hasAnimations) {
+    $style.animations = [ordered]@{}
+    foreach ($name in $convertedAnimations.Keys) {
+        $trigger = if ($name -eq $struggleAnimation) { "on_totem_activate" } else { "loop" }
+        $priority = if ($trigger -eq "on_totem_activate") { 100 } else { 20 }
+        $style.animations[$name] = [ordered]@{ animation = $name; trigger = $trigger; priority = $priority }
+    }
 }
 $style | ConvertTo-Json -Depth 32 | Set-Content -LiteralPath $styleFile -Encoding UTF8
+CopyTexture $project $InputFile $textureOutput

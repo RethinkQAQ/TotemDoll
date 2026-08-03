@@ -1,11 +1,11 @@
 {
-  "format": 2,
+  "format": 3,
   "id": "totemdoll:steve",
   "origin": "builtin",
   "name": "Steve Doll",
   "name_key": "doll.totemdoll.steve",
-  "model": { "type": "minecraft_item", "file": "models/doll/steve.json" },
-  "textures": { "base": "textures/item/doll/steve" },
-  "skin": { "supported": true, "format": "minecraft_64x64", "target": "0", "mapping": "minecraft_player" },
+  "model": { "type": "mesh", "geometry": "models/geometry.json" },
+  "textures": { "base": "textures/base.png" },
+  "skin": { "supported": true, "format": "minecraft_64x64", "target": "base", "mapping": "minecraft_player" },
   "features": { "animations": false, "dynamic_textures": false }
 }

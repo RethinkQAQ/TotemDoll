@@ -11,15 +11,32 @@ export interface StudioProject {
 }
 
 const idPattern = /^[a-z0-9_.-]+:[a-z0-9_./-]+$/;
+const isSafeRelativePath = (path: string) =>
+  path.length > 0 && !path.includes(":") && !path.split(/[\\/]/).includes("..") &&
+  !path.startsWith("/") && !path.startsWith("\\") && !/^[A-Za-z]:/.test(path);
 
 export function validateProject(project: StudioProject, template: OfficialTemplate) {
   const errors: string[] = [];
+  const runtimeStyle = project.style as StyleDefinition & {
+    format?: number;
+    model?: { type?: string; geometry?: string; animations?: string };
+  };
+  if (runtimeStyle.format !== 3) errors.push("样式必须使用 format:3。");
+  if (runtimeStyle.model?.type !== "mesh") errors.push("format:3 只支持 mesh 模型。");
   if (!idPattern.test(project.pack.id)) errors.push("样式包 ID 不是合法的 ResourceLocation。");
   if (!idPattern.test(project.style.id)) errors.push("样式 ID 不是合法的 ResourceLocation。");
   if (project.style.id.startsWith("totemdoll:") || project.style.id.startsWith("template:")) errors.push("样式 ID 必须使用自己的命名空间。");
   const known = new Set(template.files);
+  const modelPaths = [runtimeStyle.model?.geometry, runtimeStyle.model?.animations].filter(
+    (path): path is string => Boolean(path)
+  );
+  if (!runtimeStyle.model?.geometry) errors.push("mesh 模型缺少 geometry 路径。");
+  for (const path of modelPaths) {
+    if (!isSafeRelativePath(path)) errors.push(`模型路径不安全：${path}`);
+    else if (!known.has(path) && !project.overrides.has(path)) errors.push(`缺少模型文件：${path}`);
+  }
   for (const path of Object.values(project.style.textures)) {
-    if (path.includes("..") || path.startsWith("/") || /^[A-Za-z]:/.test(path)) errors.push(`纹理路径不安全：${path}`);
+    if (!isSafeRelativePath(path) || !path.toLowerCase().endsWith(".png")) errors.push(`纹理路径不安全或不是 PNG：${path}`);
     if (!known.has(path) && !project.overrides.has(path)) errors.push(`缺少纹理文件：${path}`);
   }
   for (const [name, animation] of Object.entries(project.style.texture_animations ?? {})) {

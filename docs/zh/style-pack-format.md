@@ -1,147 +1,66 @@
-﻿# Totem Doll 样式包格式
+# 样式包格式
 
-当前样式格式为 `format: 2`，包清单格式为 `format: 1`。未知字段会被忽略，方便未来扩展。
+当前样式格式为 `format: 3`，包清单格式为 `format: 1`。样式格式与 Minecraft 版本无关，未知字段会被忽略。
 
-## 单样式与多样式
-
-单样式包根目录直接包含 `style.json`：
+## 目录
 
 ```text
-my-style/
+pack.json
+styles/example/
 ├── style.json
 ├── models/
+│   ├── geometry.json
+│   └── animations.json
 └── textures/
+    └── base.png
 ```
 
-多样式包通过 `pack.json` 声明样式：
-
-```json
-{
-  "format": 1,
-  "id": "example:character_pack",
-  "name": "Character Pack",
-  "author": "Author",
-  "styles": [
-    "styles/alex/style.json",
-    "styles/robot/style.json"
-  ]
-}
-```
-
-`styles` 中的路径相对于 `pack.json`。路径必须是相对路径，不能包含 `..`。
+`pack.json` 的 `styles` 数组列出样式清单。单样式 ZIP 也可以直接以 `style.json` 为根。
 
 ## style.json
 
 ```json
 {
-  "format": 2,
-  "id": "example:alex",
-  "name": "Alex Doll",
+  "format": 3,
+  "id": "author:example",
+  "name": "Example Doll",
   "model": {
-    "type": "minecraft_item",
-    "file": "models/main.json"
-  },
-  "textures": {
-    "skin": "textures/base.png"
-  },
-  "skin": {
-    "supported": true,
-    "format": "minecraft_64x64",
-    "target": "skin",
-    "mapping": "minecraft_player"
-  },
-  "features": {
-    "animations": false,
-    "dynamic_textures": false
-  }
-}
-```
-
-- `id` 必须是合法的 Minecraft ResourceLocation，并在所有已加载样式中唯一。
-- `name` 是没有语言文件时显示的名称；内置资源也可以使用 `name_key`。
-- `origin` 由模组决定，发布包无需填写。
-- `template` 仅用于玩家创建的派生样式。
-- `textures` 的值推荐使用相对于当前 `style.json` 的 PNG 路径。导入器会转换为当前 Minecraft 版本使用的资源路径。
-
-## 模型类型
-
-### minecraft_item
-
-```json
-{
-  "model": {
-    "type": "minecraft_item",
-    "file": "models/main.json"
-  }
-}
-```
-
-模型是 Blockbench 的 Minecraft Java Item/Block JSON。支持元素、每面 UV、多纹理槽和 `display`。
-
-### minecraft_bone
-
-```json
-{
-  "model": {
-    "type": "minecraft_bone",
+    "type": "mesh",
     "geometry": "models/geometry.json",
     "animations": "models/animations.json"
-  }
-}
-```
-
-`geometry.json` 保存骨骼、立方体和显示变换；`animations.json` 保存动作。动画文件可省略，此时模型使用静态姿态。
-
-## 自定义皮肤
-
-只有明确声明以下字段的样式才会显示“创建”：
-
-```json
-{
+  },
+  "textures": { "base": "textures/base.png" },
   "skin": {
     "supported": true,
     "format": "minecraft_64x64",
     "target": "base",
     "mapping": "minecraft_player"
-  }
+  },
+  "features": { "animations": true, "dynamic_textures": false },
+  "animations": {}
 }
 ```
 
-`target` 必须与 `textures` 中的纹理槽一致。当前只接受 64×64 PNG。
+`model.type` 固定为 `mesh`。所有模型和纹理路径都相对于当前 `style.json`，不允许绝对路径、命名空间路径或 `..`。
 
-## 动态纹理
+静态样式只提供 `geometry`；动画样式额外提供 `animations`。geometry 支持骨骼层级、pivot、cube、旋转、逐面 UV、mirror 和 display 变换。
 
-```json
-{
-  "textures": {
-    "open": "textures/open.png",
-    "closed": "textures/closed.png"
-  },
-  "features": {
-    "animations": true,
-    "dynamic_textures": true
-  },
-  "texture_animations": {
-    "blink": {
-      "type": "frame_sequence",
-      "frames": ["open", "closed", "open"],
-      "frame_duration": 3,
-      "trigger": "random_idle",
-      "interval": { "min": 80, "max": 180 }
-    }
-  }
-}
+## 显示上下文
+
+display 可写在 `style.json` 或 `geometry.json`，style 优先。稳定上下文名为 `gui`、`ground`、`fixed`、`firstperson`、`thirdperson` 和 `head`。每项包含 `rotation`、`translation`、`scale` 三元数组。
+
+## 动画
+
+骨骼动画文件使用 tick、角度和倍率。顶层 `animations` 将动作绑定到 `loop`、`random_idle`、`on_screen_open`、`on_totem_activate` 或 `manual` 触发器。
+
+纹理帧动画使用 `texture_animations`，帧名称必须引用 `textures` 中的逻辑槽。`frame_duration` 和随机区间都使用 tick。
+
+## 工具链
+
+Blockbench 是创作格式，游戏不直接读取 `.bbmodel`。使用：
+
+```powershell
+.\tools\convert-bbmodel.ps1 -InputFile .\model.bbmodel -OutputDirectory .\styles\example -StyleId author:example
 ```
 
-`texture_animations` 专门用于纹理帧序列。动画名称对应 `textures` 中的纹理槽名称，不再用于骨骼动作绑定。支持 `random_idle`、`loop`、`on_screen_open`、`on_totem_activate` 和 `manual` 触发器。
-
-对于骨骼模型，`model.animations` 指向 Blockbench 导出的骨骼动画文件；顶层 `animations` 只用于声明动作绑定。纹理帧动画不能写入这个字段。`minecraft_item` 和 `minecraft_bone` 都可以使用 `texture_animations`。
-
-## 安全和限制
-
-- ZIP 解压后最大 64 MiB、最多 2048 个文件。
-- 禁止绝对路径、盘符路径和 `..` 路径。
-- 骨骼最多 256 个、层级深度最多 64。
-- 单个样式最多 64 个动作。
-- 样式包不能执行 Java、JavaScript 或其他脚本。
-
+转换器会生成 `format: 3` 的 style、geometry 和可选 animations。Minecraft 原生 `parent`、`overrides`、特殊模型和第三方 loader 不属于 mesh 格式。

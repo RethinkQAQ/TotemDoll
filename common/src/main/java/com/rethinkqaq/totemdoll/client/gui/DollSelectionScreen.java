@@ -232,6 +232,13 @@ public final class DollSelectionScreen extends Screen implements DollScreenParen
         );
         graphics.disableScissor();
 
+        // Draw fixed panels after the scrollable cards. Card previews can extend
+        // beyond their widget bounds, so the opaque header/sidebar masks that
+        // overlap. Regular widgets are rendered afterwards so the panels do not
+        // cover the sidebar buttons.
+        renderHeader(graphics);
+        renderSidebar(graphics);
+
         DollScreenRender.renderChildren(
                 this,
                 graphics,
@@ -240,15 +247,6 @@ public final class DollSelectionScreen extends Screen implements DollScreenParen
                 partialTick,
                 child -> !(child instanceof DollCardWidget)
         );
-
-        // Draw fixed panels after the scrollable cards. Card previews can extend
-        // beyond their widget bounds, so the opaque header/sidebar must be the
-        // final layer to mask any overlap.
-        graphics.pose().pushPose();
-        graphics.pose().translate(0.0F, 0.0F, 200.0F);
-        renderHeader(graphics);
-        renderSidebar(graphics);
-        graphics.pose().popPose();
     }
 
     private void renderHeader(GuiGraphics graphics) {

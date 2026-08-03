@@ -1,4 +1,0 @@
-{
-  "parent": "totemdoll:doll/blink_alex",
-  "textures": { "0": "totemdoll:item/doll/blink_alex/half", "particle": "totemdoll:item/doll/blink_alex/half" }
-}

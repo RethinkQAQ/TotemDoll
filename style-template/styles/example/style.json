@@ -1,24 +1,19 @@
 {
-  "format": 2,
+  "format": 3,
   "id": "example:style_template",
   "name": "Style Template",
   "model": {
-    "type": "minecraft_item",
-    "file": "models/main.json"
+    "type": "mesh",
+    "geometry": "models/geometry.json"
   },
   "textures": {
-    "skin": "textures/base.png"
+    "base": "textures/base.png"
   },
   "skin": {
     "supported": true,
     "format": "minecraft_64x64",
-    "target": "skin",
+    "target": "base",
     "mapping": "minecraft_player"
-  },
-  "display": {
-    "scale": 1.0,
-    "rotation": [0.0, 0.0, 0.0],
-    "translation": [0.0, 0.0, 0.0]
   },
   "features": {
     "animations": false,

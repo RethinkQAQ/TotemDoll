@@ -1,6 +1,6 @@
 # Blockbench Animation Workflow
 
-Totem Doll does not read `.bbmodel` files at runtime. Use Blockbench to edit bones and keyframes, then export the runtime files `geometry.json`, `animations.json`, and `style.json`.
+Totem Doll does not read `.bbmodel` files at runtime. Use Blockbench to edit static or animated meshes, then export the version-independent `format: 3` runtime files `geometry.json`, `animations.json`, and `style.json`.
 
 ## Recommended hierarchy
 

@@ -1,20 +1,20 @@
 ﻿{
-    "format":  2,
+    "format":  3,
     "id":  "totemdoll:animated_blink_alex",
     "origin":  "builtin",
     "name":  "Animated Blinking Alex Doll",
     "name_key":  "doll.totemdoll.animated_blink_alex",
     "model":  {
-                  "type":  "minecraft_bone",
+                  "type":  "mesh",
                   "geometry":  "models/geometry.json",
                   "animations":  "models/animations.json"
               },
     "textures":  {
-                     "base":  "totemdoll:textures/item/doll/blink_alex/open.png",
-                     "open":  "totemdoll:textures/item/doll/blink_alex/open.png",
-                     "half":  "totemdoll:textures/item/doll/blink_alex/half.png",
-                     "close":  "totemdoll:textures/item/doll/blink_alex/close.png",
-                     "activate":  "totemdoll:textures/item/doll/blink_alex/activate.png"
+                     "base":  "textures/open.png",
+                     "open":  "textures/open.png",
+                     "half":  "textures/half.png",
+                     "close":  "textures/close.png",
+                     "activate":  "textures/activate.png"
                  },
     "features":  {
                      "animations":  true,

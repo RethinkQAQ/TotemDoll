@@ -1,13 +1,13 @@
 {
-  "format": 2,
+  "format": 3,
   "id": "example:animated_example",
   "name": "Animated Example",
   "model": {
-    "type": "minecraft_bone",
+    "type": "mesh",
     "geometry": "models/geometry.json",
     "animations": "models/animations.json"
   },
-  "textures": { "base": "example:styles/animated_example/textures/base.png" },
+  "textures": { "base": "textures/base.png" },
   "skin": {
     "supported": true,
     "format": "minecraft_64x64",

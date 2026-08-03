@@ -1,16 +1,16 @@
 ﻿{
-    "format":  2,
+    "format":  3,
     "id":  "totemdoll:animated_steve",
     "origin":  "builtin",
     "name":  "Animated Steve Doll",
     "name_key":  "doll.totemdoll.animated_steve",
     "model":  {
-                  "type":  "minecraft_bone",
+                  "type":  "mesh",
                   "geometry":  "models/geometry.json",
                   "animations":  "models/animations.json"
               },
     "textures":  {
-                     "base":  "totemdoll:textures/item/doll/steve.png"
+                     "base":  "textures/base.png"
                  },
     "skin":  {
                  "supported":  true,

@@ -45,7 +45,7 @@ public final class DollStyles {
             false,
             null,
             DollStyleOrigin.BUILTIN,
-            Map.of(), List.of(), "minecraft_item", null
+            Map.of(), List.of(), "mesh", null
     );
 
     private static final Map<ResourceLocation, DollStyle> STYLES = new LinkedHashMap<>();

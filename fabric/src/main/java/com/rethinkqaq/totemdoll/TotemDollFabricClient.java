@@ -24,7 +24,6 @@ import com.rethinkqaq.totemdoll.client.TotemDollClient;
 import com.rethinkqaq.totemdoll.client.gui.DollSelectionScreen;
 import com.rethinkqaq.totemdoll.doll.DollStyleLoader;
 import com.rethinkqaq.totemdoll.doll.DollAnimationManager;
-import com.rethinkqaq.totemdoll.doll.DollAnimationModels;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -43,15 +42,8 @@ public final class TotemDollFabricClient implements ClientModInitializer {
                 FabricLoader.getInstance().getConfigDir(),
                 FabricLoader.getInstance().getGameDir()
         );
-        ModelLoadingPlugin.register(context -> {
-            context.addModels(
-                    DollStyleLoader.reload(Minecraft.getInstance().getResourceManager()).stream()
-                            .flatMap(style -> java.util.stream.Stream.concat(
-                                    java.util.stream.Stream.of(style.model()),
-                                    DollAnimationModels.modelIds(style).stream()))
-                            .toList()
-            );
-        });
+        ModelLoadingPlugin.register(context ->
+                DollStyleLoader.reload(Minecraft.getInstance().getResourceManager()));
         KeyMapping openConfig = KeyBindingHelper.registerKeyBinding(new KeyMapping(
                 "key.totemdoll.open_config",
                 InputConstants.Type.KEYSYM,

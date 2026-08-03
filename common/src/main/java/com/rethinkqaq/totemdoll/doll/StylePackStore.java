@@ -41,7 +41,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-/** Portable style-pack import/export storage for the current format-2 runtime. */
+/** Portable style-pack import/export storage for the version-independent format-3 runtime. */
 public final class StylePackStore {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final long MAX_BYTES = 64L * 1024L * 1024L;
@@ -104,49 +104,30 @@ public final class StylePackStore {
 
     private static void compileStyle(String packKey, Path styleFile) throws IOException {
         JsonObject style = read(styleFile);
-        if (!style.has("format") || style.get("format").getAsInt() != 2) throw new IOException("Expected format 2");
+        if (!style.has("format") || style.get("format").getAsInt() != 3) throw new IOException("Expected format 3");
         ResourceLocation id = ResourceLocation.tryParse(style.get("id").getAsString());
         if (id == null) throw new IOException("Invalid style id");
         String key = safeName(packKey) + "/" + safeName(id.getPath());
         Path root = styleFile.getParent();
-        JsonObject textures = style.getAsJsonObject("textures");
-        if (textures != null) {
-            for (String slot : textures.keySet()) {
-                String value = textures.get(slot).getAsString();
-                if (value.contains(":")) continue;
-                Path source = safeResolve(root, value);
-                String fileName = safeName(source.getFileName().toString());
-                Path target = generatedPackDirectory.resolve("assets").resolve(id.getNamespace())
-                        .resolve("textures/totemdoll/imported").resolve(key).resolve(fileName);
-                Files.createDirectories(target.getParent());
-                Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
-                textures.addProperty(slot, id.getNamespace() + ":totemdoll/imported/" + key + "/" + fileName.replaceFirst("\\.png$", ""));
-            }
-        }
         JsonObject model = style.getAsJsonObject("model");
         if (model == null) throw new IOException("Missing model");
         String type = model.get("type").getAsString();
+        if (!"mesh".equals(type)) throw new IOException("Unsupported model type " + type);
         Path styleTarget = generatedPackDirectory.resolve("assets").resolve(id.getNamespace())
                 .resolve("styles/imported").resolve(key).resolve("style.json");
-        if ("minecraft_item".equals(type)) {
-            String file = safePath(model, "file");
-            Path modelTarget = generatedPackDirectory.resolve("assets").resolve(id.getNamespace())
-                    .resolve("models/totemdoll/imported").resolve(key).resolve("main.json");
-            JsonObject modelJson = read(safeResolve(root, file));
-            if (textures != null && modelJson.has("textures")) {
-                JsonObject modelTextures = modelJson.getAsJsonObject("textures");
-                for (String slot : textures.keySet()) {
-                    if (modelTextures.has(slot)) modelTextures.addProperty(slot, textures.get(slot).getAsString());
-                }
-            }
-            write(modelTarget, modelJson);
-            model.addProperty("file", "models/totemdoll/imported/" + key + "/main.json");
-        } else if ("minecraft_bone".equals(type)) {
-            copyModelFile(root, model, "geometry", styleTarget.getParent().resolve("models/geometry.json"));
-            if (model.has("animations")) copyModelFile(root, model, "animations", styleTarget.getParent().resolve("models/animations.json"));
-            model.addProperty("geometry", "models/geometry.json");
-            if (model.has("animations")) model.addProperty("animations", "models/animations.json");
-        } else throw new IOException("Unsupported model type " + type);
+        copyModelFile(root, model, "geometry", styleTarget.getParent().resolve("models/geometry.json"));
+        if (model.has("animations")) copyModelFile(root, model, "animations", styleTarget.getParent().resolve("models/animations.json"));
+        model.addProperty("geometry", "models/geometry.json");
+        if (model.has("animations")) model.addProperty("animations", "models/animations.json");
+        JsonObject textures = style.getAsJsonObject("textures");
+        if (textures == null || !textures.has("base")) throw new IOException("Missing textures.base");
+        for (String slot : textures.keySet()) {
+            String value = safePath(textures, slot);
+            Path target = styleTarget.getParent().resolve(value).normalize();
+            if (!target.startsWith(styleTarget.getParent().normalize())) throw new IOException("Invalid texture path");
+            Files.createDirectories(target.getParent());
+            Files.copy(safeResolve(root, value), target, StandardCopyOption.REPLACE_EXISTING);
+        }
         style.addProperty("origin", "imported");
         write(styleTarget, style);
     }
@@ -160,28 +141,13 @@ public final class StylePackStore {
             JsonObject exportedStyle = read(source.resolve("style.json"));
             JsonObject model = exportedStyle.getAsJsonObject("model");
             String modelType = model.get("type").getAsString();
-            model.addProperty("file", "models/main.json");
-            if ("minecraft_bone".equals(modelType)) {
-                model.remove("file");
-                model.addProperty("geometry", "models/geometry.json");
-                if (model.has("animations")) model.addProperty("animations", "models/animations.json");
-            }
+            if (!"mesh".equals(modelType)) throw new IOException("Unsupported model type " + modelType);
+            model.addProperty("geometry", "models/geometry.json");
+            if (model.has("animations")) model.addProperty("animations", "models/animations.json");
             JsonObject textures = exportedStyle.getAsJsonObject("textures");
             if (textures == null) { textures = new JsonObject(); exportedStyle.add("textures", textures); }
-            String textureSlot = "minecraft_bone".equals(modelType) ? "base" : "0";
             textures.entrySet().clear();
-            textures.addProperty(textureSlot, "textures/skin.png");
-            JsonObject modelJson = null;
-            Path localModel = source.resolve("model.json");
-            if ("minecraft_item".equals(modelType)) {
-                modelJson = read(localModel);
-                JsonObject modelTextures = modelJson.getAsJsonObject("textures");
-                if (modelTextures != null) {
-                    for (String slot : modelTextures.keySet()) {
-                        if (!modelTextures.get(slot).getAsString().startsWith("#")) modelTextures.addProperty(slot, "exported:skin");
-                    }
-                }
-            }
+            textures.addProperty("base", "textures/skin.png");
             JsonObject pack = new JsonObject();
             pack.addProperty("format", 1);
             pack.addProperty("id", style.id().toString() + "_pack");
@@ -193,11 +159,8 @@ public final class StylePackStore {
             addEntry(archive, "pack.json", GSON.toJson(pack).getBytes(StandardCharsets.UTF_8));
             String base = "styles/" + style.id().getPath() + "/";
             addEntry(archive, base + "style.json", GSON.toJson(exportedStyle).getBytes(StandardCharsets.UTF_8));
-            if ("minecraft_item".equals(modelType)) addEntry(archive, base + "models/main.json", GSON.toJson(modelJson).getBytes(StandardCharsets.UTF_8));
-            else {
-                addEntry(archive, base + "models/geometry.json", Files.readAllBytes(source.resolve("geometry.json")));
-                if (model.has("animations")) addEntry(archive, base + "models/animations.json", Files.readAllBytes(source.resolve("animations.json")));
-            }
+            addEntry(archive, base + "models/geometry.json", Files.readAllBytes(source.resolve("geometry.json")));
+            if (model.has("animations")) addEntry(archive, base + "models/animations.json", Files.readAllBytes(source.resolve("animations.json")));
             addEntry(archive, base + "textures/skin.png", Files.readAllBytes(source.resolve("skin.png")));
         }
     }

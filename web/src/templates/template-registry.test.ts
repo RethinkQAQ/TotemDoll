@@ -8,6 +8,13 @@ describe("official template registry", () => {
     ]);
   });
 
+  it("uses one version-independent mesh format", () => {
+    expect(officialTemplates.every((template) => template.style.format === 3)).toBe(true);
+    expect(officialTemplates.every((template) => template.style.model.type === "mesh")).toBe(true);
+    expect(officialTemplates.every((template) => template.style.model.geometry.endsWith("geometry.json"))).toBe(true);
+    expect(officialTemplates.every((template) => !template.files.some((path) => path.endsWith("models/main.json")))).toBe(true);
+  });
+
   it("creates an independent user-owned project", () => {
     const template = officialTemplates[1];
     const project = createProject(template, 123456);

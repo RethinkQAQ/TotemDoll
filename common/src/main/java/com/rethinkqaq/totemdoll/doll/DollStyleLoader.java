@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.LinkedHashMap;
 
-/** Loads the format-2 style manifests supplied by built-in resources and packs. */
+/** Loads version-independent format-3 mesh style manifests. */
 public final class DollStyleLoader {
     private static final Gson GSON = new Gson();
 
@@ -64,8 +64,8 @@ public final class DollStyleLoader {
                                 List<DollStyle> output) {
         try (Reader reader = resource.openAsReader()) {
             JsonObject root = GSON.fromJson(reader, JsonObject.class);
-            if (root == null || !root.has("format") || root.get("format").getAsInt() != 2) {
-                throw new IllegalArgumentException("Expected style format 2");
+            if (root == null || !root.has("format") || root.get("format").getAsInt() != 3) {
+                throw new IllegalArgumentException("Expected style format 3");
             }
             if (root.has("enabled") && !root.get("enabled").getAsBoolean()) {
                 return;
@@ -74,41 +74,23 @@ public final class DollStyleLoader {
             JsonObject model = root.getAsJsonObject("model");
             if (model == null || !model.has("type")) throw new IllegalArgumentException("Missing model.type");
             String modelType = model.get("type").getAsString();
-            boolean boneModel = "minecraft_bone".equals(modelType);
-            if (!boneModel && !"minecraft_item".equals(modelType))
-                throw new IllegalArgumentException("Unsupported model type " + modelType);
-            ResourceLocation modelId;
-            if (boneModel) {
-                DollBoneModel loadedModel = DollBoneModelLoader.load(manager, source, root, model);
-                DollBoneModels.put(id, loadedModel);
-                modelId = ResourceLocation.withDefaultNamespace("item/totem_of_undying");
-            } else {
-                modelId = resolveAsset(source, requiredPath(model, "file"));
-            }
+            if (!"mesh".equals(modelType)) throw new IllegalArgumentException("Unsupported model type " + modelType);
+            DollBoneModel loadedModel = DollBoneModelLoader.load(manager, source, root, model);
+            DollBoneModels.put(id, loadedModel);
+            ResourceLocation modelId = ResourceLocation.withDefaultNamespace("item/totem_of_undying");
             String name = root.has("name") ? root.get("name").getAsString() : id.toString();
             String nameKey = root.has("name_key") ? root.get("name_key").getAsString() : null;
             ResourceLocation template = root.has("template") ? requiredId(root, "template") : null;
             DollSkinDefinition skin = readSkin(root);
             DollStyleOrigin origin = readOrigin(root, source);
-            Map<String, ResourceLocation> textures = readTextures(root, boneModel);
-            List<DollAnimationDefinition> animations = readTextureAnimations(root, textures, boneModel);
-            output.add(new DollStyle(id, name, nameKey, modelId, !boneModel, template,
+            Map<String, ResourceLocation> textures = readTextures(source, root);
+            List<DollAnimationDefinition> animations = readTextureAnimations(root, textures);
+            output.add(new DollStyle(id, name, nameKey, modelId, false, template,
                     origin == DollStyleOrigin.LOCAL, skin, origin, textures, animations,
                     modelType, source));
         } catch (Exception exception) {
             Constants.LOG.error("Could not load style {}", source, exception);
         }
-    }
-
-    private static ResourceLocation resolveAsset(ResourceLocation source, String file) {
-        String path = file.replace('\\', '/');
-        if (path.startsWith("models/")) {
-            return ResourceLocation.fromNamespaceAndPath(source.getNamespace(), path.substring(7, path.length() - (path.endsWith(".json") ? 5 : 0)));
-        }
-        String parent = source.getPath().substring(0, source.getPath().lastIndexOf('/'));
-        String resolved = parent + "/" + path;
-        if (resolved.startsWith("styles/")) resolved = resolved.substring(7);
-        return ResourceLocation.fromNamespaceAndPath(source.getNamespace(), resolved.substring(0, resolved.length() - 5));
     }
 
     private static DollStyleOrigin readOrigin(JsonObject root, ResourceLocation source) {
@@ -127,31 +109,15 @@ public final class DollStyleLoader {
         return result.supportsImport() ? result : null;
     }
 
-    private static Map<String, ResourceLocation> readTextures(JsonObject root, boolean boneModel) {
+    private static Map<String, ResourceLocation> readTextures(ResourceLocation source, JsonObject root) {
         Map<String, ResourceLocation> result = new LinkedHashMap<>();
         JsonObject textures = root.getAsJsonObject("textures");
         if (textures == null) return result;
         for (String key : textures.keySet()) {
-            ResourceLocation id = parseTextureId(textures.get(key).getAsString(), boneModel);
-            if (id != null) result.put(key, id);
+            String path = safeRelativePath(textures.get(key).getAsString());
+            result.put(key, resolve(source, path));
         }
         return result;
-    }
-
-    /**
-     * Item models reference atlas sprites (namespace:item/foo), while the
-     * custom bone renderer binds a texture file directly
-     * (namespace:textures/item/foo.png). Keep those two forms separate.
-     */
-    private static ResourceLocation parseTextureId(String value, boolean boneModel) {
-        String normalized = value.replace('\\', '/');
-        ResourceLocation id = ResourceLocation.tryParse(normalized);
-        if (id == null || !boneModel) return id;
-
-        String path = id.getPath();
-        if (!path.startsWith("textures/")) path = "textures/" + path;
-        if (!path.endsWith(".png")) path += ".png";
-        return ResourceLocation.fromNamespaceAndPath(id.getNamespace(), path);
     }
 
     private static List<DollAnimationDefinition> readAnimations(JsonObject root, Map<String, ResourceLocation> textures) {
@@ -188,12 +154,24 @@ public final class DollStyleLoader {
     }
 
     private static List<DollAnimationDefinition> readTextureAnimations(JsonObject root,
-                                                                         Map<String, ResourceLocation> textures,
-                                                                         boolean boneModel) {
+                                                                         Map<String, ResourceLocation> textures) {
         if (!root.has("texture_animations")) return List.of();
         JsonObject copy = root.deepCopy();
         copy.add("animations", root.get("texture_animations").deepCopy());
         return readAnimations(copy, textures);
+    }
+
+    private static ResourceLocation resolve(ResourceLocation source, String relative) {
+        String parent = source.getPath().substring(0, source.getPath().lastIndexOf('/') + 1);
+        return ResourceLocation.fromNamespaceAndPath(source.getNamespace(), parent + relative);
+    }
+
+    private static String safeRelativePath(String value) {
+        String path = value.replace('\\', '/');
+        if (path.isBlank() || path.startsWith("/") || path.contains("..") || path.contains(":"))
+            throw new IllegalArgumentException("Invalid relative path " + value);
+        if (!path.endsWith(".png")) throw new IllegalArgumentException("Texture must be a PNG: " + value);
+        return path;
     }
 
     private static ResourceLocation requiredId(JsonObject object, String key) {

@@ -48,9 +48,9 @@ public final class DollBoneModelLoader {
         int textureWidth = integer(geometry, "texture_width", 64);
         int textureHeight = integer(geometry, "texture_height", 64);
         JsonObject textures = style.getAsJsonObject("textures");
-        if (textures == null || !textures.has("base")) throw new IOException("Bone model requires textures.base");
-        ResourceLocation texture = ResourceLocation.tryParse(textures.get("base").getAsString());
-        if (texture == null) throw new IOException("Invalid textures.base");
+        if (textures == null || !textures.has("base")) throw new IOException("Mesh model requires textures.base");
+        String texturePath = safeRelativePath(textures.get("base").getAsString(), "textures.base");
+        ResourceLocation texture = resolve(styleSource, texturePath);
 
         List<DollBone> roots = new ArrayList<>();
         List<JsonElement> bones = elements(geometry, "bones");
@@ -62,11 +62,12 @@ public final class DollBoneModelLoader {
                 ? Map.of() : readAnimations(manager, resolve(styleSource, animationsPath));
         List<DollActionBinding> bindings = readBindings(style, animations);
         return new DollBoneModel(textureWidth, textureHeight, texture, List.copyOf(roots),
-                Map.copyOf(animations), List.copyOf(bindings), readDisplay(geometry));
+                Map.copyOf(animations), List.copyOf(bindings), readDisplay(style, geometry));
     }
 
-    private static Map<String, DollDisplayTransform> readDisplay(JsonObject geometry) {
-        JsonObject display = geometry.getAsJsonObject("display");
+    private static Map<String, DollDisplayTransform> readDisplay(JsonObject style, JsonObject geometry) {
+        JsonObject display = style.getAsJsonObject("display");
+        if (display == null) display = geometry.getAsJsonObject("display");
         if (display == null) return Map.of();
         Map<String, DollDisplayTransform> result = new LinkedHashMap<>();
         for (String context : display.keySet()) {
@@ -81,10 +82,19 @@ public final class DollBoneModelLoader {
             translation[0] /= 16F;
             translation[1] /= 16F;
             translation[2] /= 16F;
-            result.put(context, new DollDisplayTransform(rotation[0], rotation[1], rotation[2],
+            result.put(normalizeDisplayContext(context), new DollDisplayTransform(rotation[0], rotation[1], rotation[2],
                     translation[0], translation[1], translation[2], scale[0], scale[1], scale[2]));
         }
         return Map.copyOf(result);
+    }
+
+    private static String normalizeDisplayContext(String context) {
+        return switch (context) {
+            case "firstperson_righthand", "firstperson_lefthand" -> "firstperson";
+            case "thirdperson_righthand", "thirdperson_lefthand" -> "thirdperson";
+            case "none" -> "fixed";
+            default -> context;
+        };
     }
 
     private static DollBone readBone(JsonObject object, int depth, Counter counter) throws IOException {
@@ -224,6 +234,14 @@ public final class DollBoneModelLoader {
         String value = object.get(key).getAsString().replace('\\', '/');
         if (value.isBlank() || value.startsWith("/") || value.contains("..")) throw new IOException("Invalid path " + value);
         return value;
+    }
+
+    private static String safeRelativePath(String value, String key) throws IOException {
+        String path = value.replace('\\', '/');
+        if (path.isBlank() || path.startsWith("/") || path.contains("..") || path.contains(":"))
+            throw new IOException("Invalid relative path " + key);
+        if (!path.endsWith(".png")) throw new IOException(key + " must reference a PNG");
+        return path;
     }
 
     private static int integer(JsonObject object, String key, int fallback) {

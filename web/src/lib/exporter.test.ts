@@ -15,4 +15,13 @@ describe("project validation", () => {
     project.style.textures.base = "../secret.png";
     expect(validateProject(project, template).join(" ")).toMatch(/命名空间|不安全/);
   });
+  it("rejects non-format-3 projects and unsafe model paths", () => {
+    const template = officialTemplates[0];
+    const project = createProject(template, 123456);
+    (project.style as { format: number }).format = 2;
+    project.style.model.geometry = "../native-model.json";
+    const errors = validateProject(project, template).join(" ");
+    expect(errors).toMatch(/format:3/);
+    expect(errors).toMatch(/模型路径不安全/);
+  });
 });

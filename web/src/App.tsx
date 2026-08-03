@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import JSZip from "jszip";
 import { BonePreview } from "./BonePreview";
-import { ItemModelRenderer } from "./ItemModelRenderer";
 import { TextureEditor } from "./TextureEditor";
 import { TextureTimeline } from "./TextureTimeline";
 import { Icon } from "./Icon";
@@ -152,7 +151,7 @@ export function App() {
         character: "Alex",
         description: "从本地 ZIP 导入的样式",
         source: "builtin",
-        preview: style.model?.type === "minecraft_bone" ? "bone" : "item",
+        preview: style.model?.animations ? "bone" : "item",
         root: "local",
         files: [...files.keys()],
         editable: ["skin", "actions", "texture_frames"],
@@ -283,16 +282,7 @@ export function App() {
               <Icon name={playing ? "pause" : "play"} />
             </button>
           </div>
-          {model.type === "minecraft_item" ? (
-            <ItemModelRenderer
-              store={store}
-              modelPath={model.file}
-              texturePath={currentPath}
-              textureSlots={project.style.textures}
-              displayTransform="editor"
-            />
-          ) : (
-            <BonePreview
+          <BonePreview
               store={store}
               geometryPath={model.geometry}
               animationsPath={model.animations}
@@ -304,7 +294,6 @@ export function App() {
               textureSlots={project.style.textures}
               textureAnimation={currentTextureAnimation}
             />
-          )}
           <div className="editor-bottom">
             {currentTextureAnimation && (
               <TextureTimeline animation={currentTextureAnimation} selected={frame} onSelect={setFrame} />
@@ -601,8 +590,7 @@ function TemplateCard({ template, onUse }: { template: OfficialTemplate; onUse: 
   return (
     <article className="template-card model-card">
       <div className="card-model">
-        {model.type === "minecraft_bone" ? (
-          <BonePreview
+        <BonePreview
             store={store}
             geometryPath={model.geometry}
             animationsPath={model.animations}
@@ -617,19 +605,6 @@ function TemplateCard({ template, onUse }: { template: OfficialTemplate; onUse: 
             textureAnimation={textureAnimation}
             previewYaw={-18}
           />
-        ) : (
-          <ItemModelRenderer
-            store={store}
-            modelPath={model.file}
-            texturePath={texturePath}
-            textureSlots={template.style.textures}
-            textureAnimation={textureAnimation}
-            interactive={false}
-            displayTransform="game"
-            fitScale={1.25}
-            previewYaw={-18}
-          />
-        )}
       </div>
       <div className="card-body">
         <div className="tags">

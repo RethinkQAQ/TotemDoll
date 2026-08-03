@@ -20,7 +20,7 @@ root
 
 - `geometry.json`：骨骼层级、pivot、立方体和 UV。
 - `animations.json`：rotation、position、scale 时间轴。
-- `style.json`：模型类型、纹理和触发规则。
+- `style.json`：`format: 3` mesh、纹理和触发规则。
 - `textures/base.png`：模型纹理。
 
 第一版插值支持 `linear`、`step`、`smooth`；触发器支持 `loop`、`random_idle`、`on_screen_open`、`on_totem_activate` 和 `manual`。

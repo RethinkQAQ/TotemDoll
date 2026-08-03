@@ -36,8 +36,8 @@ import net.minecraft.network.chat.Component;
 import org.lwjgl.util.tinyfd.TinyFileDialogs;
 
 //? >= 1.21.3 {
-import net.minecraft.client.renderer.RenderType;
-//?}
+/*import net.minecraft.client.renderer.RenderType;
+*///?}
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -205,7 +205,7 @@ public final class DollCreateScreen extends Screen {
         if (previewTexture != null) {
             int previewX = Math.min(this.width - 72, this.width / 2 + 140);
             int previewCenter = previewX + 32;
-            graphics.blit(/*? >= 1.21.3 {*/RenderType::guiTextured, /*?}*/previewTexture, previewX, 104, 0, 0, 64, 64, 64, 64);
+            graphics.blit(/*? >= 1.21.3 {*//*RenderType::guiTextured, *//*?}*/previewTexture, previewX, 104, 0, 0, 64, 64, 64, 64);
             graphics.drawCenteredString(
                     this.font,
                     Component.translatable("screen.totemdoll.skin_preview"),

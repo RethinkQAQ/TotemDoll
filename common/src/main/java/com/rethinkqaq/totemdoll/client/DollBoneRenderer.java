@@ -39,7 +39,6 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.FaceInfo;
 import net.minecraft.client.renderer.block.model.BlockFaceUV;
 import net.minecraft.client.renderer.block.model.ItemTransform;
-import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemDisplayContext;
 import org.joml.Vector3f;
@@ -56,17 +55,16 @@ public final class DollBoneRenderer {
 
     public static boolean render(DollStyle style, ItemDisplayContext context, boolean leftHand,
                                  PoseStack poseStack, MultiBufferSource buffers, int light, int overlay,
-                                 BakedModel referenceModel, float partialTick) {
+                                 float partialTick) {
         DollBoneModel model = DollBoneModels.get(style.id());
         if (model == null) return false;
         RuntimeModel runtime = CACHE.computeIfAbsent(style.id(), ignored -> build(model));
         applyPoses(style, runtime, partialTick);
 
         poseStack.pushPose();
-        DollDisplayTransform display = model.display().get(context.getSerializedName());
-        if (display == null) {
-            referenceModel.getTransforms().getTransform(context).apply(leftHand, poseStack);
-        } else {
+        DollDisplayTransform display = model.display().get(displayContext(context));
+        if (display == null) display = model.display().get("fixed");
+        if (display != null) {
             new ItemTransform(
                     new Vector3f(display.rotationX(), display.rotationY(), display.rotationZ()),
                     new Vector3f(display.translationX(), display.translationY(), display.translationZ()),
@@ -98,6 +96,18 @@ public final class DollBoneRenderer {
             renderPart(root, poseStack, consumer, light, overlay);
         poseStack.popPose();
         return true;
+    }
+
+    private static String displayContext(ItemDisplayContext context) {
+        return switch (context) {
+            case GUI -> "gui";
+            case GROUND -> "ground";
+            case FIXED -> "fixed";
+            case FIRST_PERSON_LEFT_HAND, FIRST_PERSON_RIGHT_HAND -> "firstperson";
+            case THIRD_PERSON_LEFT_HAND, THIRD_PERSON_RIGHT_HAND -> "thirdperson";
+            case HEAD -> "head";
+            default -> "fixed";
+        };
     }
 
     public static void clear() { CACHE.clear(); }

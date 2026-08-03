@@ -19,11 +19,11 @@ config/totemdoll/styles/imported/
 
 - `No style.json was found`：ZIP 根目录没有 `pack.json` 或 `style.json`。
 - `Expected pack format 1`：`pack.json.format` 不为 `1`。
-- `Expected style format 2`：`style.json.format` 不为 `2`。
+- `Expected style format 3`：`style.json.format` 不为 `3`。
 - `Missing declared style`：`pack.json.styles` 指向了不存在的文件。
 - `Path leaves the style pack`：内部路径包含 `..` 或尝试访问包外文件。
 - `Missing texture/model`：文件名、大小写或相对路径不一致。
-- `Unsupported model type`：当前只支持 `minecraft_item` 和 `minecraft_bone`。
+- `Unsupported model type`：当前只支持跨版本的 `mesh`。
 
 详细错误会写入客户端日志：
 

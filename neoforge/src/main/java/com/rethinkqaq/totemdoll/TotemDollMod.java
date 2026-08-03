@@ -24,11 +24,9 @@ import com.rethinkqaq.totemdoll.client.TotemDollClient;
 import com.rethinkqaq.totemdoll.client.gui.DollSelectionScreen;
 import com.rethinkqaq.totemdoll.doll.DollStyleLoader;
 import com.rethinkqaq.totemdoll.doll.DollAnimationManager;
-import com.rethinkqaq.totemdoll.doll.DollAnimationModels;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.loading.FMLEnvironment;
@@ -60,13 +58,7 @@ public class TotemDollMod {
     }
 
     private void registerAdditionalModels(ModelEvent.RegisterAdditional event) {
-        DollStyleLoader.reload(Minecraft.getInstance().getResourceManager())
-                .forEach(style -> {
-                    event.register(new ModelResourceLocation(style.model(), "standalone"));
-                    DollAnimationModels.modelIds(style).forEach(id -> {
-                        event.register(new ModelResourceLocation(id, "standalone"));
-                    });
-                });
+        DollStyleLoader.reload(Minecraft.getInstance().getResourceManager());
     }
 
     private void registerKeyMappings(RegisterKeyMappingsEvent event) {
