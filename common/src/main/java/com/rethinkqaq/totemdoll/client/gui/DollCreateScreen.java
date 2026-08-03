@@ -101,10 +101,20 @@ public final class DollCreateScreen extends Screen {
             skinPath = selected;
             releasePreviewTexture();
             try (var input = java.nio.file.Files.newInputStream(selected)) {
+                DynamicTexture texture = new DynamicTexture(NativeImage.read(input));
+
+                //? >= 1.21.4 {
+                /*previewTexture = ResourceLocation.fromNamespaceAndPath(
+                        "totemdoll",
+                        "dynamic/skin_preview"
+                );
+                this.minecraft.getTextureManager().register(previewTexture, texture);
+                *///?} else {
                 previewTexture = this.minecraft.getTextureManager().register(
                         "totemdoll_skin_preview",
-                        new DynamicTexture(NativeImage.read(input))
+                        texture
                 );
+                //?}
             }
             if (nameBox.getValue().isBlank()) {
                 String fileName = selected.getFileName().toString();

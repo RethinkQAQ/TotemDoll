@@ -29,9 +29,6 @@ import com.rethinkqaq.totemdoll.doll.bone.DollBoneModels;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.ItemRenderer;
-//? < 1.21.4 {
-import net.minecraft.client.resources.model.BakedModel;
-//?}
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -40,14 +37,32 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+//? >= 1.21.4 {
+/*import net.minecraft.world.level.Level;
+import net.minecraft.world.entity.LivingEntity;*/
+//? } else {
+import net.minecraft.client.resources.model.BakedModel;
+//?}
+
 @Mixin(ItemRenderer.class)
 public abstract class ItemRendererMixin {
 
-    //? < 1.21.4 {
-    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    private void totemdoll$renderBoneModel(ItemStack stack, ItemDisplayContext context, boolean leftHand,
-                                           PoseStack poseStack, MultiBufferSource buffers, int light, int overlay,
-                                           BakedModel referenceModel, CallbackInfo callback) {
+    @Inject(
+            //? >= 1.21.4 {
+            /*method = "renderStatic(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemDisplayContext;ZLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/world/level/Level;III)V",
+            *///?} else {
+            method = "render", 
+            //?}
+            at = @At("HEAD"),
+            cancellable = true
+    )
+    private void totemdoll$renderBoneModel(
+            //? >= 1.21.4 {
+            /*LivingEntity entity, ItemStack stack, ItemDisplayContext context, boolean leftHand, PoseStack poseStack, MultiBufferSource buffers, Level level, int light, int overlay, int seed, CallbackInfo ci
+            *///?} else {
+            ItemStack stack, ItemDisplayContext context, boolean leftHand, PoseStack poseStack, MultiBufferSource buffers, int light, int overlay, BakedModel referenceModel, CallbackInfo ci
+            //?}
+    ) {
         if (!stack.is(Items.TOTEM_OF_UNDYING)) return;
         DollStyle style = DollPreviewContext.current();
         if (style == null) style = TotemDollConfig.selectedStyle();
@@ -59,8 +74,7 @@ public abstract class ItemRendererMixin {
         float partialTick = Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(false);
         //?}
         if (DollBoneRenderer.render(style, context, leftHand, poseStack, buffers, light, overlay, partialTick)) {
-            callback.cancel();
+            ci.cancel();
         }
     }
-    //?}
 }
