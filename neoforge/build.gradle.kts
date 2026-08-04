@@ -1,6 +1,6 @@
 plugins {
     id("multiloader-loader")
-    id("net.neoforged.moddev") version "2.0.49-beta"
+    id("net.neoforged.moddev") version "2.0.143"
     id("com.github.hierynomus.license") version "0.16.1"
 }
 

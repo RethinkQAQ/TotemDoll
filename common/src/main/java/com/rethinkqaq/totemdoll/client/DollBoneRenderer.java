@@ -31,13 +31,13 @@ import com.rethinkqaq.totemdoll.doll.bone.DollBoneModels;
 import com.rethinkqaq.totemdoll.doll.bone.DollCube;
 import com.rethinkqaq.totemdoll.doll.bone.DollDisplayTransform;
 import com.rethinkqaq.totemdoll.doll.bone.DollFace;
+import com.rethinkqaq.totemdoll.utils.UvUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.FaceInfo;
-import net.minecraft.client.renderer.block.model.BlockFaceUV;
 import net.minecraft.client.renderer.block.model.ItemTransform;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -69,17 +69,22 @@ public final class DollBoneRenderer {
                     new Vector3f(display.rotationX(), display.rotationY(), display.rotationZ()),
                     new Vector3f(display.translationX(), display.translationY(), display.translationZ()),
                     new Vector3f(display.scaleX(), display.scaleY(), display.scaleZ())
-            ).apply(leftHand, poseStack);
+            ).apply(
+                    leftHand,
+                    //? >= 1.21.5 {
+                    /*poseStack.last()
+                    *///?} else {
+                    poseStack
+                    //?}
+            );
         }
-        // geometry.json uses the same 0..16, Y-up coordinate space as a
-        // Minecraft Java item model. ModelPart is commonly used for entity
-        // models together with a Y/Z flip, but applying that convention here
-        // turns this item model upside down (head below body, limbs above it).
-        // Match ItemRenderer's baked-model origin instead.
+        //? >= 1.21.5 {
+        /*if (display == null) {
+            poseStack.translate(-0.5F, -0.5F, -0.5F);
+        }*/
+        //? } else {
         poseStack.translate(-0.5F, -0.5F, -0.5F);
-        // Player skin overlays may contain partial alpha. The cutout render
-        // type treats those pixels as opaque; translucent keeps the second
-        // skin layer's full alpha channel.
+        //? }
         net.minecraft.resources.ResourceLocation texture = model.texture();
         if (DollAnimationManager.isTotemActivationActive(style)
                 && style.textures().containsKey("activate")) {
@@ -184,15 +189,14 @@ public final class DollBoneRenderer {
             Direction direction = Direction.byName(entry.getKey());
             if (direction == null) continue;
             DollFace face = entry.getValue();
-            BlockFaceUV uv = new BlockFaceUV(
-                    new float[]{face.u1(), face.v1(), face.u2(), face.v2()}, face.rotation());
             FaceInfo info = FaceInfo.fromFacing(direction);
             for (int vertex = 0; vertex < 4; vertex++) {
                 FaceInfo.VertexInfo position = info.getVertexInfo(vertex);
+                float[] uv = UvUtil.vertexUv(face, vertex);
                 consumer.addVertex(poseStack.last(), shape[position.xFace] / 16F,
                                 shape[position.yFace] / 16F, shape[position.zFace] / 16F)
                         .setColor(-1)
-                        .setUv(uv.getU(vertex) / 16F, uv.getV(vertex) / 16F)
+                        .setUv(uv[0] / 16F, uv[1] / 16F)
                         .setOverlay(overlay)
                         .setLight(light)
                         .setNormal(poseStack.last(), direction.getStepX(), direction.getStepY(), direction.getStepZ());

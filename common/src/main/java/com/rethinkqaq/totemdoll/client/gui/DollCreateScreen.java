@@ -101,7 +101,12 @@ public final class DollCreateScreen extends Screen {
             skinPath = selected;
             releasePreviewTexture();
             try (var input = java.nio.file.Files.newInputStream(selected)) {
-                DynamicTexture texture = new DynamicTexture(NativeImage.read(input));
+                DynamicTexture texture = new DynamicTexture(
+                        //? >= 1.21.5 {
+                        /*() -> "totemdoll_skin_preview",
+                        *///?}
+                        NativeImage.read(input)
+                );
 
                 //? >= 1.21.4 {
                 /*previewTexture = ResourceLocation.fromNamespaceAndPath(

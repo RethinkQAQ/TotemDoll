@@ -13,8 +13,8 @@ import net.minecraft.world.item.ItemDisplayContext;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;*/
-//?} else {
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+*///?} else {
 import com.rethinkqaq.totemdoll.utils.Dummy;
 //?}
 
@@ -31,8 +31,10 @@ public abstract class ItemStackRenderStateMixin {
     /*@Shadow
     private ItemDisplayContext displayContext;
 
+    //? < 1.21.4 {
     @Shadow
     private boolean isLeftHand;
+    //?}
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     private void totemdoll$renderFormat3(
@@ -44,6 +46,11 @@ public abstract class ItemStackRenderStateMixin {
     ) {
         DollStyle style = DollThirdPersonState.get((ItemStackRenderState) (Object) this);
         if (style == null) return;
+
+        //? >= 1.21.5 {
+        /^boolean isLeftHand = displayContext == ItemDisplayContext.THIRD_PERSON_LEFT_HAND
+                || displayContext == ItemDisplayContext.FIRST_PERSON_LEFT_HAND;
+        ^///?}
 
         float partialTick = Minecraft.getInstance()
                 .getDeltaTracker()

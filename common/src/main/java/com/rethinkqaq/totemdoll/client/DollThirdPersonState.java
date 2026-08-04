@@ -46,8 +46,8 @@ public final class DollThirdPersonState {
 
     private DollThirdPersonState() {
     }
-}*/
-//?} else {
+}
+*///?} else {
 public final class DollThirdPersonState {
     private DollThirdPersonState() {
     }

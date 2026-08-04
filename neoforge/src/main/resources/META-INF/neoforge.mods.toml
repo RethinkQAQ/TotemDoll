@@ -20,7 +20,7 @@ config="${modId}.neoforge.mixins.json"
 [[dependencies.${modId}]]
 modId="neoforge"
 type="required"
-versionRange="[${neoForgeVersion},)"
+versionRange="[${neoForgeMinVersion},)"
 ordering="NONE"
 side="CLIENT"
 

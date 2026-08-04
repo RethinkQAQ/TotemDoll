@@ -11,8 +11,8 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;*/
-//?} else {
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+*///?} else {
 import com.rethinkqaq.totemdoll.utils.Dummy;
 //?}
 
@@ -31,7 +31,9 @@ public abstract class ItemModelResolverMixin {
             ItemStackRenderState renderState,
             ItemStack stack,
             ItemDisplayContext context,
+            //? < 1.21.5 {
             boolean leftHand,
+            //?}
             LivingEntity entity,
             CallbackInfo callback
     ) {

@@ -1,6 +1,6 @@
 plugins {
     id("multiloader-common")
-    id("fabric-loom") version "1.8.13"
+    id("fabric-loom") version "1.17-SNAPSHOT"
     id("com.github.hierynomus.license") version "0.16.1"
 }
 

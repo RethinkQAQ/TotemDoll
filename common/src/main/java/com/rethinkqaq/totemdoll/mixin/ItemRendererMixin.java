@@ -39,8 +39,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 //? >= 1.21.4 {
 /*import net.minecraft.world.level.Level;
-import net.minecraft.world.entity.LivingEntity;*/
-//? } else {
+import net.minecraft.world.entity.LivingEntity;
+*///?} else {
 import net.minecraft.client.resources.model.BakedModel;
 //?}
 
@@ -48,25 +48,34 @@ import net.minecraft.client.resources.model.BakedModel;
 public abstract class ItemRendererMixin {
 
     @Inject(
-            //? >= 1.21.4 {
-            /*method = "renderStatic(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemDisplayContext;ZLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/world/level/Level;III)V",
-            *///?} else {
+            //? >= 1.21.5 {
+            /*method = "renderStatic(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemDisplayContext;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/world/level/Level;III)V",
+            *///?} else if >= 1.21.4 {
+            /*method = "renderStatic(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemDisplayContext;ZLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/world/level/Level;III)V",*/
+            //?} else {
             method = "render", 
             //?}
             at = @At("HEAD"),
             cancellable = true
     )
     private void totemdoll$renderBoneModel(
-            //? >= 1.21.4 {
-            /*LivingEntity entity, ItemStack stack, ItemDisplayContext context, boolean leftHand, PoseStack poseStack, MultiBufferSource buffers, Level level, int light, int overlay, int seed, CallbackInfo ci
-            *///?} else {
+            //? >= 1.21.5 {
+            /*LivingEntity entity, ItemStack stack, ItemDisplayContext context, PoseStack poseStack, MultiBufferSource buffers, Level level, int light, int overlay, int seed, CallbackInfo ci
+            *///?} else if >= 1.21.4 {
+            /*LivingEntity entity, ItemStack stack, ItemDisplayContext context, boolean leftHand, PoseStack poseStack, MultiBufferSource buffers, Level level, int light, int overlay, int seed, CallbackInfo ci*/
+            //?} else {
             ItemStack stack, ItemDisplayContext context, boolean leftHand, PoseStack poseStack, MultiBufferSource buffers, int light, int overlay, BakedModel referenceModel, CallbackInfo ci
-            //?}
+             //?}
     ) {
         if (!stack.is(Items.TOTEM_OF_UNDYING)) return;
         DollStyle style = DollPreviewContext.current();
         if (style == null) style = TotemDollConfig.selectedStyle();
         if (style == null || !DollBoneModels.contains(style.id())) return;
+
+        //? >= 1.21.5 {
+        /*boolean leftHand = context == ItemDisplayContext.THIRD_PERSON_LEFT_HAND
+                || context == ItemDisplayContext.FIRST_PERSON_LEFT_HAND;*/
+        //? }
 
         //? >= 1.21.3 {
         /*float partialTick = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);

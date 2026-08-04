@@ -37,12 +37,9 @@ public final class TotemDollClient {
         DollStyles.init();
         TotemDollConfig.initialize(configDirectory);
         DollLocalStyleStore.initialize(configDirectory, gameDirectory);
-        Minecraft client = Minecraft.getInstance();
-        enableGeneratedPack(client);
-        // The generated pack is enabled before the normal resource load, but
-        // the resource manager may not have included it yet. Let the first
-        // client tick perform one reload after the manager is ready so saved
-        // local styles are visible on the first launch.
+        // The client instance is not available during NeoForge mod construction.
+        // The first client tick enables the generated pack after Minecraft and
+        // its resource manager have been initialized.
         initialStylesReloaded = false;
     }
 
