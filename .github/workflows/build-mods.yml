@@ -199,6 +199,7 @@ jobs:
 
   upload-artifacts:
     name: Upload ${{ matrix.group }} artifact
+    if: github.event_name == 'release'
     needs: build
     runs-on: ubuntu-latest
     strategy:
@@ -216,4 +217,23 @@ jobs:
         with:
           name: Totem-Doll-${{ needs.build.outputs.artifact_version }}-${{ matrix.group }}
           path: artifacts/${{ matrix.path }}/
+          if-no-files-found: error
+
+  upload-build-artifact:
+    name: Upload combined build artifact
+    if: github.event_name != 'release'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download staging artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.build.outputs.artifact_name }}
+          path: artifacts
+
+      - name: Upload combined artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Totem-Doll-${{ needs.build.outputs.artifact_version }}
+          path: artifacts/
           if-no-files-found: error
