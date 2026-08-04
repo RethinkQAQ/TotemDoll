@@ -2,85 +2,12 @@ name: Build Totem Doll
 
 on:
   push:
-    branches:
-      - '**'
+    branches: ['**']
   workflow_dispatch:
-    inputs:
-      release_version:
-        description: 'Release version, for example 0.1-alpha'
-        required: false
-        type: string
 
 permissions:
   contents: read
 
 jobs:
   build:
-    name: Build Minecraft targets
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '21'
-
-      - name: Set build version
-        shell: bash
-        run: |
-          if [[ -n "${{ inputs.release_version }}" ]]; then
-            echo "BUILD_VERSION=${{ inputs.release_version }}" >> "$GITHUB_ENV"
-            echo "BUILD_SUFFIX=" >> "$GITHUB_ENV"
-            echo "ARTIFACT_VERSION=${{ inputs.release_version }}" >> "$GITHUB_ENV"
-          else
-            echo "BUILD_VERSION=0.1.1-alpha" >> "$GITHUB_ENV"
-            echo "BUILD_SUFFIX=build.${GITHUB_RUN_NUMBER}" >> "$GITHUB_ENV"
-            echo "ARTIFACT_VERSION=0.1.1-alpha.build.${GITHUB_RUN_NUMBER}" >> "$GITHUB_ENV"
-          fi
-
-      - name: Build all targets
-        run: |
-          ./gradlew licenseFormat --no-daemon
-          ./gradlew build -Pmod.version="$BUILD_VERSION" -Pbuild.number="$BUILD_SUFFIX" --no-daemon --stacktrace
-
-      - name: Collect artifacts
-        shell: bash
-        run: |
-          rm -rf artifacts
-          mkdir -p artifacts
-
-          echo "Gradle JAR outputs:"
-          find fabric neoforge -type f -path '*/build/libs/*.jar' -print
-
-          find fabric neoforge -type f -path '*/build/libs/*.jar' \
-            ! -name '*-sources.jar' \
-            ! -name '*-javadoc.jar' \
-            ! -name '*-dev.jar' \
-            -exec cp {} artifacts/ \;
-
-          echo "Collected artifacts:"
-          find artifacts -maxdepth 1 -type f -name '*.jar' -print
-
-          fabric_count=$(find artifacts -maxdepth 1 -type f -name '*.jar' -iname '*fabric*' | wc -l)
-          neoforge_count=$(find artifacts -maxdepth 1 -type f -name '*.jar' -iname '*neoforge*' | wc -l)
-          total_count=$(find artifacts -maxdepth 1 -type f -name '*.jar' | wc -l)
-
-          if [[ "$fabric_count" -lt 1 || "$neoforge_count" -lt 1 || "$total_count" -lt 2 ]]; then
-            echo "Expected at least one Fabric and one NeoForge mod JAR."
-            echo "Fabric JARs: $fabric_count"
-            echo "NeoForge JARs: $neoforge_count"
-            echo "Total JARs: $total_count"
-            exit 1
-          fi
-
-          ls -la artifacts
-
-      - name: Upload mod jars
-        uses: actions/upload-artifact@v4
-        with:
-          name: Totem-Doll-${{ env.ARTIFACT_VERSION }}
-          path: artifacts/*.jar
-          if-no-files-found: error
+    uses: ./.github/workflows/build-mods.yml

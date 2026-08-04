@@ -1,0 +1,219 @@
+name: Reusable Minecraft build
+
+on:
+  workflow_call:
+    outputs:
+      artifact_name:
+        description: Internal staging artifact name
+        value: ${{ jobs.build.outputs.artifact_name }}
+      artifact_version:
+        description: Build or release artifact version
+        value: ${{ jobs.build.outputs.artifact_version }}
+      publish_matrix:
+        description: Per-loader and Minecraft-version publishing matrix
+        value: ${{ jobs.build.outputs.publish_matrix }}
+
+permissions:
+  contents: read
+
+env:
+  BASE_VERSION: 0.1.1-alpha
+
+jobs:
+  build:
+    name: Build Minecraft targets
+    runs-on: ubuntu-latest
+    outputs:
+      artifact_name: ${{ steps.version.outputs.artifact_name }}
+      artifact_version: ${{ steps.version.outputs.artifact_version }}
+      publish_matrix: ${{ steps.manifest.outputs.publish_matrix }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Set build version
+        id: version
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "release" ]]; then
+            version="${GITHUB_REF_NAME#v}"
+            artifact_version="$GITHUB_REF_NAME"
+            build_suffix=""
+          else
+            version="$BASE_VERSION"
+            artifact_version="${BASE_VERSION}.build.${GITHUB_RUN_NUMBER}"
+            build_suffix="build.${GITHUB_RUN_NUMBER}"
+          fi
+
+          echo "BUILD_VERSION=$version" >> "$GITHUB_ENV"
+          echo "BUILD_SUFFIX=$build_suffix" >> "$GITHUB_ENV"
+          echo "ARTIFACT_VERSION=$artifact_version" >> "$GITHUB_ENV"
+          echo "artifact_name=Totem-Doll-$artifact_version-staging" >> "$GITHUB_OUTPUT"
+          echo "artifact_version=$artifact_version" >> "$GITHUB_OUTPUT"
+
+      - name: Build all targets
+        run: |
+          ./gradlew licenseFormat build \
+            -Pmod.version="$BUILD_VERSION" \
+            -Pbuild.number="$BUILD_SUFFIX" \
+            --parallel \
+            --build-cache \
+            --no-daemon \
+            --stacktrace
+
+      - name: Collect jars and generate manifests
+        id: manifest
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import re
+          import zipfile
+          from collections import defaultdict
+          from pathlib import Path
+
+          artifacts = Path('artifacts')
+          artifacts.mkdir(exist_ok=True)
+          groups = defaultdict(list)
+
+          for root_name in ('fabric', 'neoforge'):
+              root = Path(root_name) / 'versions'
+              if not root.exists():
+                  continue
+              for jar in sorted(root.glob('*/build/libs/*.jar')):
+                  if any(suffix in jar.name for suffix in ('-sources.jar', '-javadoc.jar', '-dev.jar')):
+                      continue
+
+                  loader = root_name
+                  minecraft_version = jar.parts[2]
+                  with zipfile.ZipFile(jar) as zf:
+                      names = set(zf.namelist())
+                      if loader == 'fabric':
+                          if 'fabric.mod.json' not in names:
+                              raise SystemExit(f'Missing fabric.mod.json: {jar}')
+                          metadata = json.loads(zf.read('fabric.mod.json'))
+                          mod_id = metadata.get('id', '')
+                          mod_version = metadata.get('version', '')
+                          version_range = metadata.get('depends', {}).get('minecraft', '')
+                      else:
+                          metadata_name = 'META-INF/neoforge.mods.toml'
+                          if metadata_name not in names:
+                              raise SystemExit(f'Missing {metadata_name}: {jar}')
+                          text = zf.read(metadata_name).decode()
+                          mod_block = re.search(r'\[\[mods\]\](.*?)(?=\n\[\[|\Z)', text, re.S)
+                          dependency = re.search(r'modId="minecraft".*?versionRange="([^"]+)"', text, re.S)
+                          mod_id = re.search(r'modId="([^"]+)"', mod_block.group(1)).group(1) if mod_block else ''
+                          mod_version = re.search(r'version="([^"]+)"', mod_block.group(1)).group(1) if mod_block else ''
+                          version_range = dependency.group(1) if dependency else ''
+
+                  if not all((mod_id, mod_version, version_range)):
+                      raise SystemExit(f'Incomplete mod metadata: {jar}')
+
+                  group_name = f'{loader}-{minecraft_version}'
+                  group_dir = artifacts / group_name
+                  group_dir.mkdir(parents=True, exist_ok=True)
+                  (group_dir / jar.name).write_bytes(jar.read_bytes())
+                  groups[group_name].append({
+                      'loader': loader,
+                      'minecraft_version': minecraft_version,
+                      'minecraft_version_range': version_range,
+                      'mod_id': mod_id,
+                      'mod_version': mod_version,
+                      'jar': jar.name,
+                  })
+
+          if not any(item['loader'] == 'fabric' for items in groups.values() for item in items):
+              raise SystemExit('No Fabric mod jars found')
+          if not any(item['loader'] == 'neoforge' for items in groups.values() for item in items):
+              raise SystemExit('No NeoForge mod jars found')
+
+          matrix_entries = []
+          for group_name in sorted(groups):
+              items = groups[group_name]
+              manifest = {
+                  'loader': items[0]['loader'],
+                  'minecraft_version': items[0]['minecraft_version'],
+                  'minecraft_version_range': items[0]['minecraft_version_range'],
+                  'mod_id': items[0]['mod_id'],
+                  'mod_version': items[0]['mod_version'],
+                  'jars': [item['jar'] for item in items],
+              }
+              group_dir = artifacts / group_name
+              (group_dir / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
+              summary = [
+                  f'# {group_name}', '',
+                  f'- Loader: `{manifest["loader"]}`',
+                  f'- Minecraft: `{manifest["minecraft_version"]}`',
+                  f'- Minecraft range: `{manifest["minecraft_version_range"]}`',
+                  f'- Mod: `{manifest["mod_id"]}`',
+                  f'- Mod version: `{manifest["mod_version"]}`', '',
+                  '## Files', '',
+              ]
+              summary.extend(f'- `{jar_name}`' for jar_name in manifest['jars'])
+              (group_dir / 'summary.md').write_text('\n'.join(summary) + '\n')
+              matrix_entries.append({
+                  'group': group_name,
+                  'loader': manifest['loader'],
+                  'minecraft_version': manifest['minecraft_version'],
+                  'mod_version': manifest['mod_version'],
+                  'path': group_name,
+              })
+
+          lines = [
+              '# Build Summary', '',
+              f'- Event: `{os.environ.get("GITHUB_EVENT_NAME", "unknown")}`',
+              f'- Commit: `{os.environ.get("GITHUB_SHA", "unknown")}`',
+              f'- Ref: `{os.environ.get("GITHUB_REF_NAME", "unknown")}`',
+              f'- Mod version: `{os.environ.get("BUILD_VERSION", "unknown")}`',
+              f'- Build suffix: `{os.environ.get("BUILD_SUFFIX") or "none"}`', '',
+              '## Build Artifacts Summary', '',
+              '| Loader | Minecraft | Mod version | JAR | Artifact |',
+              '| --- | --- | --- | --- | --- |',
+          ]
+          for entry in matrix_entries:
+              for item in groups[entry['group']]:
+                  artifact_name = f'Totem-Doll-{os.environ["ARTIFACT_VERSION"]}-{entry["group"]}'
+                  lines.append(f'| {item["loader"]} | {item["minecraft_version"]} | {item["mod_version"]} | `{item["jar"]}` | `{artifact_name}` |')
+          Path(os.environ['GITHUB_STEP_SUMMARY']).write_text('\n'.join(lines) + '\n')
+
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write('publish_matrix=' + json.dumps({'include': matrix_entries}, separators=(',', ':')) + '\n')
+          PY
+
+      - name: Upload staging artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.version.outputs.artifact_name }}
+          path: artifacts/
+          if-no-files-found: error
+
+  upload-artifacts:
+    name: Upload ${{ matrix.group }} artifact
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.build.outputs.publish_matrix) }}
+    steps:
+      - name: Download staging artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.build.outputs.artifact_name }}
+          path: artifacts
+
+      - name: Upload versioned artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Totem-Doll-${{ needs.build.outputs.artifact_version }}-${{ matrix.group }}
+          path: artifacts/${{ matrix.path }}/
+          if-no-files-found: error

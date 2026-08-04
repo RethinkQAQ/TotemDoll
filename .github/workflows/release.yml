@@ -1,0 +1,63 @@
+name: Release Totem Doll
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-mods.yml
+
+  upload-release-assets:
+    name: Upload GitHub Release assets
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download staging artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.build.outputs.artifact_name }}
+          path: artifacts
+
+      - name: Upload jars to GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          while IFS= read -r -d '' jar; do
+            gh release upload "$GITHUB_REF_NAME" "$jar" --clobber
+          done < <(find artifacts -type f -name '*.jar' -print0)
+
+  # Modrinth/CurseForge publishing remains disabled until their projects and
+  # repository secrets exist. The reusable build workflow already exposes a
+  # per-loader/version matrix and manifests for enabling this later.
+  #
+  # publish-platforms:
+  #   name: Publish ${{ matrix.group }}
+  #   if: github.event_name == 'release'
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     fail-fast: false
+  #     matrix: ${{ fromJSON(needs.build.outputs.publish_matrix) }}
+  #   steps:
+  #     - uses: actions/download-artifact@v4
+  #       with:
+  #         name: ${{ needs.build.outputs.artifact_name }}
+  #         path: artifacts
+  #     - uses: Kir-Antipov/mc-publish@v3.3
+  #       with:
+  #         modrinth-id: ${{ vars.MODRINTH_PROJECT_ID }}
+  #         modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+  #         curseforge-id: ${{ vars.CURSEFORGE_PROJECT_ID }}
+  #         curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+  #         files-primary: artifacts/${{ matrix.path }}/*.jar
+  #         version: ${{ matrix.mod_version }}
+  #         version-type: release
+  #         loaders: ${{ matrix.loader }}
+  #         game-versions: ${{ matrix.minecraft_version }}
+  #         changelog: ${{ github.event.release.body }}
