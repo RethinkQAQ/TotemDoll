@@ -21,6 +21,10 @@
 package com.rethinkqaq.totemdoll;
 
 import com.rethinkqaq.totemdoll.client.TotemDollClient;
+//? >= 1.21.6 {
+/*import com.rethinkqaq.totemdoll.client.gui.DollGuiPreviewRenderer;
+import com.rethinkqaq.totemdoll.client.gui.DollGuiPreviewRenderState;
+*///?}
 import com.rethinkqaq.totemdoll.client.gui.DollSelectionScreen;
 import com.rethinkqaq.totemdoll.doll.DollStyleLoader;
 import com.rethinkqaq.totemdoll.doll.DollAnimationManager;
@@ -34,6 +38,9 @@ import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+//? >= 1.21.6 {
+/*import net.neoforged.neoforge.client.event.RegisterPictureInPictureRenderersEvent;
+*///?}
 import net.neoforged.neoforge.common.NeoForge;
 import org.lwjgl.glfw.GLFW;
 
@@ -52,6 +59,9 @@ public class TotemDollMod {
         if (FMLEnvironment.dist.isClient()) {
             eventBus.addListener(this::registerAdditionalModels);
             eventBus.addListener(this::registerKeyMappings);
+            //? >= 1.21.6 {
+            /*eventBus.addListener(this::registerPictureInPictureRenderer);
+            *///?}
             NeoForge.EVENT_BUS.addListener(this::onClientTick);
             TotemDollClient.init(FMLPaths.CONFIGDIR.get(), FMLPaths.GAMEDIR.get());
         }
@@ -70,6 +80,12 @@ public class TotemDollMod {
     private void registerKeyMappings(RegisterKeyMappingsEvent event) {
         event.register(OPEN_CONFIG);
     }
+
+    //? >= 1.21.6 {
+    /*private void registerPictureInPictureRenderer(RegisterPictureInPictureRenderersEvent event) {
+        event.register(DollGuiPreviewRenderState.class, DollGuiPreviewRenderer::new);
+    }
+    *///?}
 
     private void onClientTick(ClientTickEvent.Post event) {
         DollAnimationManager.tick();

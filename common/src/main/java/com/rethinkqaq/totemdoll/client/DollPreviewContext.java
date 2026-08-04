@@ -25,6 +25,7 @@ import com.rethinkqaq.totemdoll.doll.DollStyle;
 public final class DollPreviewContext {
 
     private static final ThreadLocal<DollStyle> PREVIEW_STYLE = new ThreadLocal<>();
+    private static final ThreadLocal<Boolean> NATIVE_RENDER = ThreadLocal.withInitial(() -> false);
 
     public static DollStyle current() {
         return PREVIEW_STYLE.get();
@@ -40,6 +41,24 @@ public final class DollPreviewContext {
                 PREVIEW_STYLE.remove();
             } else {
                 PREVIEW_STYLE.set(previous);
+            }
+        }
+    }
+
+    public static boolean isNativeRender() {
+        return NATIVE_RENDER.get();
+    }
+
+    public static void renderNative(Runnable renderCall) {
+        boolean previous = NATIVE_RENDER.get();
+        NATIVE_RENDER.set(true);
+        try {
+            renderCall.run();
+        } finally {
+            if (previous) {
+                NATIVE_RENDER.set(true);
+            } else {
+                NATIVE_RENDER.remove();
             }
         }
     }

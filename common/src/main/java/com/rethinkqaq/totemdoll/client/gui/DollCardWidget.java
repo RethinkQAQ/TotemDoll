@@ -20,7 +20,6 @@
 
 package com.rethinkqaq.totemdoll.client.gui;
 
-import com.rethinkqaq.totemdoll.client.DollPreviewContext;
 import com.rethinkqaq.totemdoll.config.TotemDollConfig;
 import com.rethinkqaq.totemdoll.doll.DollStyle;
 import com.rethinkqaq.totemdoll.doll.DollStyles;
@@ -29,8 +28,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 
 public final class DollCardWidget extends AbstractWidget {
 
@@ -69,22 +66,15 @@ public final class DollCardWidget extends AbstractWidget {
         graphics.fill(getX(), getY(), getRight(), getBottom(), border);
         graphics.fill(getX() + 2, getY() + 2, getRight() - 2, getBottom() - 2, background);
 
-        graphics.pose().pushPose();
-        graphics.pose().translate(getX() + 34.0F, getY() + 8.0F, 100.0F);
-        graphics.pose().scale(2.35F, 2.35F, 2.35F);
-        DollPreviewContext.renderAs(
-                style,
-                () -> graphics.renderItem(new ItemStack(Items.TOTEM_OF_UNDYING), -8, 0)
-        );
-        graphics.pose().popPose();
+        DollGuiPreview.render(graphics, style, getX() + 5, getY() + 5, 52, 52, 37.6F);
 
         int textX = getX() + 61;
         int textWidth = getRight() - textX - 7;
-        graphics.drawString(font, trim(style.label(), textWidth), textX, getY() + 11, 0xFFFFFF);
-        graphics.drawString(font, trim(originLabel(), textWidth), textX, getY() + 27, 0xA0A0A0);
+        graphics.drawString(font, trim(style.label(), textWidth), textX, getY() + 11, 0xFFFFFFFF);
+        graphics.drawString(font, trim(originLabel(), textWidth), textX, getY() + 27, 0xFFA0A0A0);
         int detailY = 42;
         if (style.supportsSkin()) {
-            drawDetail(graphics, Component.translatable("screen.totemdoll.skin_supported"), textX, detailY, textWidth, 0x80C88A);
+            drawDetail(graphics, Component.translatable("screen.totemdoll.skin_supported"), textX, detailY, textWidth, 0xFF80C88A);
             detailY += 15;
         }
         if (style.hasDynamicModel() || style.hasDynamicTextures()) {
@@ -93,18 +83,18 @@ public final class DollCardWidget extends AbstractWidget {
                     : style.hasDynamicModel()
                     ? Component.translatable("screen.totemdoll.dynamic_model")
                     : Component.translatable("screen.totemdoll.dynamic_texture");
-            drawDetail(graphics, capability, textX, detailY, textWidth, 0x80B8E8);
+            drawDetail(graphics, capability, textX, detailY, textWidth, 0xFF80B8E8);
             detailY += 15;
         }
         if (style.isLocal() && style.templateId() != null) {
             DollStyle template = DollStyles.get(style.templateId());
             drawDetail(graphics,
                     Component.translatable("screen.totemdoll.from_template", template.label()),
-                    textX, 72, textWidth, 0xA0A0A0);
+                    textX, 72, textWidth, 0xFFA0A0A0);
         }
         if (selected && !(style.isLocal() && style.templateId() != null)) {
             drawDetail(graphics, Component.translatable("screen.totemdoll.current"),
-                    textX, 72, textWidth, 0x70E088);
+                    textX, 72, textWidth, 0xFF70E088);
         }
 
         renderActions(graphics, mouseX, mouseY);
@@ -138,7 +128,7 @@ public final class DollCardWidget extends AbstractWidget {
                 Component.translatable("screen.totemdoll.use"),
                 (left + split - (hasSecondary ? 2 : 0)) / 2,
                 top + 6,
-                0xFFFFFF
+                0xFFFFFFFF
         );
 
         if (hasSecondary) {
@@ -151,7 +141,7 @@ public final class DollCardWidget extends AbstractWidget {
                     secondaryLabel,
                     (split + 2 + right) / 2,
                     top + 6,
-                    0xFFFFFF
+                    0xFFFFFFFF
             );
         }
     }

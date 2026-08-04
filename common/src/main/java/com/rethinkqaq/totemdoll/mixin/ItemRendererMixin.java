@@ -53,7 +53,7 @@ public abstract class ItemRendererMixin {
             *///?} else if >= 1.21.4 {
             /*method = "renderStatic(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemDisplayContext;ZLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/world/level/Level;III)V",*/
             //?} else {
-            method = "render", 
+            method = "render",
             //?}
             at = @At("HEAD"),
             cancellable = true
@@ -68,14 +68,15 @@ public abstract class ItemRendererMixin {
              //?}
     ) {
         if (!stack.is(Items.TOTEM_OF_UNDYING)) return;
+        if (DollPreviewContext.isNativeRender()) return;
         DollStyle style = DollPreviewContext.current();
         if (style == null) style = TotemDollConfig.selectedStyle();
         if (style == null || !DollBoneModels.contains(style.id())) return;
 
         //? >= 1.21.5 {
         /*boolean leftHand = context == ItemDisplayContext.THIRD_PERSON_LEFT_HAND
-                || context == ItemDisplayContext.FIRST_PERSON_LEFT_HAND;*/
-        //? }
+                || context == ItemDisplayContext.FIRST_PERSON_LEFT_HAND;
+        *///?}
 
         //? >= 1.21.3 {
         /*float partialTick = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);

@@ -18,9 +18,10 @@
  * with Totem Doll. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.rethinkqaq.totemdoll.utils;
+package com.rethinkqaq.totemdoll.client.gui;
 
-
-// fake mixin class
-public class Dummy {
+/** Internal bridge implemented by the 1.21.6+ GuiGraphics mixin. */
+public interface DollGuiPreviewAccess {
+    default void totemdoll$submitPreview(DollGuiPreviewRenderState state) {
+    }
 }

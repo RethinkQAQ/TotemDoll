@@ -20,7 +20,6 @@
 
 package com.rethinkqaq.totemdoll.client.gui;
 
-import com.rethinkqaq.totemdoll.client.DollPreviewContext;
 import com.rethinkqaq.totemdoll.config.TotemDollConfig;
 import com.rethinkqaq.totemdoll.doll.DollStyle;
 import com.rethinkqaq.totemdoll.doll.DollStyles;
@@ -216,8 +215,8 @@ public final class DollSelectionScreen extends Screen implements DollScreenParen
             Component emptyTitle = Component.translatable("screen.totemdoll.empty_title");
             Component emptyHint = Component.translatable("screen.totemdoll.empty_hint");
             int centerX = SIDEBAR_WIDTH + (this.width - SIDEBAR_WIDTH) / 2;
-            graphics.drawCenteredString(this.font, emptyTitle, centerX, HEADER_HEIGHT + 72, 0xFFFFFF);
-            graphics.drawCenteredString(this.font, emptyHint, centerX, HEADER_HEIGHT + 88, 0xA0A0A0);
+            graphics.drawCenteredString(this.font, emptyTitle, centerX, HEADER_HEIGHT + 72, 0xFFFFFFFF);
+            graphics.drawCenteredString(this.font, emptyHint, centerX, HEADER_HEIGHT + 88, 0xFFA0A0A0);
         }
         int cardTop = HEADER_HEIGHT + 22;
         int cardBottom = this.height - FOOTER_HEIGHT;
@@ -253,16 +252,9 @@ public final class DollSelectionScreen extends Screen implements DollScreenParen
         graphics.fill(8, 8, this.width - 8, HEADER_HEIGHT, 0xFF181818);
         graphics.fill(8, HEADER_HEIGHT - 2, this.width - 8, HEADER_HEIGHT, 0xFF4A4A4A);
         DollStyle selected = TotemDollConfig.selectedStyle();
-        graphics.pose().pushPose();
-        graphics.pose().translate(48.0F, 21.0F, 100.0F);
-        graphics.pose().scale(3.4F, 3.4F, 3.4F);
-        DollPreviewContext.renderAs(
-                selected,
-                () -> graphics.renderItem(new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.TOTEM_OF_UNDYING), -8, 0)
-        );
-        graphics.pose().popPose();
-        graphics.drawString(this.font, Component.translatable("screen.totemdoll.current_preview"), 82, 18, 0xA0A0A0);
-        graphics.drawString(this.font, selected.label(), 82, 36, 0xFFFFFF);
+        DollGuiPreview.render(graphics, selected, 20, 12, 56, 56, 54.4F);
+        graphics.drawString(this.font, Component.translatable("screen.totemdoll.current_preview"), 82, 18, 0xFFA0A0A0);
+        graphics.drawString(this.font, selected.label(), 82, 36, 0xFFFFFFFF);
         graphics.drawString(
                 this.font,
                 Component.translatable("screen.totemdoll.current_type", selected.isLocal()
@@ -270,7 +262,7 @@ public final class DollSelectionScreen extends Screen implements DollScreenParen
                         : Component.translatable("screen.totemdoll.template")),
                 82,
                 53,
-                0xA0A0A0
+                0xFFA0A0A0
         );
         if (selected.isLocal() && selected.templateId() != null) {
             graphics.drawString(
@@ -281,7 +273,7 @@ public final class DollSelectionScreen extends Screen implements DollScreenParen
                     ),
                     82,
                     68,
-                    0x8FB4D8
+                    0xFF8FB4D8
             );
         }
     }
@@ -289,7 +281,7 @@ public final class DollSelectionScreen extends Screen implements DollScreenParen
     private void renderSidebar(GuiGraphics graphics) {
         graphics.fill(8, HEADER_HEIGHT + 8, SIDEBAR_WIDTH - 4, this.height - FOOTER_HEIGHT, 0xFF181818);
         graphics.fill(SIDEBAR_WIDTH - 6, HEADER_HEIGHT + 8, SIDEBAR_WIDTH - 4, this.height - FOOTER_HEIGHT, 0xFF3D3D3D);
-        graphics.drawString(this.font, Component.translatable("screen.totemdoll.library"), 18, HEADER_HEIGHT + 18, 0xA0A0A0);
+        graphics.drawString(this.font, Component.translatable("screen.totemdoll.library"), 18, HEADER_HEIGHT + 18, 0xFFA0A0A0);
         int indicatorY = tab == Tab.TEMPLATES ? HEADER_HEIGHT + 28 : HEADER_HEIGHT + 54;
         graphics.fill(10, indicatorY, 13, indicatorY + 20, 0xFF55D878);
     }

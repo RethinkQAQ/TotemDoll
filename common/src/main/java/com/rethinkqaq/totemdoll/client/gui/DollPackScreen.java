@@ -61,5 +61,5 @@ public final class DollPackScreen extends Screen implements DollScreenParent {
     }
     @Override public void onClose() { minecraft.setScreen(parent); }
     @Override public Screen rootParent() { return parent instanceof DollScreenParent p ? p.rootParent() : parent; }
-    @Override public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) { renderTransparentBackground(graphics); graphics.drawCenteredString(font, title, width / 2, 22, 0xFFFFFF); graphics.drawCenteredString(font, Component.translatable("screen.totemdoll.import_hint"), width / 2, 84, 0xA0A0A0); if (status != null) graphics.drawCenteredString(font, status, width / 2, height - 54, 0xE0C070); DollScreenRender.renderChildren(this, graphics, mouseX, mouseY, partialTick); }
+    @Override public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) { renderTransparentBackground(graphics); graphics.drawCenteredString(font, title, width / 2, 22, 0xFFFFFFFF); graphics.drawCenteredString(font, Component.translatable("screen.totemdoll.import_hint"), width / 2, 84, 0xFFA0A0A0); if (status != null) graphics.drawCenteredString(font, status, width / 2, height - 54, 0xFFE0C070); DollScreenRender.renderChildren(this, graphics, mouseX, mouseY, partialTick); }
 }

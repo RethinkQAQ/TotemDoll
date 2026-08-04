@@ -81,10 +81,10 @@ public final class DollBoneRenderer {
         //? >= 1.21.5 {
         /*if (display == null) {
             poseStack.translate(-0.5F, -0.5F, -0.5F);
-        }*/
-        //? } else {
+        }
+        *///?} else {
         poseStack.translate(-0.5F, -0.5F, -0.5F);
-        //? }
+        //?}
         net.minecraft.resources.ResourceLocation texture = model.texture();
         if (DollAnimationManager.isTotemActivationActive(style)
                 && style.textures().containsKey("activate")) {

@@ -33,6 +33,7 @@ import com.rethinkqaq.totemdoll.doll.bone.DollBoneModelLoader;
 import com.rethinkqaq.totemdoll.doll.bone.DollBoneModels;
 import com.rethinkqaq.totemdoll.doll.bone.DollBoneActionManager;
 import com.rethinkqaq.totemdoll.client.DollBoneRenderer;
+import com.rethinkqaq.totemdoll.client.gui.DollGuiPreviewRenderer;
 
 import java.io.Reader;
 import java.util.ArrayList;
@@ -47,6 +48,7 @@ public final class DollStyleLoader {
 
     public static List<DollStyle> reload(ResourceManager manager) {
         DollBoneRenderer.clear();
+        DollGuiPreviewRenderer.invalidateAll();
         DollBoneActionManager.clear();
         DollBoneModels.clear();
         Map<ResourceLocation, Resource> resources = manager.listResources(

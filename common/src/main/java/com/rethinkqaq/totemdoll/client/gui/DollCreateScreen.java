@@ -20,7 +20,6 @@
 
 package com.rethinkqaq.totemdoll.client.gui;
 
-import com.rethinkqaq.totemdoll.client.DollPreviewContext;
 import com.rethinkqaq.totemdoll.client.TotemDollClient;
 import com.rethinkqaq.totemdoll.config.TotemDollConfig;
 import com.rethinkqaq.totemdoll.doll.DollLocalStyleStore;
@@ -35,9 +34,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.chat.Component;
 import org.lwjgl.util.tinyfd.TinyFileDialogs;
 
-//? >= 1.21.3 {
-/*import net.minecraft.client.renderer.RenderType;
-*///?}
+//? >= 1.21.6 {
+/*import net.minecraft.client.renderer.RenderPipelines;
+*///?} else if >= 1.21.3 {
+/*import net.minecraft.client.renderer.RenderType;*/
+//?}
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -184,23 +185,16 @@ public final class DollCreateScreen extends Screen {
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         this.renderTransparentBackground(graphics);
-        graphics.drawCenteredString(this.font, this.title, this.width / 2, 20, 0xFFFFFF);
+        graphics.drawCenteredString(this.font, this.title, this.width / 2, 20, 0xFFFFFFFF);
         graphics.drawCenteredString(
                 this.font,
                 Component.translatable("screen.totemdoll.from_template", template.label()),
                 this.width / 2,
                 38,
-                0xA0A0A0
+                0xFFA0A0A0
         );
-        graphics.pose().pushPose();
-        graphics.pose().translate(this.width / 2.0F, 52.0F, 100.0F);
-        graphics.pose().scale(3.2F, 3.2F, 3.2F);
-        DollPreviewContext.renderAs(
-                template,
-                () -> graphics.renderItem(new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.TOTEM_OF_UNDYING), -8, 0)
-        );
-        graphics.pose().popPose();
-        graphics.drawString(this.font, Component.translatable("screen.totemdoll.name"), this.width / 2 - 110, 100, 0xFFFFFF);
+        DollGuiPreview.render(graphics, template, this.width / 2 - 28, 46, 56, 56, 51.2F);
+        graphics.drawString(this.font, Component.translatable("screen.totemdoll.name"), this.width / 2 - 110, 100, 0xFFFFFFFF);
         graphics.drawCenteredString(
                 this.font,
                 skinPath == null
@@ -208,29 +202,35 @@ public final class DollCreateScreen extends Screen {
                         : Component.translatable("screen.totemdoll.skin_selected", skinPath.getFileName().toString()),
                 this.width / 2,
                 172,
-                skinPath == null ? 0xA0A0A0 : 0x80C080
+                skinPath == null ? 0xFFA0A0A0 : 0xFF80C080
         );
         graphics.drawCenteredString(
                 this.font,
                 Component.translatable("screen.totemdoll.skin_format_hint"),
                 this.width / 2,
                 190,
-                0x808080
+                0xFF808080
         );
         if (previewTexture != null) {
             int previewX = Math.min(this.width - 72, this.width / 2 + 140);
             int previewCenter = previewX + 32;
-            graphics.blit(/*? >= 1.21.3 {*//*RenderType::guiTextured, *//*?}*/previewTexture, previewX, 104, 0, 0, 64, 64, 64, 64);
+            graphics.blit(
+                    //? >= 1.21.6 {
+                    /*RenderPipelines.GUI_TEXTURED,
+                    *///?} else if >= 1.21.3 {
+                    /*RenderType::guiTextured,*/
+                    //?}
+                    previewTexture, previewX, 104, 0, 0, 64, 64, 64, 64);
             graphics.drawCenteredString(
                     this.font,
                     Component.translatable("screen.totemdoll.skin_preview"),
                     previewCenter,
                     172,
-                    0xA0A0A0
+                    0xFFA0A0A0
             );
         }
         if (status != null) {
-            graphics.drawCenteredString(this.font, status, this.width / 2, this.height - 70, 0xFF8080);
+            graphics.drawCenteredString(this.font, status, this.width / 2, this.height - 70, 0xFFFF8080);
         }
         DollScreenRender.renderChildren(this, graphics, mouseX, mouseY, partialTick);
     }

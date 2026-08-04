@@ -20,7 +20,6 @@
 
 package com.rethinkqaq.totemdoll.client.gui;
 
-import com.rethinkqaq.totemdoll.client.DollPreviewContext;
 import com.rethinkqaq.totemdoll.client.TotemDollClient;
 import com.rethinkqaq.totemdoll.config.TotemDollConfig;
 import com.rethinkqaq.totemdoll.doll.DollLocalStyleStore;
@@ -142,18 +141,11 @@ public final class DollStyleManageScreen extends Screen implements DollScreenPar
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         this.renderTransparentBackground(graphics);
-        graphics.drawCenteredString(this.font, this.title, this.width / 2, 22, 0xFFFFFF);
-        graphics.drawCenteredString(this.font, style.label(), this.width / 2, 44, 0xA0A0A0);
-        graphics.pose().pushPose();
-        graphics.pose().translate(this.width / 2.0F, 52.0F, 100.0F);
-        graphics.pose().scale(2.8F, 2.8F, 2.8F);
-        DollPreviewContext.renderAs(
-                style,
-                () -> graphics.renderItem(new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.TOTEM_OF_UNDYING), -8, 0)
-        );
-        graphics.pose().popPose();
+        graphics.drawCenteredString(this.font, this.title, this.width / 2, 22, 0xFFFFFFFF);
+        graphics.drawCenteredString(this.font, style.label(), this.width / 2, 44, 0xFFA0A0A0);
+        DollGuiPreview.render(graphics, style, this.width / 2 - 24, 48, 48, 48, 44.8F);
         if (status != null) {
-            graphics.drawCenteredString(this.font, status, this.width / 2, this.height - 64, 0xFF8080);
+            graphics.drawCenteredString(this.font, status, this.width / 2, this.height - 64, 0xFFFF8080);
         }
         DollScreenRender.renderChildren(this, graphics, mouseX, mouseY, partialTick);
     }
