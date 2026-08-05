@@ -61,5 +61,6 @@
   "screen.totemdoll.delete_confirm_title": "删除图腾娃娃样式？",
   "screen.totemdoll.delete_confirm": "确定删除 %s 吗？这会删除本地样式文件。",
   "key.totemdoll.open_config": "打开图腾娃娃设置",
-  "key.categories.totemdoll": "图腾娃娃"
+  "key.categories.totemdoll": "图腾娃娃",
+  "key.category.totemdoll": "图腾娃娃"
 }

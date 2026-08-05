@@ -27,6 +27,9 @@ import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+//? >= 1.21.9 {
+/^import net.minecraft.world.entity.ItemOwner;
+^///?}
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 //? >= 1.21.6 {
@@ -81,7 +84,11 @@ public abstract class ItemModelResolverMixin {
             ItemStack stack,
             ItemDisplayContext context,
             Level level,
+            //? >= 1.21.9 {
+            /^¹ItemOwner entity,
+            ¹^///?} else {
             LivingEntity entity,
+            //?}
             int seed,
             CallbackInfo callback
     ) {

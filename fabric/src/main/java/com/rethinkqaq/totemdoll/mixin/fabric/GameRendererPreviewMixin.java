@@ -45,13 +45,25 @@ public abstract class GameRendererPreviewMixin {
     //? >= 1.21.6 {
     /*@ModifyArgs(
             method = "<init>",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/render/GuiRenderer;<init>(Lnet/minecraft/client/gui/render/state/GuiRenderState;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Ljava/util/List;)V")
+            //? >= 1.21.9 {
+            /^at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/render/GuiRenderer;<init>(Lnet/minecraft/client/gui/render/state/GuiRenderState;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/feature/FeatureRenderDispatcher;Ljava/util/List;)V")
+            ^///?} else if >= 1.21.6 {
+            /^at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/render/GuiRenderer;<init>(Lnet/minecraft/client/gui/render/state/GuiRenderState;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Ljava/util/List;)V")^/
+            //?}
     )
     private void totemdoll$addPreviewRenderer(Args args) {
+        //? >= 1.21.9 {
+        /^List<PictureInPictureRenderer<?>> renderers = args.get(4);
+        ^///?} else {
         List<PictureInPictureRenderer<?>> renderers = args.get(2);
+        //?}
         List<PictureInPictureRenderer<?>> result = new ArrayList<>(renderers);
         result.add(new DollGuiPreviewRenderer(args.get(1)));
+        //? >= 1.21.9 {
+        /^args.set(4, result);
+        ^///?} else {
         args.set(2, result);
+        //?}
     }
     *///?}
 }

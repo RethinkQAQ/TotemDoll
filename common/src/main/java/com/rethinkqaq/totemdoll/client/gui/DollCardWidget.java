@@ -28,6 +28,9 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
+//? >= 1.21.9 {
+/*import net.minecraft.client.input.MouseButtonEvent;
+*///?}
 
 public final class DollCardWidget extends AbstractWidget {
 
@@ -155,7 +158,17 @@ public final class DollCardWidget extends AbstractWidget {
     }
 
     @Override
+    //? >= 1.21.9 {
+    /*public void onClick(MouseButtonEvent event, boolean isDoubleClick) {
+        handleClick(event.x(), event.y());
+    }
+    *///?} else {
     public void onClick(double mouseX, double mouseY) {
+        handleClick(mouseX, mouseY);
+    }
+    //?}
+
+    private void handleClick(double mouseX, double mouseY) {
         double relativeX = mouseX - getX();
         double relativeY = mouseY - getY();
         int actionTop = getHeight() - ACTION_HEIGHT - 4;

@@ -35,9 +35,13 @@ import com.rethinkqaq.totemdoll.utils.UvUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.FaceInfo;
+//? >= 1.21.9 {
+/*import net.minecraft.client.renderer.SubmitNodeCollector;
+*///?}
 import net.minecraft.client.renderer.block.model.ItemTransform;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -103,6 +107,60 @@ public final class DollBoneRenderer {
         return true;
     }
 
+    //? >= 1.21.9 {
+    /*public static boolean submit(DollStyle style, ItemDisplayContext context, boolean leftHand,
+                                 PoseStack poseStack, SubmitNodeCollector nodeCollector, int light,
+                                 int overlay, int outlineColor) {
+        DollBoneModel model = DollBoneModels.get(style.id());
+        if (model == null) return false;
+        RuntimeModel runtime = CACHE.computeIfAbsent(style.id(), ignored -> build(model));
+        float partialTick = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
+        applyPoses(style, runtime, partialTick);
+
+        poseStack.pushPose();
+        DollDisplayTransform display = model.display().get(displayContext(context));
+        if (display == null) display = model.display().get("fixed");
+        if (display != null) {
+            new ItemTransform(
+                    new Vector3f(display.rotationX(), display.rotationY(), display.rotationZ()),
+                    new Vector3f(display.translationX(), display.translationY(), display.translationZ()),
+                    new Vector3f(display.scaleX(), display.scaleY(), display.scaleZ())
+            ).apply(leftHand, poseStack.last());
+        } else {
+            poseStack.translate(-0.5F, -0.5F, -0.5F);
+        }
+
+        net.minecraft.resources.ResourceLocation texture = model.texture();
+        if (DollAnimationManager.isTotemActivationActive(style)
+                && style.textures().containsKey("activate")) {
+            texture = style.textures().get("activate");
+        } else if (style.hasDynamicTextures() && !style.animations().isEmpty()) {
+            DollAnimationDefinition animation = style.animations().get(0);
+            int frame = DollAnimationManager.currentFrame(style, animation.id());
+            if (frame >= 0 && frame < animation.frames().size()) {
+                texture = style.textures().getOrDefault(animation.frames().get(frame), texture);
+            }
+        }
+
+        net.minecraft.resources.ResourceLocation finalTexture = texture;
+        nodeCollector.submitCustomGeometry(
+                poseStack,
+                RenderType.entityTranslucent(finalTexture),
+                (capturedPose, consumer) -> {
+                    PoseStack capturedStack = new PoseStack();
+                    capturedStack.last().pose().set(capturedPose.pose());
+                    capturedStack.last().normal().set(capturedPose.normal());
+                    for (RuntimePart root : runtime.roots) {
+                        renderPart(root, capturedStack, consumer, light, overlay);
+                    }
+                }
+        );
+        poseStack.popPose();
+        return true;
+    }
+
+    *///?}
+
     private static String displayContext(ItemDisplayContext context) {
         return switch (context) {
             case GUI -> "gui";
@@ -111,6 +169,9 @@ public final class DollBoneRenderer {
             case FIRST_PERSON_LEFT_HAND, FIRST_PERSON_RIGHT_HAND -> "firstperson";
             case THIRD_PERSON_LEFT_HAND, THIRD_PERSON_RIGHT_HAND -> "thirdperson";
             case HEAD -> "head";
+            //? >= 1.21.9 {
+            /*case ON_SHELF -> "on_shelf";
+            *///?}
             default -> "fixed";
         };
     }

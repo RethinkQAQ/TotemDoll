@@ -62,5 +62,6 @@
   "screen.totemdoll.delete_confirm_title": "Delete doll style?",
   "screen.totemdoll.delete_confirm": "Delete %s? This removes its local files.",
   "key.totemdoll.open_config": "Open Totem Doll settings",
-  "key.categories.totemdoll": "Totem Doll"
+  "key.categories.totemdoll": "Totem Doll",
+  "key.category.totemdoll": "Totem Doll"
 }

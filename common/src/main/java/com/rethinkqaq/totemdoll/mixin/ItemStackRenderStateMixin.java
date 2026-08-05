@@ -28,6 +28,12 @@ import com.rethinkqaq.totemdoll.client.DollThirdPersonState;
 import com.rethinkqaq.totemdoll.doll.DollStyle;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
+//? >= 1.21.9 {
+/^import net.minecraft.client.renderer.SubmitNodeCollector;
+^///?} else {
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
+//?}
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.world.item.ItemDisplayContext;
 import org.spongepowered.asm.mixin.Shadow;
@@ -56,7 +62,40 @@ public abstract class ItemStackRenderStateMixin {
     private boolean isLeftHand;
     //?}
 
-    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
+    //? >= 1.21.9 {
+    /^@Inject(method = "submit", at = @At("HEAD"), cancellable = true)
+    private void totemdoll$submitFormat3(
+            PoseStack poseStack,
+            SubmitNodeCollector nodeCollector,
+            int light,
+            int overlay,
+            int outlineColor,
+            CallbackInfo callback
+    ) {
+        DollStyle style = DollThirdPersonState.get((ItemStackRenderState) (Object) this);
+        if (style == null) return;
+
+        boolean isLeftHand = displayContext == ItemDisplayContext.THIRD_PERSON_LEFT_HAND
+                || displayContext == ItemDisplayContext.FIRST_PERSON_LEFT_HAND;
+        if (DollBoneRenderer.submit(
+                style,
+                displayContext,
+                isLeftHand,
+                poseStack,
+                nodeCollector,
+                light,
+                overlay,
+                outlineColor
+        )) {
+            callback.cancel();
+        }
+    }
+    ^///?} else {
+    @Inject(
+            method = "render",
+            at = @At("HEAD"),
+            cancellable = true
+    )
     private void totemdoll$renderFormat3(
             PoseStack poseStack,
             MultiBufferSource buffers,

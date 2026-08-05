@@ -46,7 +46,13 @@ public final class DollThirdPersonState {
                 && context != ItemDisplayContext.THIRD_PERSON_RIGHT_HAND
                 && context != ItemDisplayContext.GROUND
                 && context != ItemDisplayContext.FIXED
-                && context != ItemDisplayContext.GUI) {
+                && context != ItemDisplayContext.GUI
+                && context != ItemDisplayContext.FIRST_PERSON_LEFT_HAND
+                && context != ItemDisplayContext.FIRST_PERSON_RIGHT_HAND
+                //? >= 1.21.9 {
+                /^&& context != ItemDisplayContext.ON_SHELF
+                ^///?}
+                ) {
             STYLES.remove(renderState);
             return;
         }

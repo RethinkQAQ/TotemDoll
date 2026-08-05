@@ -20,12 +20,18 @@ public final class DollGuiModelIdentity {
             return;
         }
         trackingState.appendModelIdentityElement(style.id());
+        if (style.hasDynamicModel() || style.hasDynamicTextures() || style.supportsSkin()) {
+            trackingState.setAnimated();
+        }
         *///?} else if >= 1.21.6 {
         /*if (!(renderState instanceof ItemStackRenderState) || context != ItemDisplayContext.GUI) {
             return;
         }
         ((ItemStackRenderState) renderState).clearModelIdentity();
         ((ItemStackRenderState) renderState).appendModelIdentityElement(style.id());
+        if (style.hasDynamicModel() || style.hasDynamicTextures() || style.supportsSkin()) {
+            ((ItemStackRenderState) renderState).setAnimated();
+        }
         *///?}
     }
 }
