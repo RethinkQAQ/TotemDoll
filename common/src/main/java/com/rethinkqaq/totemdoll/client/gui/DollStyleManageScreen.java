@@ -114,7 +114,7 @@ public final class DollStyleManageScreen extends Screen implements DollScreenPar
     }
 
     private void exportStyle() {
-        String path = TinyFileDialogs.tinyfd_saveFileDialog(Component.translatable("screen.totemdoll.export").getString(), style.id().getPath() + ".zip", null, "Totem Doll style pack (*.zip)");
+        String path = TinyFileDialogs.tinyfd_saveFileDialog(Component.translatable("screen.totemdoll.export").getString(), style.id().path() + ".zip", null, "Totem Doll style pack (*.zip)");
         if (path == null) return;
         try { DollLocalStyleStore.exportStyle(style, java.nio.file.Path.of(path)); status = Component.translatable("screen.totemdoll.export_success"); }
         catch (Exception exception) { status = Component.translatable("screen.totemdoll.pack_import_failed", exception.getMessage()); }

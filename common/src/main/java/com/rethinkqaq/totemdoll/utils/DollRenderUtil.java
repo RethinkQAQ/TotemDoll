@@ -18,14 +18,26 @@
  * with Totem Doll. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.rethinkqaq.totemdoll.doll.bone;
+package com.rethinkqaq.totemdoll.utils;
 
-import com.rethinkqaq.totemdoll.utils.DollResourceId;
+//? >= 1.21.11 {
+/*import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+*///? } else {
+import net.minecraft.client.renderer.RenderType;
+//?}
 
-import java.util.List;
-import java.util.Map;
+public final class DollRenderUtil {
+    private DollRenderUtil() {
+    }
 
-public record DollBoneModel(int textureWidth, int textureHeight, DollResourceId texture,
-                            List<DollBone> roots, Map<String, DollBoneAnimation> animations,
-                            List<DollActionBinding> bindings,
-                            Map<String, DollDisplayTransform> display) {}
+    //? >= 1.21.11 {
+    /*public static RenderType entityTranslucent(DollResourceId texture) {
+        return RenderTypes.entityTranslucent(DollMinecraftResourceUtil.nativeId(texture));
+    }
+    *///? } else {
+    public static RenderType entityTranslucent(DollResourceId texture) {
+        return RenderType.entityTranslucent(DollMinecraftResourceUtil.nativeId(texture));
+    }
+    //?}
+}

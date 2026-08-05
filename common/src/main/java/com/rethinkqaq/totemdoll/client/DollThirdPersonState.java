@@ -49,7 +49,7 @@ public final class DollThirdPersonState {
                 && context != ItemDisplayContext.GUI
                 && context != ItemDisplayContext.FIRST_PERSON_LEFT_HAND
                 && context != ItemDisplayContext.FIRST_PERSON_RIGHT_HAND
-                //? >= 1.21.9 {
+                //? >= 1.21.10 {
                 /^&& context != ItemDisplayContext.ON_SHELF
                 ^///?}
                 ) {

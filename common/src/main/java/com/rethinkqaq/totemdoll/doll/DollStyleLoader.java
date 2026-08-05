@@ -25,7 +25,8 @@ import com.rethinkqaq.totemdoll.config.TotemDollConfig;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonArray;
-import net.minecraft.resources.ResourceLocation;
+import com.rethinkqaq.totemdoll.utils.DollResourceId;
+import com.rethinkqaq.totemdoll.utils.DollMinecraftResourceUtil;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import com.rethinkqaq.totemdoll.doll.bone.DollBoneModel;
@@ -51,18 +52,19 @@ public final class DollStyleLoader {
         DollGuiPreviewRenderer.invalidateAll();
         DollBoneActionManager.clear();
         DollBoneModels.clear();
-        Map<ResourceLocation, Resource> resources = manager.listResources(
-                "styles", id -> id.getPath().endsWith("/style.json"));
         List<DollStyle> styles = new ArrayList<>();
-        resources.entrySet().stream()
-                .sorted(Map.Entry.comparingByKey(Comparator.comparing(ResourceLocation::toString)))
-                .forEach(entry -> loadOne(manager, entry.getKey(), entry.getValue(), styles));
+        List<Map.Entry<DollResourceId, Resource>> resources = new ArrayList<>();
+        for (var entry : manager.listResources("styles", id -> id.getPath().endsWith("/style.json")).entrySet()) {
+            resources.add(Map.entry(DollMinecraftResourceUtil.fromNative(entry.getKey()), entry.getValue()));
+        }
+        resources.sort(Map.Entry.comparingByKey(Comparator.comparing(DollResourceId::toString)));
+        resources.forEach(entry -> loadOne(manager, entry.getKey(), entry.getValue(), styles));
         DollStyles.replaceDiscovered(styles);
         TotemDollConfig.reconcileSelectedStyle();
         return List.copyOf(styles);
     }
 
-    private static void loadOne(ResourceManager manager, ResourceLocation source, Resource resource,
+    private static void loadOne(ResourceManager manager, DollResourceId source, Resource resource,
                                 List<DollStyle> output) {
         try (Reader reader = resource.openAsReader()) {
             JsonObject root = GSON.fromJson(reader, JsonObject.class);
@@ -72,20 +74,20 @@ public final class DollStyleLoader {
             if (root.has("enabled") && !root.get("enabled").getAsBoolean()) {
                 return;
             }
-            ResourceLocation id = requiredId(root, "id");
+            DollResourceId id = requiredId(root, "id");
             JsonObject model = root.getAsJsonObject("model");
             if (model == null || !model.has("type")) throw new IllegalArgumentException("Missing model.type");
             String modelType = model.get("type").getAsString();
             if (!"mesh".equals(modelType)) throw new IllegalArgumentException("Unsupported model type " + modelType);
             DollBoneModel loadedModel = DollBoneModelLoader.load(manager, source, root, model);
             DollBoneModels.put(id, loadedModel);
-            ResourceLocation modelId = ResourceLocation.withDefaultNamespace("item/totem_of_undying");
+            DollResourceId modelId = DollResourceId.ofVanilla("item/totem_of_undying");
             String name = root.has("name") ? root.get("name").getAsString() : id.toString();
             String nameKey = root.has("name_key") ? root.get("name_key").getAsString() : null;
-            ResourceLocation template = root.has("template") ? requiredId(root, "template") : null;
+            DollResourceId template = root.has("template") ? requiredId(root, "template") : null;
             DollSkinDefinition skin = readSkin(root);
             DollStyleOrigin origin = readOrigin(root, source);
-            Map<String, ResourceLocation> textures = readTextures(source, root);
+            Map<String, DollResourceId> textures = readTextures(source, root);
             List<DollAnimationDefinition> animations = readTextureAnimations(root, textures);
             output.add(new DollStyle(id, name, nameKey, modelId, false, template,
                     origin == DollStyleOrigin.LOCAL, skin, origin, textures, animations,
@@ -95,12 +97,12 @@ public final class DollStyleLoader {
         }
     }
 
-    private static DollStyleOrigin readOrigin(JsonObject root, ResourceLocation source) {
+    private static DollStyleOrigin readOrigin(JsonObject root, DollResourceId source) {
         if (root.has("origin")) {
             try { return DollStyleOrigin.valueOf(root.get("origin").getAsString().toUpperCase()); }
             catch (IllegalArgumentException ignored) { }
         }
-        return Constants.MOD_ID.equals(source.getNamespace()) ? DollStyleOrigin.BUILTIN : DollStyleOrigin.RESOURCE_PACK;
+        return Constants.MOD_ID.equals(source.namespace()) ? DollStyleOrigin.BUILTIN : DollStyleOrigin.RESOURCE_PACK;
     }
 
     private static DollSkinDefinition readSkin(JsonObject root) {
@@ -111,8 +113,8 @@ public final class DollStyleLoader {
         return result.supportsImport() ? result : null;
     }
 
-    private static Map<String, ResourceLocation> readTextures(ResourceLocation source, JsonObject root) {
-        Map<String, ResourceLocation> result = new LinkedHashMap<>();
+    private static Map<String, DollResourceId> readTextures(DollResourceId source, JsonObject root) {
+        Map<String, DollResourceId> result = new LinkedHashMap<>();
         JsonObject textures = root.getAsJsonObject("textures");
         if (textures == null) return result;
         for (String key : textures.keySet()) {
@@ -122,7 +124,7 @@ public final class DollStyleLoader {
         return result;
     }
 
-    private static List<DollAnimationDefinition> readAnimations(JsonObject root, Map<String, ResourceLocation> textures) {
+    private static List<DollAnimationDefinition> readAnimations(JsonObject root, Map<String, DollResourceId> textures) {
         List<DollAnimationDefinition> result = new ArrayList<>();
         JsonObject animations = root.getAsJsonObject("animations");
         if (animations == null) return result;
@@ -156,16 +158,16 @@ public final class DollStyleLoader {
     }
 
     private static List<DollAnimationDefinition> readTextureAnimations(JsonObject root,
-                                                                         Map<String, ResourceLocation> textures) {
+                                                                         Map<String, DollResourceId> textures) {
         if (!root.has("texture_animations")) return List.of();
         JsonObject copy = root.deepCopy();
         copy.add("animations", root.get("texture_animations").deepCopy());
         return readAnimations(copy, textures);
     }
 
-    private static ResourceLocation resolve(ResourceLocation source, String relative) {
-        String parent = source.getPath().substring(0, source.getPath().lastIndexOf('/') + 1);
-        return ResourceLocation.fromNamespaceAndPath(source.getNamespace(), parent + relative);
+    private static DollResourceId resolve(DollResourceId source, String relative) {
+        String parent = source.path().substring(0, source.path().lastIndexOf('/') + 1);
+        return DollResourceId.of(source.namespace(), parent + relative);
     }
 
     private static String safeRelativePath(String value) {
@@ -176,9 +178,9 @@ public final class DollStyleLoader {
         return path;
     }
 
-    private static ResourceLocation requiredId(JsonObject object, String key) {
+    private static DollResourceId requiredId(JsonObject object, String key) {
         if (!object.has(key)) throw new IllegalArgumentException("Missing " + key);
-        ResourceLocation id = ResourceLocation.tryParse(object.get(key).getAsString());
+        DollResourceId id = DollResourceId.tryParse(object.get(key).getAsString());
         if (id == null) throw new IllegalArgumentException("Invalid resource location: " + key);
         return id;
     }

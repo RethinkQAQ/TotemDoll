@@ -73,7 +73,8 @@ public final class DollGuiPreviewRenderer extends PictureInPictureRenderer<DollG
             target.ready = true;
         }
         guiRenderState.submitBlitToCurrentLayer(new BlitRenderState(
-                RenderPipelines.GUI_TEXTURED_PREMULTIPLIED_ALPHA, TextureSetup.singleTexture(target.view), state.pose(),
+                RenderPipelines.GUI_TEXTURED_PREMULTIPLIED_ALPHA,
+                DollGuiPreview.singleTexture(target.view), state.pose(),
                 state.x0(), state.y0(), state.x1(), state.y1(), 0.0F, 1.0F, 1.0F, 0.0F,
                 -1, state.scissorArea(), null));
     }
@@ -146,7 +147,9 @@ public final class DollGuiPreviewRenderer extends PictureInPictureRenderer<DollG
             this.height = height;
             GpuDevice device = RenderSystem.getDevice();
             texture = device.createTexture("TotemDoll GUI preview", 12, TextureFormat.RGBA8, width, height, 1, 1);
+            //? < 1.21.11 {
             texture.setTextureFilter(FilterMode.NEAREST, false);
+            //? }
             view = device.createTextureView(texture);
             depth = device.createTexture("TotemDoll GUI preview depth", 8, TextureFormat.DEPTH32, width, height, 1, 1);
             depthView = device.createTextureView(depth);

@@ -27,6 +27,12 @@ import com.rethinkqaq.totemdoll.utils.GuiPoseUtil;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+//? >= 1.21.6 {
+/*import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.textures.FilterMode;
+import com.mojang.blaze3d.textures.GpuTextureView;
+import net.minecraft.client.gui.render.TextureSetup;
+*///?}
 
 /** Renders a TotemDoll preview using the best GUI path for the active version. */
 public final class DollGuiPreview {
@@ -51,6 +57,17 @@ public final class DollGuiPreview {
                         () -> graphics.renderItem(new ItemStack(Items.TOTEM_OF_UNDYING), 0, 0)));
         //?}
     }
+
+    //? >= 1.21.11 {
+    /*public static TextureSetup singleTexture(GpuTextureView view) {
+        return TextureSetup.singleTexture(view,
+                RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST));
+    }
+    *///?} else if >= 1.21.6 {
+    /*public static TextureSetup singleTexture(GpuTextureView view) {
+        return TextureSetup.singleTexture(view);
+    }
+    *///?}
 
     private static void renderItemPreview(
             GuiGraphics graphics, int x, int y, int width, int height, float modelScale, Runnable renderCall

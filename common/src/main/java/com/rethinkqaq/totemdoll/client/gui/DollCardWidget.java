@@ -28,7 +28,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
-//? >= 1.21.9 {
+//? >= 1.21.10 {
 /*import net.minecraft.client.input.MouseButtonEvent;
 *///?}
 
@@ -158,7 +158,7 @@ public final class DollCardWidget extends AbstractWidget {
     }
 
     @Override
-    //? >= 1.21.9 {
+//? >= 1.21.10 {
     /*public void onClick(MouseButtonEvent event, boolean isDoubleClick) {
         handleClick(event.x(), event.y());
     }

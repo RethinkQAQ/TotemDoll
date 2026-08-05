@@ -24,6 +24,8 @@ import com.rethinkqaq.totemdoll.client.TotemDollClient;
 import com.rethinkqaq.totemdoll.client.gui.DollSelectionScreen;
 import com.rethinkqaq.totemdoll.doll.DollStyleLoader;
 import com.rethinkqaq.totemdoll.doll.DollAnimationManager;
+import com.rethinkqaq.totemdoll.utils.DollMinecraftResourceUtil;
+import com.rethinkqaq.totemdoll.utils.DollResourceId;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -32,9 +34,6 @@ import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-//? >= 1.21.9 {
-/*import net.minecraft.resources.ResourceLocation;
-*///?}
 import org.lwjgl.glfw.GLFW;
 
 public final class TotemDollFabricClient implements ClientModInitializer {
@@ -51,8 +50,9 @@ public final class TotemDollFabricClient implements ClientModInitializer {
                 "key.totemdoll.open_config",
                 InputConstants.Type.KEYSYM,
                 GLFW.GLFW_KEY_F9,
-                //? >= 1.21.9 {
-                /*KeyMapping.Category.register(ResourceLocation.withDefaultNamespace("totemdoll"))
+//? >= 1.21.10 {
+                /*KeyMapping.Category.register(DollMinecraftResourceUtil.nativeId(
+                        DollResourceId.ofVanilla("totemdoll")))
                 *///?} else {
                 "key.categories.totemdoll"
                 //?}

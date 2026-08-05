@@ -6,6 +6,14 @@ plugins {
 
 apply(from = rootProject.file("license.gradle"))
 
+tasks.named("compileJava") {
+    dependsOn("licenseFormat")
+}
+
+tasks.named("licenseMain") {
+    dependsOn("licenseFormat")
+}
+
 dependencies {
     minecraft("com.mojang:minecraft:${commonMod.mc}")
     mappings(loom.layered {

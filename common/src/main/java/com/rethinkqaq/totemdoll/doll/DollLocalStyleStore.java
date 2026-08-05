@@ -25,7 +25,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.resources.ResourceLocation;
+import com.rethinkqaq.totemdoll.utils.DollResourceId;
+import com.rethinkqaq.totemdoll.utils.DollMinecraftResourceUtil;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 
@@ -61,7 +62,7 @@ public final class DollLocalStyleStore {
         }
     }
 
-    public static ResourceLocation importSkin(
+    public static DollResourceId importSkin(
             DollStyle template,
             Path sourceSkin,
             String displayName,
@@ -76,7 +77,7 @@ public final class DollLocalStyleStore {
         return importMeshSkin(template, sourceSkin, displayName, resourceManager);
     }
 
-    private static ResourceLocation importMeshSkin(
+    private static DollResourceId importMeshSkin(
             DollStyle template,
             Path sourceSkin,
             String displayName,
@@ -99,7 +100,7 @@ public final class DollLocalStyleStore {
                 resourceManager, resolveRelative(template.definitionSource(), animationsPath));
 
         String key = "user_" + UUID.randomUUID().toString().replace("-", "");
-        ResourceLocation id = ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, key);
+        DollResourceId id = DollResourceId.of(Constants.MOD_ID, key);
         JsonObject style = new JsonObject();
         style.addProperty("format", 3);
         style.addProperty("id", id.toString());
@@ -147,7 +148,7 @@ public final class DollLocalStyleStore {
         if (name.isEmpty()) {
             return false;
         }
-        Path directory = stylesDirectory.resolve(style.id().getPath()).normalize();
+        Path directory = stylesDirectory.resolve(style.id().path()).normalize();
         Path metadataFile = directory.resolve("style.json");
         if (!directory.getParent().equals(stylesDirectory.normalize())
                 || !Files.isRegularFile(metadataFile)) {
@@ -176,7 +177,7 @@ public final class DollLocalStyleStore {
         if (!style.userCreated() || stylesDirectory == null) {
             return false;
         }
-        Path target = stylesDirectory.resolve(style.id().getPath()).normalize();
+        Path target = stylesDirectory.resolve(style.id().path()).normalize();
         if (!target.getParent().equals(stylesDirectory.normalize()) || !Files.isDirectory(target)) {
             return false;
         }
@@ -253,17 +254,17 @@ public final class DollLocalStyleStore {
                 Constants.LOG.warn("Skipping obsolete local style {}: only style format 3 is supported", styleDirectory);
                 return;
             }
-            ResourceLocation id = requireLocation(metadata, "id");
-            if (!id.getNamespace().equals(Constants.MOD_ID)
-                    || !id.getPath().equals(styleDirectory.getFileName().toString())) {
+            DollResourceId id = requireLocation(metadata, "id");
+            if (!id.namespace().equals(Constants.MOD_ID)
+                    || !id.path().equals(styleDirectory.getFileName().toString())) {
                 throw new IOException("Style id does not match its directory");
             }
             JsonObject modelObject = metadata.getAsJsonObject("model");
             String modelType = string(modelObject, "type");
 
             Path assets = generatedPackDirectory.resolve("assets");
-            Path styleTarget = assets.resolve(id.getNamespace()).resolve("styles/generated")
-                    .resolve(id.getPath()).resolve("style.json");
+            Path styleTarget = assets.resolve(id.namespace()).resolve("styles/generated")
+                    .resolve(id.path()).resolve("style.json");
             Path skinTarget = styleTarget.getParent().resolve("textures/skin.png");
             Files.createDirectories(styleTarget.getParent());
             Files.createDirectories(skinTarget.getParent());
@@ -295,8 +296,8 @@ public final class DollLocalStyleStore {
         Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
     }
 
-    private static JsonObject readResourceJson(ResourceManager manager, ResourceLocation location) throws IOException {
-        Resource resource = manager.getResource(location)
+    private static JsonObject readResourceJson(ResourceManager manager, DollResourceId location) throws IOException {
+        Resource resource = manager.getResource(DollMinecraftResourceUtil.nativeId(location))
                 .orElseThrow(() -> new IOException("Missing template resource " + location));
         try (Reader reader = resource.openAsReader()) {
             JsonObject value = GSON.fromJson(reader, JsonObject.class);
@@ -305,9 +306,9 @@ public final class DollLocalStyleStore {
         }
     }
 
-    private static ResourceLocation resolveRelative(ResourceLocation source, String relative) {
-        String parent = source.getPath().substring(0, source.getPath().lastIndexOf('/') + 1);
-        return ResourceLocation.fromNamespaceAndPath(source.getNamespace(), parent + relative);
+    private static DollResourceId resolveRelative(DollResourceId source, String relative) {
+        String parent = source.path().substring(0, source.path().lastIndexOf('/') + 1);
+        return DollResourceId.of(source.namespace(), parent + relative);
     }
 
     private static String safeRelativePath(JsonObject object, String member) throws IOException {
@@ -329,11 +330,11 @@ public final class DollLocalStyleStore {
         }
     }
 
-    private static ResourceLocation requireLocation(JsonObject object, String member) throws IOException {
+    private static DollResourceId requireLocation(JsonObject object, String member) throws IOException {
         if (object == null || !object.has(member)) {
             throw new IOException("Missing " + member);
         }
-        ResourceLocation location = ResourceLocation.tryParse(object.get(member).getAsString());
+        DollResourceId location = DollResourceId.tryParse(object.get(member).getAsString());
         if (location == null) {
             throw new IOException("Invalid resource location in " + member);
         }

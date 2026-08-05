@@ -21,6 +21,7 @@
 package com.rethinkqaq.totemdoll.client.gui;
 
 import com.rethinkqaq.totemdoll.doll.DollStyle;
+import com.rethinkqaq.totemdoll.utils.DollResourceId;
 
 //? >= 1.21.6 {
 /*import net.minecraft.client.gui.navigation.ScreenRectangle;
@@ -45,7 +46,7 @@ public record DollGuiPreviewRenderState(
         return style.hasDynamicModel() || style.hasDynamicTextures() || style.supportsSkin();
     }
 
-    public record PreviewKey(net.minecraft.resources.ResourceLocation styleId, int width, int height, float scale) {
+    public record PreviewKey(DollResourceId styleId, int width, int height, float scale) {
     }
 }
 *///?} else {

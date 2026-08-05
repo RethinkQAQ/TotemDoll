@@ -28,10 +28,11 @@ import com.rethinkqaq.totemdoll.client.gui.DollGuiPreviewRenderState;
 import com.rethinkqaq.totemdoll.client.gui.DollSelectionScreen;
 import com.rethinkqaq.totemdoll.doll.DollStyleLoader;
 import com.rethinkqaq.totemdoll.doll.DollAnimationManager;
+import com.rethinkqaq.totemdoll.utils.DollMinecraftResourceUtil;
+import com.rethinkqaq.totemdoll.utils.DollResourceId;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.loading.FMLEnvironment;
@@ -52,8 +53,9 @@ public class TotemDollMod {
             "key.totemdoll.open_config",
             InputConstants.Type.KEYSYM,
             GLFW.GLFW_KEY_F9,
-            //? >= 1.21.9 {
-            /*KeyMapping.Category.register(ResourceLocation.withDefaultNamespace("totemdoll"))
+//? >= 1.21.10 {
+            /*KeyMapping.Category.register(DollMinecraftResourceUtil.nativeId(
+                    DollResourceId.ofVanilla("totemdoll")))
             *///?} else {
             "key.categories.totemdoll"
             //?}
@@ -62,7 +64,7 @@ public class TotemDollMod {
     public TotemDollMod(IEventBus eventBus) {
         CommonClass.init();
         if (
-                //? >= 1.21.9 {
+//? >= 1.21.10 {
                 /*FMLEnvironment.getDist().isClient()
                 *///?} else {
                 FMLEnvironment.dist.isClient()

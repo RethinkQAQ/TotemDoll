@@ -25,7 +25,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.rethinkqaq.totemdoll.Constants;
-import net.minecraft.resources.ResourceLocation;
+import com.rethinkqaq.totemdoll.utils.DollResourceId;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -105,15 +105,15 @@ public final class StylePackStore {
     private static void compileStyle(String packKey, Path styleFile) throws IOException {
         JsonObject style = read(styleFile);
         if (!style.has("format") || style.get("format").getAsInt() != 3) throw new IOException("Expected format 3");
-        ResourceLocation id = ResourceLocation.tryParse(style.get("id").getAsString());
+        DollResourceId id = DollResourceId.tryParse(style.get("id").getAsString());
         if (id == null) throw new IOException("Invalid style id");
-        String key = safeName(packKey) + "/" + safeName(id.getPath());
+        String key = safeName(packKey) + "/" + safeName(id.path());
         Path root = styleFile.getParent();
         JsonObject model = style.getAsJsonObject("model");
         if (model == null) throw new IOException("Missing model");
         String type = model.get("type").getAsString();
         if (!"mesh".equals(type)) throw new IOException("Unsupported model type " + type);
-        Path styleTarget = generatedPackDirectory.resolve("assets").resolve(id.getNamespace())
+        Path styleTarget = generatedPackDirectory.resolve("assets").resolve(id.namespace())
                 .resolve("styles/imported").resolve(key).resolve("style.json");
         copyModelFile(root, model, "geometry", styleTarget.getParent().resolve("models/geometry.json"));
         if (model.has("animations")) copyModelFile(root, model, "animations", styleTarget.getParent().resolve("models/animations.json"));
@@ -135,7 +135,7 @@ public final class StylePackStore {
 
     public static void exportLocal(DollStyle style, Path zip) throws IOException {
         if (!style.isLocal()) throw new IOException("Only local styles can be exported");
-        Path source = stylesDirectory.resolve(style.id().getPath()).normalize();
+        Path source = stylesDirectory.resolve(style.id().path()).normalize();
         if (!source.startsWith(stylesDirectory) || !Files.isDirectory(source)) throw new IOException("Local style not found");
         try (OutputStream output = Files.newOutputStream(zip); ZipOutputStream archive = new ZipOutputStream(output)) {
             JsonObject exportedStyle = read(source.resolve("style.json"));
@@ -154,10 +154,10 @@ public final class StylePackStore {
             pack.addProperty("name", style.displayName());
             pack.addProperty("author", "Totem Doll");
             JsonArray styles = new JsonArray();
-            styles.add("styles/" + style.id().getPath() + "/style.json");
+            styles.add("styles/" + style.id().path() + "/style.json");
             pack.add("styles", styles);
             addEntry(archive, "pack.json", GSON.toJson(pack).getBytes(StandardCharsets.UTF_8));
-            String base = "styles/" + style.id().getPath() + "/";
+            String base = "styles/" + style.id().path() + "/";
             addEntry(archive, base + "style.json", GSON.toJson(exportedStyle).getBytes(StandardCharsets.UTF_8));
             addEntry(archive, base + "models/geometry.json", Files.readAllBytes(source.resolve("geometry.json")));
             if (model.has("animations")) addEntry(archive, base + "models/animations.json", Files.readAllBytes(source.resolve("animations.json")));

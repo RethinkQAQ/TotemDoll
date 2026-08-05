@@ -25,11 +25,11 @@ import com.rethinkqaq.totemdoll.doll.bone.DollBoneActionManager;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import net.minecraft.resources.ResourceLocation;
+import com.rethinkqaq.totemdoll.utils.DollResourceId;
 
 public final class DollAnimationManager {
     private static final Map<String, State> STATES = new HashMap<>();
-    private static final Map<ResourceLocation, Integer> ACTIVATION_TICKS = new HashMap<>();
+    private static final Map<DollResourceId, Integer> ACTIVATION_TICKS = new HashMap<>();
     private static final Random RANDOM = new Random();
 
     public static synchronized void tick() {

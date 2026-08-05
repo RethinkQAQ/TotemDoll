@@ -32,14 +32,21 @@ import com.rethinkqaq.totemdoll.doll.bone.DollCube;
 import com.rethinkqaq.totemdoll.doll.bone.DollDisplayTransform;
 import com.rethinkqaq.totemdoll.doll.bone.DollFace;
 import com.rethinkqaq.totemdoll.utils.UvUtil;
+import com.rethinkqaq.totemdoll.utils.DollRenderUtil;
+import com.rethinkqaq.totemdoll.utils.DollResourceId;
+import com.rethinkqaq.totemdoll.utils.DollFaceUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
+//? >= 1.21.11 {
+/*import net.minecraft.client.renderer.rendertype.RenderType;
+*///?} else {
 import net.minecraft.client.renderer.RenderType;
+//?}
 import net.minecraft.client.renderer.FaceInfo;
-//? >= 1.21.9 {
+//? >= 1.21.10 {
 /*import net.minecraft.client.renderer.SubmitNodeCollector;
 *///?}
 import net.minecraft.client.renderer.block.model.ItemTransform;
@@ -55,7 +62,7 @@ import java.util.List;
 import java.util.Map;
 
 public final class DollBoneRenderer {
-    private static final Map<net.minecraft.resources.ResourceLocation, RuntimeModel> CACHE = new ConcurrentHashMap<>();
+    private static final Map<DollResourceId, RuntimeModel> CACHE = new ConcurrentHashMap<>();
 
     public static boolean render(DollStyle style, ItemDisplayContext context, boolean leftHand,
                                  PoseStack poseStack, MultiBufferSource buffers, int light, int overlay,
@@ -89,7 +96,7 @@ public final class DollBoneRenderer {
         *///?} else {
         poseStack.translate(-0.5F, -0.5F, -0.5F);
         //?}
-        net.minecraft.resources.ResourceLocation texture = model.texture();
+        DollResourceId texture = model.texture();
         if (DollAnimationManager.isTotemActivationActive(style)
                 && style.textures().containsKey("activate")) {
             texture = style.textures().get("activate");
@@ -100,14 +107,14 @@ public final class DollBoneRenderer {
                 texture = style.textures().getOrDefault(animation.frames().get(frame), texture);
             }
         }
-        var consumer = buffers.getBuffer(RenderType.entityTranslucent(texture));
+        var consumer = buffers.getBuffer(DollRenderUtil.entityTranslucent(texture));
         for (RuntimePart root : runtime.roots)
             renderPart(root, poseStack, consumer, light, overlay);
         poseStack.popPose();
         return true;
     }
 
-    //? >= 1.21.9 {
+//? >= 1.21.10 {
     /*public static boolean submit(DollStyle style, ItemDisplayContext context, boolean leftHand,
                                  PoseStack poseStack, SubmitNodeCollector nodeCollector, int light,
                                  int overlay, int outlineColor) {
@@ -130,7 +137,7 @@ public final class DollBoneRenderer {
             poseStack.translate(-0.5F, -0.5F, -0.5F);
         }
 
-        net.minecraft.resources.ResourceLocation texture = model.texture();
+        DollResourceId texture = model.texture();
         if (DollAnimationManager.isTotemActivationActive(style)
                 && style.textures().containsKey("activate")) {
             texture = style.textures().get("activate");
@@ -142,10 +149,10 @@ public final class DollBoneRenderer {
             }
         }
 
-        net.minecraft.resources.ResourceLocation finalTexture = texture;
+        DollResourceId finalTexture = texture;
         nodeCollector.submitCustomGeometry(
                 poseStack,
-                RenderType.entityTranslucent(finalTexture),
+                DollRenderUtil.entityTranslucent(finalTexture),
                 (capturedPose, consumer) -> {
                     PoseStack capturedStack = new PoseStack();
                     capturedStack.last().pose().set(capturedPose.pose());
@@ -169,7 +176,7 @@ public final class DollBoneRenderer {
             case FIRST_PERSON_LEFT_HAND, FIRST_PERSON_RIGHT_HAND -> "firstperson";
             case THIRD_PERSON_LEFT_HAND, THIRD_PERSON_RIGHT_HAND -> "thirdperson";
             case HEAD -> "head";
-            //? >= 1.21.9 {
+//? >= 1.21.10 {
             /*case ON_SHELF -> "on_shelf";
             *///?}
             default -> "fixed";
@@ -254,8 +261,9 @@ public final class DollBoneRenderer {
             for (int vertex = 0; vertex < 4; vertex++) {
                 FaceInfo.VertexInfo position = info.getVertexInfo(vertex);
                 float[] uv = UvUtil.vertexUv(face, vertex);
-                consumer.addVertex(poseStack.last(), shape[position.xFace] / 16F,
-                                shape[position.yFace] / 16F, shape[position.zFace] / 16F)
+                consumer.addVertex(poseStack.last(), DollFaceUtil.x(position, shape, minX, minY, minZ, maxX, maxY, maxZ) / 16F,
+                                DollFaceUtil.y(position, shape, minX, minY, minZ, maxX, maxY, maxZ) / 16F,
+                                DollFaceUtil.z(position, shape, minX, minY, minZ, maxX, maxY, maxZ) / 16F)
                         .setColor(-1)
                         .setUv(uv[0] / 16F, uv[1] / 16F)
                         .setOverlay(overlay)

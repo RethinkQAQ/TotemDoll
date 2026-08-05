@@ -20,7 +20,7 @@
 
 package com.rethinkqaq.totemdoll.doll;
 
-import net.minecraft.resources.ResourceLocation;
+import com.rethinkqaq.totemdoll.utils.DollResourceId;
 import net.minecraft.network.chat.Component;
 
 import java.util.List;
@@ -28,19 +28,19 @@ import java.util.Map;
 import com.rethinkqaq.totemdoll.doll.bone.DollBoneModels;
 
 public record DollStyle(
-        ResourceLocation id,
+        DollResourceId id,
         String displayName,
         String translationKey,
-        ResourceLocation model,
+        DollResourceId model,
         boolean usesCustomModel,
-        ResourceLocation templateId,
+        DollResourceId templateId,
         boolean userCreated,
         DollSkinDefinition skin,
         DollStyleOrigin origin,
-        Map<String, ResourceLocation> textures,
+        Map<String, DollResourceId> textures,
         List<DollAnimationDefinition> animations,
         String modelType,
-        ResourceLocation definitionSource
+        DollResourceId definitionSource
 ) {
 
     public Component label() {

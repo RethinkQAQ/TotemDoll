@@ -28,7 +28,7 @@ import com.rethinkqaq.totemdoll.client.DollThirdPersonState;
 import com.rethinkqaq.totemdoll.doll.DollStyle;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-//? >= 1.21.9 {
+//? >= 1.21.10 {
 /^import net.minecraft.client.renderer.SubmitNodeCollector;
 ^///?} else {
 import net.minecraft.client.Minecraft;
@@ -62,7 +62,7 @@ public abstract class ItemStackRenderStateMixin {
     private boolean isLeftHand;
     //?}
 
-    //? >= 1.21.9 {
+//? >= 1.21.10 {
     /^@Inject(method = "submit", at = @At("HEAD"), cancellable = true)
     private void totemdoll$submitFormat3(
             PoseStack poseStack,

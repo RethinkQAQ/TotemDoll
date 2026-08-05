@@ -26,7 +26,7 @@ import com.rethinkqaq.totemdoll.doll.DollStyles;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import net.minecraft.resources.ResourceLocation;
+import com.rethinkqaq.totemdoll.utils.DollResourceId;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -37,7 +37,7 @@ public final class TotemDollConfig {
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static Path file;
-    private static ResourceLocation selectedStyle = DollStyles.ALEX_ID;
+    private static DollResourceId selectedStyle = DollStyles.ALEX_ID;
 
     public static void initialize(Path configDirectory) {
         file = configDirectory.resolve("totemdoll-client.json");
@@ -48,7 +48,7 @@ public final class TotemDollConfig {
         return DollStyles.get(selectedStyle);
     }
 
-    public static void select(ResourceLocation styleId) {
+    public static void select(DollResourceId styleId) {
         selectedStyle = DollStyles.contains(styleId) ? styleId : fallbackStyle();
         Constants.LOG.info("Selected Totem Doll style {}", selectedStyle);
         save();
@@ -72,7 +72,7 @@ public final class TotemDollConfig {
         try {
             JsonObject root = GSON.fromJson(Files.readString(file, StandardCharsets.UTF_8), JsonObject.class);
             if (root != null && root.has("selected_style")) {
-                ResourceLocation parsed = ResourceLocation.tryParse(root.get("selected_style").getAsString());
+                DollResourceId parsed = DollResourceId.tryParse(root.get("selected_style").getAsString());
                 if (parsed != null) {
                     selectedStyle = parsed;
                 }
@@ -100,7 +100,7 @@ public final class TotemDollConfig {
         }
     }
 
-    private static ResourceLocation fallbackStyle() {
+    private static DollResourceId fallbackStyle() {
         return DollStyles.contains(DollStyles.ALEX_ID) ? DollStyles.ALEX_ID : DollStyles.VANILLA_ID;
     }
 

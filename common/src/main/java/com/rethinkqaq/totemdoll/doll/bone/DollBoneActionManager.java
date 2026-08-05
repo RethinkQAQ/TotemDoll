@@ -21,7 +21,7 @@
 package com.rethinkqaq.totemdoll.doll.bone;
 
 import com.rethinkqaq.totemdoll.doll.DollStyle;
-import net.minecraft.resources.ResourceLocation;
+import com.rethinkqaq.totemdoll.utils.DollResourceId;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,7 +29,7 @@ import java.util.Random;
 
 public final class DollBoneActionManager {
     private static final int TOTEM_ACTIVATION_DURATION = 40;
-    private static final Map<ResourceLocation, State> STATES = new HashMap<>();
+    private static final Map<DollResourceId, State> STATES = new HashMap<>();
     private static final Random RANDOM = new Random();
 
     public static synchronized void tick() {
@@ -66,7 +66,7 @@ public final class DollBoneActionManager {
     public static synchronized void reset(DollStyle style) { STATES.remove(style.id()); }
     public static synchronized void clear() { STATES.clear(); }
 
-    private static State state(ResourceLocation id, DollBoneModel model) {
+    private static State state(DollResourceId id, DollBoneModel model) {
         return STATES.computeIfAbsent(id, ignored -> new State(model));
     }
 

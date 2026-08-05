@@ -24,13 +24,19 @@ import com.rethinkqaq.totemdoll.client.TotemDollClient;
 import com.rethinkqaq.totemdoll.config.TotemDollConfig;
 import com.rethinkqaq.totemdoll.doll.DollLocalStyleStore;
 import com.rethinkqaq.totemdoll.doll.DollStyle;
+import com.rethinkqaq.totemdoll.utils.DollMinecraftResourceUtil;
+import com.rethinkqaq.totemdoll.utils.DollResourceId;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.renderer.texture.DynamicTexture;
+//? >= 1.21.11 {
+/*import net.minecraft.resources.Identifier;
+*///? } else {
 import net.minecraft.resources.ResourceLocation;
+//?}
 import net.minecraft.network.chat.Component;
 import org.lwjgl.util.tinyfd.TinyFileDialogs;
 
@@ -49,7 +55,11 @@ public final class DollCreateScreen extends Screen {
     private final DollStyle template;
     private EditBox nameBox;
     private Path skinPath;
+    //? >= 1.21.11 {
+    /*private Identifier previewTexture;
+    *///? } else {
     private ResourceLocation previewTexture;
+    //?}
     private Component status;
 
     public DollCreateScreen(Screen parent, DollStyle template) {
@@ -110,10 +120,8 @@ public final class DollCreateScreen extends Screen {
                 );
 
                 //? >= 1.21.4 {
-                /*previewTexture = ResourceLocation.fromNamespaceAndPath(
-                        "totemdoll",
-                        "dynamic/skin_preview"
-                );
+                /*previewTexture = DollMinecraftResourceUtil.nativeId(
+                        DollResourceId.of("totemdoll", "dynamic/skin_preview"));
                 this.minecraft.getTextureManager().register(previewTexture, texture);
                 *///?} else {
                 previewTexture = this.minecraft.getTextureManager().register(

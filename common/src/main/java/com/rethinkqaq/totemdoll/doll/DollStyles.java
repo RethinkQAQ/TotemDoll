@@ -21,7 +21,7 @@
 package com.rethinkqaq.totemdoll.doll;
 
 import com.rethinkqaq.totemdoll.Constants;
-import net.minecraft.resources.ResourceLocation;
+import com.rethinkqaq.totemdoll.utils.DollResourceId;
 
 import java.util.LinkedHashMap;
 import java.util.Collection;
@@ -30,16 +30,16 @@ import java.util.Map;
 
 public final class DollStyles {
 
-    public static final ResourceLocation VANILLA_ID =
-            ResourceLocation.withDefaultNamespace("default");
-    public static final ResourceLocation ALEX_ID =
-            ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "alex");
+    public static final DollResourceId VANILLA_ID =
+            DollResourceId.ofVanilla("default");
+    public static final DollResourceId ALEX_ID =
+            DollResourceId.of(Constants.MOD_ID, "alex");
 
     public static final DollStyle VANILLA = new DollStyle(
             VANILLA_ID,
             "Vanilla Totem",
             "doll.totemdoll.vanilla",
-            ResourceLocation.withDefaultNamespace("totem_of_undying"),
+            DollResourceId.ofVanilla("totem_of_undying"),
             false,
             null,
             false,
@@ -48,7 +48,7 @@ public final class DollStyles {
             Map.of(), List.of(), "mesh", null
     );
 
-    private static final Map<ResourceLocation, DollStyle> STYLES = new LinkedHashMap<>();
+    private static final Map<DollResourceId, DollStyle> STYLES = new LinkedHashMap<>();
 
     static {
         register(VANILLA);
@@ -58,7 +58,7 @@ public final class DollStyles {
         Constants.LOG.info("Loaded {} Totem Doll styles", STYLES.size());
     }
 
-    public static synchronized DollStyle get(ResourceLocation id) {
+    public static synchronized DollStyle get(DollResourceId id) {
         return STYLES.getOrDefault(id, STYLES.getOrDefault(ALEX_ID, VANILLA));
     }
 
@@ -66,7 +66,7 @@ public final class DollStyles {
         return List.copyOf(STYLES.values());
     }
 
-    public static synchronized boolean contains(ResourceLocation id) {
+    public static synchronized boolean contains(DollResourceId id) {
         return STYLES.containsKey(id);
     }
 

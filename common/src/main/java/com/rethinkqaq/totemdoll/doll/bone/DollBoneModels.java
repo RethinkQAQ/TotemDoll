@@ -20,17 +20,17 @@
 
 package com.rethinkqaq.totemdoll.doll.bone;
 
-import net.minecraft.resources.ResourceLocation;
+import com.rethinkqaq.totemdoll.utils.DollResourceId;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public final class DollBoneModels {
-    private static final Map<ResourceLocation, DollBoneModel> MODELS = new HashMap<>();
+    private static final Map<DollResourceId, DollBoneModel> MODELS = new HashMap<>();
 
-    public static synchronized void put(ResourceLocation styleId, DollBoneModel model) { MODELS.put(styleId, model); }
-    public static synchronized DollBoneModel get(ResourceLocation styleId) { return MODELS.get(styleId); }
-    public static synchronized boolean contains(ResourceLocation styleId) { return MODELS.containsKey(styleId); }
+    public static synchronized void put(DollResourceId styleId, DollBoneModel model) { MODELS.put(styleId, model); }
+    public static synchronized DollBoneModel get(DollResourceId styleId) { return MODELS.get(styleId); }
+    public static synchronized boolean contains(DollResourceId styleId) { return MODELS.containsKey(styleId); }
     public static synchronized void clear() { MODELS.clear(); }
 
     private DollBoneModels() {}

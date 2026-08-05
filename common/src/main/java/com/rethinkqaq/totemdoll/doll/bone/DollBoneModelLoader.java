@@ -24,7 +24,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.resources.ResourceLocation;
+import com.rethinkqaq.totemdoll.utils.DollResourceId;
+import com.rethinkqaq.totemdoll.utils.DollMinecraftResourceUtil;
 import net.minecraft.server.packs.resources.ResourceManager;
 
 import java.io.IOException;
@@ -38,7 +39,7 @@ import java.util.Map;
 public final class DollBoneModelLoader {
     private static final Gson GSON = new Gson();
 
-    public static DollBoneModel load(ResourceManager manager, ResourceLocation styleSource,
+    public static DollBoneModel load(ResourceManager manager, DollResourceId styleSource,
                                      JsonObject style, JsonObject model) throws IOException {
         String geometryPath = safePath(model, "geometry");
         String animationsPath = model.has("animations") ? safePath(model, "animations") : null;
@@ -50,7 +51,7 @@ public final class DollBoneModelLoader {
         JsonObject textures = style.getAsJsonObject("textures");
         if (textures == null || !textures.has("base")) throw new IOException("Mesh model requires textures.base");
         String texturePath = safeRelativePath(textures.get("base").getAsString(), "textures.base");
-        ResourceLocation texture = resolve(styleSource, texturePath);
+        DollResourceId texture = resolve(styleSource, texturePath);
 
         List<DollBone> roots = new ArrayList<>();
         List<JsonElement> bones = elements(geometry, "bones");
@@ -135,7 +136,7 @@ public final class DollBoneModelLoader {
     }
 
     private static Map<String, DollBoneAnimation> readAnimations(ResourceManager manager,
-                                                                 ResourceLocation location) throws IOException {
+                                                                 DollResourceId location) throws IOException {
         JsonObject root = read(manager, location);
         if (!root.has("format") || root.get("format").getAsInt() != 1) throw new IOException("Expected animation format 1");
         Map<String, DollBoneAnimation> result = new LinkedHashMap<>();
@@ -216,17 +217,18 @@ public final class DollBoneModelLoader {
         };
     }
 
-    private static JsonObject read(ResourceManager manager, ResourceLocation location) throws IOException {
-        try (Reader reader = manager.getResource(location).orElseThrow(() -> new IOException("Missing " + location)).openAsReader()) {
+    private static JsonObject read(ResourceManager manager, DollResourceId location) throws IOException {
+        try (Reader reader = manager.getResource(DollMinecraftResourceUtil.nativeId(location))
+                .orElseThrow(() -> new IOException("Missing " + location)).openAsReader()) {
             JsonObject value = GSON.fromJson(reader, JsonObject.class);
             if (value == null) throw new IOException("Empty " + location);
             return value;
         }
     }
 
-    private static ResourceLocation resolve(ResourceLocation source, String relative) {
-        String parent = source.getPath().substring(0, source.getPath().lastIndexOf('/') + 1);
-        return ResourceLocation.fromNamespaceAndPath(source.getNamespace(), parent + relative);
+    private static DollResourceId resolve(DollResourceId source, String relative) {
+        String parent = source.path().substring(0, source.path().lastIndexOf('/') + 1);
+        return DollResourceId.of(source.namespace(), parent + relative);
     }
 
     private static String safePath(JsonObject object, String key) throws IOException {
