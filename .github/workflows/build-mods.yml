@@ -126,12 +126,16 @@ jobs:
                   group_name = f'{loader}-{minecraft_version}'
                   group_dir = artifacts / group_name
                   group_dir.mkdir(parents=True, exist_ok=True)
-                  output_name = f'{mod_id}-{build_version}-{loader}'
-                  if build_suffix:
-                      output_name += f'-{build_suffix}'
-                  output_name += '.jar'
+                  output_name = jar.name
                   (group_dir / output_name).write_bytes(jar.read_bytes())
-                  (combined / output_name).write_bytes(jar.read_bytes())
+
+                  combined_name = output_name
+                  if (combined / combined_name).exists():
+                      source_stem = Path(output_name).stem
+                      combined_name = f'{source_stem}-mc{minecraft_version}.jar'
+                      if (combined / combined_name).exists():
+                          raise SystemExit(f'Cannot flatten duplicate jar name: {jar}')
+                  (combined / combined_name).write_bytes(jar.read_bytes())
                   groups[group_name].append({
                       'loader': loader,
                       'minecraft_version': minecraft_version,
@@ -139,6 +143,7 @@ jobs:
                       'mod_id': mod_id,
                       'mod_version': mod_version,
                       'jar': output_name,
+                      'combined_jar': combined_name,
                   })
 
           if not any(item['loader'] == 'fabric' for items in groups.values() for item in items):

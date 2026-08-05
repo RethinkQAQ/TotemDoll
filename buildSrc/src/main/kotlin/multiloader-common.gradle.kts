@@ -8,10 +8,10 @@ val buildSuffix = commonMod.propOrNull("build.number")
     ?.trim()
     ?.takeIf { it.isNotEmpty() }
 
-version = listOfNotNull("${commonMod.version}-${loader}", buildSuffix)
+version = listOfNotNull("${commonMod.version}-mc${commonMod.mc}", buildSuffix)
     .joinToString("-")
 
-base { archivesName = commonMod.id }
+base { archivesName = "${commonMod.id}-${loader}" }
 
 java {
     toolchain.languageVersion = JavaLanguageVersion.of(commonProject.prop("java.version")!!)
