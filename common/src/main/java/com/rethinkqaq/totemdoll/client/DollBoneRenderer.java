@@ -68,8 +68,10 @@ public final class DollBoneRenderer {
                                  PoseStack poseStack, MultiBufferSource buffers, int light, int overlay,
                                  float partialTick) {
         DollBoneModel model = DollBoneModels.get(style.id());
-        if (model == null) return false;
-        RuntimeModel runtime = CACHE.computeIfAbsent(style.id(), ignored -> build(model));
+        RenderData data = resolve(style, model);
+        if (data == null) return false;
+        model = data.model();
+        RuntimeModel runtime = data.runtime();
         applyPoses(style, runtime, partialTick);
 
         poseStack.pushPose();
@@ -96,17 +98,7 @@ public final class DollBoneRenderer {
         *///?} else {
         poseStack.translate(-0.5F, -0.5F, -0.5F);
         //?}
-        DollResourceId texture = model.texture();
-        if (DollAnimationManager.isTotemActivationActive(style)
-                && style.textures().containsKey("activate")) {
-            texture = style.textures().get("activate");
-        } else if (style.hasDynamicTextures() && !style.animations().isEmpty()) {
-            DollAnimationDefinition animation = style.animations().get(0);
-            int frame = DollAnimationManager.currentFrame(style, animation.id());
-            if (frame >= 0 && frame < animation.frames().size()) {
-                texture = style.textures().getOrDefault(animation.frames().get(frame), texture);
-            }
-        }
+        DollResourceId texture = resolveTexture(style, model);
         var consumer = buffers.getBuffer(DollRenderUtil.entityTranslucent(texture));
         for (RuntimePart root : runtime.roots)
             renderPart(root, poseStack, consumer, light, overlay);
@@ -118,9 +110,10 @@ public final class DollBoneRenderer {
     /*public static boolean submit(DollStyle style, ItemDisplayContext context, boolean leftHand,
                                  PoseStack poseStack, SubmitNodeCollector nodeCollector, int light,
                                  int overlay, int outlineColor) {
-        DollBoneModel model = DollBoneModels.get(style.id());
-        if (model == null) return false;
-        RuntimeModel runtime = CACHE.computeIfAbsent(style.id(), ignored -> build(model));
+        RenderData data = resolve(style, DollBoneModels.get(style.id()));
+        if (data == null) return false;
+        DollBoneModel model = data.model();
+        RuntimeModel runtime = data.runtime();
         float partialTick = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
         applyPoses(style, runtime, partialTick);
 
@@ -137,17 +130,7 @@ public final class DollBoneRenderer {
             poseStack.translate(-0.5F, -0.5F, -0.5F);
         }
 
-        DollResourceId texture = model.texture();
-        if (DollAnimationManager.isTotemActivationActive(style)
-                && style.textures().containsKey("activate")) {
-            texture = style.textures().get("activate");
-        } else if (style.hasDynamicTextures() && !style.animations().isEmpty()) {
-            DollAnimationDefinition animation = style.animations().get(0);
-            int frame = DollAnimationManager.currentFrame(style, animation.id());
-            if (frame >= 0 && frame < animation.frames().size()) {
-                texture = style.textures().getOrDefault(animation.frames().get(frame), texture);
-            }
-        }
+        DollResourceId texture = resolveTexture(style, model);
 
         DollResourceId finalTexture = texture;
         nodeCollector.submitCustomGeometry(
@@ -184,6 +167,27 @@ public final class DollBoneRenderer {
     }
 
     public static void clear() { CACHE.clear(); }
+
+    private static RenderData resolve(DollStyle style, DollBoneModel model) {
+        if (model == null) return null;
+        return new RenderData(model, CACHE.computeIfAbsent(style.id(), ignored -> build(model)));
+    }
+
+    private static DollResourceId resolveTexture(DollStyle style, DollBoneModel model) {
+        DollResourceId texture = model.texture();
+        if (DollAnimationManager.isTotemActivationActive(style)
+                && style.textures().containsKey("activate")) {
+            return style.textures().get("activate");
+        }
+        if (style.hasDynamicTextures() && !style.animations().isEmpty()) {
+            DollAnimationDefinition animation = style.animations().get(0);
+            int frame = DollAnimationManager.currentFrame(style, animation.id());
+            if (frame >= 0 && frame < animation.frames().size()) {
+                return style.textures().getOrDefault(animation.frames().get(frame), texture);
+            }
+        }
+        return texture;
+    }
 
     private static RuntimeModel build(DollBoneModel model) {
         Map<String, ModelPart> named = new HashMap<>();
@@ -290,6 +294,7 @@ public final class DollBoneRenderer {
     private static float radians(float degrees) { return degrees * ((float) Math.PI / 180F); }
     private record RuntimeModel(List<RuntimePart> roots, Map<String, ModelPart> named,
                                 Map<String, BasePose> bases) {}
+    private record RenderData(DollBoneModel model, RuntimeModel runtime) {}
     private record RuntimePart(ModelPart transform, DollBone bone, List<ModelPart.Cube> legacyCubes,
                                List<DollCube> faceCubes, List<RuntimePart> children) {}
     private record BasePose(float x, float y, float z, float xRot, float yRot, float zRot) {}

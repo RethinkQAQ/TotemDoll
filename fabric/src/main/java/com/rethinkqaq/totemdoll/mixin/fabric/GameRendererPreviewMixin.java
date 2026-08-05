@@ -53,17 +53,18 @@ public abstract class GameRendererPreviewMixin {
     )
     private void totemdoll$addPreviewRenderer(Args args) {
 //? >= 1.21.10 {
-        /^List<PictureInPictureRenderer<?>> renderers = args.get(4);
-        ^///?} else {
-        List<PictureInPictureRenderer<?>> renderers = args.get(2);
-        //?}
+        int rendererIndex = 4;
+//?} else {
+        int rendererIndex = 2;
+//?}
+        addPreviewRenderer(args, rendererIndex);
+    }
+
+    private static void addPreviewRenderer(Args args, int rendererIndex) {
+        List<PictureInPictureRenderer<?>> renderers = args.get(rendererIndex);
         List<PictureInPictureRenderer<?>> result = new ArrayList<>(renderers);
         result.add(new DollGuiPreviewRenderer(args.get(1)));
-//? >= 1.21.10 {
-        /^args.set(4, result);
-        ^///?} else {
-        args.set(2, result);
-        //?}
+        args.set(rendererIndex, result);
     }
     *///?}
 }

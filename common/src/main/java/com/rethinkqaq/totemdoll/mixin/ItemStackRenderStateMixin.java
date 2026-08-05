@@ -62,6 +62,10 @@ public abstract class ItemStackRenderStateMixin {
     private boolean isLeftHand;
     //?}
 
+    private DollStyle totemdoll$style() {
+        return DollThirdPersonState.get((ItemStackRenderState) (Object) this);
+    }
+
 //? >= 1.21.10 {
     /^@Inject(method = "submit", at = @At("HEAD"), cancellable = true)
     private void totemdoll$submitFormat3(
@@ -72,7 +76,7 @@ public abstract class ItemStackRenderStateMixin {
             int outlineColor,
             CallbackInfo callback
     ) {
-        DollStyle style = DollThirdPersonState.get((ItemStackRenderState) (Object) this);
+        DollStyle style = totemdoll$style();
         if (style == null) return;
 
         boolean isLeftHand = displayContext == ItemDisplayContext.THIRD_PERSON_LEFT_HAND
@@ -103,7 +107,7 @@ public abstract class ItemStackRenderStateMixin {
             int overlay,
             CallbackInfo callback
     ) {
-        DollStyle style = DollThirdPersonState.get((ItemStackRenderState) (Object) this);
+        DollStyle style = totemdoll$style();
         if (style == null) return;
 
         //? >= 1.21.5 {
@@ -127,5 +131,6 @@ public abstract class ItemStackRenderStateMixin {
             callback.cancel();
         }
     }
+
     *///?}
 }

@@ -66,7 +66,9 @@ public final class DollThirdPersonState {
         if (style == null) style = TotemDollConfig.selectedStyle();
         if (style != null && DollBoneModels.contains(style.id())) {
             STYLES.put(renderState, style);
+            //? >= 1.21.6 {
             DollGuiModelIdentity.mark(renderState, context, style);
+            //?}
         } else {
             STYLES.remove(renderState);
         }
