@@ -82,6 +82,10 @@ jobs:
           from collections import defaultdict
           from pathlib import Path
 
+          import sys
+          sys.path.insert(0, str(Path('.github/scripts').resolve()))
+          from resolve_game_versions import resolve_versions
+
           artifacts = Path('artifacts')
           artifacts.mkdir(exist_ok=True)
           combined = Path('combined-artifacts')
@@ -89,6 +93,14 @@ jobs:
           groups = defaultdict(list)
           build_version = os.environ['BUILD_VERSION']
           build_suffix = os.environ.get('BUILD_SUFFIX', '').strip()
+          configured_versions = re.search(
+              r'^stonecutter_enabled_common_versions=(.+)$',
+              Path('gradle.properties').read_text(),
+              re.M,
+          )
+          if not configured_versions:
+              raise SystemExit('Missing stonecutter_enabled_common_versions')
+          supported_versions = [item.strip() for item in configured_versions.group(1).split(',') if item.strip()]
 
           for root_name in ('fabric', 'neoforge'):
               root = Path(root_name) / 'versions'
@@ -162,6 +174,12 @@ jobs:
                   'mod_version': items[0]['mod_version'],
                   'jars': [item['jar'] for item in items],
               }
+              game_versions = resolve_versions(
+                  manifest['minecraft_version_range'],
+                  supported_versions,
+                  manifest['minecraft_version'],
+              )
+              manifest['game_versions'] = game_versions
               group_dir = artifacts / group_name
               (group_dir / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
               summary = [
@@ -169,6 +187,7 @@ jobs:
                   f'- Loader: `{manifest["loader"]}`',
                   f'- Minecraft: `{manifest["minecraft_version"]}`',
                   f'- Minecraft range: `{manifest["minecraft_version_range"]}`',
+                  f'- Published game versions: `{", ".join(game_versions)}`',
                   f'- Mod: `{manifest["mod_id"]}`',
                   f'- Mod version: `{manifest["mod_version"]}`', '',
                   '## Files', '',
@@ -180,6 +199,11 @@ jobs:
                   'loader': manifest['loader'],
                   'minecraft_version': manifest['minecraft_version'],
                   'mod_version': manifest['mod_version'],
+                  'game_versions': '\n'.join(resolve_versions(
+                      manifest['minecraft_version_range'],
+                      supported_versions,
+                      manifest['minecraft_version'],
+                  )),
                   'path': group_name,
               })
 

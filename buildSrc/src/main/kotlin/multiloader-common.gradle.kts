@@ -4,6 +4,18 @@ plugins {
     `java-library`
 }
 
+// Stonecutter creates version-specific Java sources during the build. Ensure
+// those generated sources receive the license header before compilation.
+val stonecutterGenerateTask = ":common:${commonMod.prop("minecraft_version")}:stonecutterGenerate"
+
+tasks.matching { it.name == "licenseFormat" }.configureEach {
+    dependsOn(stonecutterGenerateTask)
+}
+
+tasks.withType<JavaCompile>().configureEach {
+    dependsOn(tasks.matching { it.name == "licenseFormat" })
+}
+
 val buildSuffix = commonMod.propOrNull("build.number")
     ?.trim()
     ?.takeIf { it.isNotEmpty() }

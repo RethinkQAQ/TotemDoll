@@ -74,4 +74,8 @@ gradle.projectsEvaluated {
         description = "Checks LGPL-3.0 headers in Java source files."
         dependsOn(licenseProjects.map { it.tasks.named("license") })
     }
+
+    rootProject.tasks.named("build") {
+        dependsOn(rootProject.tasks.named("licenseFormat"))
+    }
 }
