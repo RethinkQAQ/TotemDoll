@@ -82,10 +82,6 @@ jobs:
           from collections import defaultdict
           from pathlib import Path
 
-          import sys
-          sys.path.insert(0, str(Path('.github/scripts').resolve()))
-          from resolve_game_versions import resolve_versions
-
           artifacts = Path('artifacts')
           artifacts.mkdir(exist_ok=True)
           combined = Path('combined-artifacts')
@@ -93,14 +89,16 @@ jobs:
           groups = defaultdict(list)
           build_version = os.environ['BUILD_VERSION']
           build_suffix = os.environ.get('BUILD_SUFFIX', '').strip()
-          configured_versions = re.search(
-              r'^stonecutter_enabled_common_versions=(.+)$',
-              Path('gradle.properties').read_text(),
-              re.M,
-          )
-          if not configured_versions:
-              raise SystemExit('Missing stonecutter_enabled_common_versions')
-          supported_versions = [item.strip() for item in configured_versions.group(1).split(',') if item.strip()]
+
+          def read_properties(path):
+              values = {}
+              for line in path.read_text().splitlines():
+                  line = line.strip()
+                  if not line or line.startswith('#') or '=' not in line:
+                      continue
+                  key, value = line.split('=', 1)
+                  values[key.strip()] = value.strip()
+              return values
 
           for root_name in ('fabric', 'neoforge'):
               root = Path(root_name) / 'versions'
@@ -112,6 +110,13 @@ jobs:
 
                   loader = root_name
                   minecraft_version = jar.parts[2]
+                  version_properties = Path('versions') / minecraft_version / 'gradle.properties'
+                  if not version_properties.exists():
+                      raise SystemExit(f'Missing version properties: {version_properties}')
+                  version_config = read_properties(version_properties)
+                  min_minecraft_version = version_config.get('min_minecraft_version')
+                  if not min_minecraft_version:
+                      raise SystemExit(f'Missing min_minecraft_version: {version_properties}')
                   with zipfile.ZipFile(jar) as zf:
                       names = set(zf.namelist())
                       if loader == 'fabric':
@@ -151,9 +156,12 @@ jobs:
                   groups[group_name].append({
                       'loader': loader,
                       'minecraft_version': minecraft_version,
+                      'min_minecraft_version': min_minecraft_version,
+                      'game_version_base': min_minecraft_version,
                       'minecraft_version_range': version_range,
                       'mod_id': mod_id,
                       'mod_version': mod_version,
+                      'platform_version': f'{mod_version}-mc{minecraft_version}-{loader}',
                       'jar': output_name,
                       'combined_jar': combined_name,
                   })
@@ -169,27 +177,27 @@ jobs:
               manifest = {
                   'loader': items[0]['loader'],
                   'minecraft_version': items[0]['minecraft_version'],
+                  'min_minecraft_version': items[0]['min_minecraft_version'],
+                  'game_version_base': items[0]['game_version_base'],
                   'minecraft_version_range': items[0]['minecraft_version_range'],
                   'mod_id': items[0]['mod_id'],
                   'mod_version': items[0]['mod_version'],
+                  'platform_version': items[0]['platform_version'],
                   'jars': [item['jar'] for item in items],
               }
-              game_versions = resolve_versions(
-                  manifest['minecraft_version_range'],
-                  supported_versions,
-                  manifest['minecraft_version'],
-              )
-              manifest['game_versions'] = game_versions
               group_dir = artifacts / group_name
               (group_dir / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
               summary = [
                   f'# {group_name}', '',
                   f'- Loader: `{manifest["loader"]}`',
                   f'- Minecraft: `{manifest["minecraft_version"]}`',
+                  f'- Minimum Minecraft: `{manifest["min_minecraft_version"]}`',
+                  f'- Game version base: `{manifest["game_version_base"]}`',
                   f'- Minecraft range: `{manifest["minecraft_version_range"]}`',
-                  f'- Published game versions: `{", ".join(game_versions)}`',
                   f'- Mod: `{manifest["mod_id"]}`',
                   f'- Mod version: `{manifest["mod_version"]}`', '',
+                  f'- Platform version: `{manifest["platform_version"]}`',
+                  '- Version resolver: `releasesIfAny`', '',
                   '## Files', '',
               ]
               summary.extend(f'- `{jar_name}`' for jar_name in manifest['jars'])
@@ -198,12 +206,10 @@ jobs:
                   'group': group_name,
                   'loader': manifest['loader'],
                   'minecraft_version': manifest['minecraft_version'],
+                  'min_minecraft_version': manifest['min_minecraft_version'],
+                  'game_version_base': manifest['game_version_base'],
                   'mod_version': manifest['mod_version'],
-                  'game_versions': '\n'.join(resolve_versions(
-                      manifest['minecraft_version_range'],
-                      supported_versions,
-                      manifest['minecraft_version'],
-                  )),
+                  'platform_version': manifest['platform_version'],
                   'path': group_name,
               })
 
@@ -215,13 +221,13 @@ jobs:
               f'- Mod version: `{os.environ.get("BUILD_VERSION", "unknown")}`',
               f'- Build suffix: `{os.environ.get("BUILD_SUFFIX") or "none"}`', '',
               '## Build Artifacts Summary', '',
-              '| Loader | Minecraft | Mod version | JAR | Artifact |',
-              '| --- | --- | --- | --- | --- |',
+              '| Loader | Minecraft | Game base | Mod version | Platform version | JAR | Artifact |',
+              '| --- | --- | --- | --- | --- | --- | --- |',
           ]
           for entry in matrix_entries:
               for item in groups[entry['group']]:
                   artifact_name = f'Totem-Doll-{os.environ["ARTIFACT_VERSION"]}-{entry["group"]}'
-                  lines.append(f'| {item["loader"]} | {item["minecraft_version"]} | {item["mod_version"]} | `{item["jar"]}` | `{artifact_name}` |')
+                  lines.append(f'| {item["loader"]} | {item["minecraft_version"]} | {entry["game_version_base"]} | {item["mod_version"]} | `{entry["platform_version"]}` | `{item["jar"]}` | `{artifact_name}` |')
           Path(os.environ['GITHUB_STEP_SUMMARY']).write_text('\n'.join(lines) + '\n')
 
           with open(os.environ['GITHUB_OUTPUT'], 'a') as output:

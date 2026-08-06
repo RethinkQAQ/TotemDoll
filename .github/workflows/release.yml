@@ -30,25 +30,22 @@ jobs:
         env:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
           CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
-          MODRINTH_PROJECT_ID: ${{ vars.MODRINTH_PROJECT_ID }}
-          CURSEFORGE_PROJECT_ID: ${{ vars.CURSEFORGE_PROJECT_ID }}
         run: |
           test -n "$MODRINTH_TOKEN" || { echo 'Missing MODRINTH_TOKEN'; exit 1; }
           test -n "$CURSEFORGE_TOKEN" || { echo 'Missing CURSEFORGE_TOKEN'; exit 1; }
-          test -n "$MODRINTH_PROJECT_ID" || { echo 'Missing MODRINTH_PROJECT_ID'; exit 1; }
-          test -n "$CURSEFORGE_PROJECT_ID" || { echo 'Missing CURSEFORGE_PROJECT_ID'; exit 1; }
 
       - name: Publish to Modrinth and CurseForge
         uses: Kir-Antipov/mc-publish@v3.3
         with:
-          modrinth-id: ${{ vars.MODRINTH_PROJECT_ID }}
+          modrinth-id: CcfJqGL2
           modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
-          curseforge-id: ${{ vars.CURSEFORGE_PROJECT_ID }}
+          curseforge-id: 1641634
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
           files-primary: artifacts/${{ matrix.path }}/*.jar
           name: ${{ github.event.release.name || github.ref_name }} for Minecraft ${{ matrix.minecraft_version }}
-          version: ${{ matrix.mod_version }}
+          version: ${{ matrix.platform_version }}
           version-type: release
           loaders: ${{ matrix.loader }}
-          game-versions: ${{ matrix.game_versions }}
+          game-versions: ${{ matrix.game_version_base }}
+          version-resolver: releasesIfAny
           changelog: ${{ github.event.release.body }}
