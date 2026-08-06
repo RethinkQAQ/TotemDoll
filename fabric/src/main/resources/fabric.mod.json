@@ -10,7 +10,12 @@
   "environment": "client",
   "entrypoints": {
     "main": ["com.rethinkqaq.totemdoll.TotemDollMod"],
-    "client": ["com.rethinkqaq.totemdoll.TotemDollFabricClient"]
+    "client": ["com.rethinkqaq.totemdoll.TotemDollFabricClient"],
+    "modmenu": ["com.rethinkqaq.totemdoll.coustomapi.ModMenuApiImpl"]
+  },
+  "contact": {
+    "repo": "https://github.com/RethinkQAQ/TotemDoll",
+    "issues": "https://github.com/RethinkQAQ/TotemDoll/issues"
   },
   "mixins": ["${mod_id}.mixins.json", "${mod_id}.fabric.mixins.json"],
   "depends": {
@@ -18,5 +23,12 @@
     "fabric-api": "*",
     "minecraft": "${minecraft_version_range_fabric}",
     "java": ">=${java_version}"
+  },
+  "custom": {
+    "modmenu": {
+      "links": {
+        "github": "https://github.com/RethinkQAQ/TotemDoll"
+      }
+    }
   }
 }
