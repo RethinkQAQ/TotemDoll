@@ -145,6 +145,9 @@ public final class DollGuiPreviewRenderer extends PictureInPictureRenderer<DollG
 
     //?} else {
     /*protected void renderToTexture(DollGuiPreviewRenderState state, PoseStack poseStack) {
+        poseStack.scale(1.0F, -1.0F, -1.0F);
+        float verticalOffset = 0.75F * 37.6F / state.scale();
+        poseStack.translate(0.0F, verticalOffset, 0.0F);
         DollBoneRenderer.render(
                 state.style(), ItemDisplayContext.GUI, false, poseStack, bufferSource,
                 15728880, OverlayTexture.NO_OVERLAY,
