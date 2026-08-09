@@ -21,92 +21,56 @@
 package com.rethinkqaq.totemdoll.client.gui;
 
 //? >= 1.21.6 {
-/*import com.mojang.blaze3d.ProjectionType;
-import com.mojang.blaze3d.systems.GpuDevice;
+import com.mojang.blaze3d.ProjectionType;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.textures.FilterMode;
 import com.mojang.blaze3d.textures.GpuTexture;
 import com.mojang.blaze3d.textures.GpuTextureView;
-import com.mojang.blaze3d.textures.TextureFormat;
+import com.mojang.blaze3d.textures.FilterMode;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.rethinkqaq.totemdoll.client.DollBoneRenderer;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.render.TextureSetup;
+import com.rethinkqaq.totemdoll.client.gui.DollGuiPreviewRenderState.PreviewKey;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
-import net.minecraft.client.gui.render.state.BlitRenderState;
-import net.minecraft.client.gui.render.state.GuiRenderState;
-import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer;
-import net.minecraft.client.renderer.MultiBufferSource;
+//? >= 26.2 {
+import com.mojang.blaze3d.GpuFormat;
+import net.minecraft.client.gui.render.TextureSetup;
+import net.minecraft.client.renderer.Projection;
+import net.minecraft.client.renderer.ProjectionMatrixBuffer;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.SubmitNodeStorage;
+import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
+import net.minecraft.client.gui.render.GuiRenderer;
 import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.state.gui.BlitRenderState;
+import net.minecraft.client.renderer.state.gui.GuiRenderState;
+//?} else {
+/*import com.rethinkqaq.totemdoll.utils.Dummy;
+*///?}
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.item.ItemDisplayContext;
+//? >= 26.2 {
+//?} else {
+/*import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
+*///?}
+
+import java.util.HashMap;
+import java.util.Map;
 
 public final class DollGuiPreviewRenderer extends PictureInPictureRenderer<DollGuiPreviewRenderState> {
-    private static final int MAX_CACHED_PREVIEWS = 64;
-    private static long invalidationGeneration;
-    private final Map<DollGuiPreviewRenderState.PreviewKey, PreviewTarget> targets = new LinkedHashMap<>(16, 0.75F, true);
-    private final CachedOrthoProjectionMatrixBuffer projection = new CachedOrthoProjectionMatrixBuffer(
-            "totemdoll gui preview", -1000.0F, 1000.0F, true);
-    private long renderedGeneration = -1;
-
-    public DollGuiPreviewRenderer(MultiBufferSource.BufferSource bufferSource) {
+    //? >= 26.2 {
+    private final Map<PreviewKey, PreviewTarget> targets = new HashMap<>();
+    private final Projection projection = new Projection();
+    private final ProjectionMatrixBuffer projectionBuffer = new ProjectionMatrixBuffer("TotemDoll GUI preview");
+    //?}
+    //? >= 26.2 {
+    public DollGuiPreviewRenderer() {
+        super();
+    }
+    //?} else {
+    /*public DollGuiPreviewRenderer(MultiBufferSource.BufferSource bufferSource) {
         super(bufferSource);
     }
-
-    @Override
-    public void prepare(DollGuiPreviewRenderState state, GuiRenderState guiRenderState, int guiScale) {
-        if (renderedGeneration != invalidationGeneration) {
-            clearTargets();
-            renderedGeneration = invalidationGeneration;
-        }
-        DollGuiPreviewRenderState.PreviewKey key = state.key(guiScale);
-        PreviewTarget target = targets.get(key);
-        if (target == null) {
-            target = new PreviewTarget(key.width(), key.height());
-            targets.put(key, target);
-            trimTargets();
-        }
-        if (!target.ready || state.dynamic()) {
-            renderTarget(state, target, guiScale);
-            target.ready = true;
-        }
-        guiRenderState.submitBlitToCurrentLayer(new BlitRenderState(
-                RenderPipelines.GUI_TEXTURED_PREMULTIPLIED_ALPHA,
-                DollGuiPreview.singleTexture(target.view), state.pose(),
-                state.x0(), state.y0(), state.x1(), state.y1(), 0.0F, 1.0F, 1.0F, 0.0F,
-                -1, state.scissorArea(), null));
-    }
-
-    private void renderTarget(DollGuiPreviewRenderState state, PreviewTarget target, int guiScale) {
-        RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(target.texture, 0, target.depth, 1.0);
-        RenderSystem.outputColorTextureOverride = target.view;
-        RenderSystem.outputDepthTextureOverride = target.depthView;
-        RenderSystem.setProjectionMatrix(projection.getBuffer(target.width, target.height), ProjectionType.ORTHOGRAPHIC);
-        PoseStack pose = new PoseStack();
-        pose.translate(target.width / 2.0F, target.height / 2.0F, 0.0F);
-        float scale = state.scale() * guiScale;
-        pose.scale(scale, -scale, scale);
-        DollBoneRenderer.render(state.style(), ItemDisplayContext.GUI, false, pose, bufferSource, 15728880,
-                OverlayTexture.NO_OVERLAY, Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false));
-        bufferSource.endBatch();
-        RenderSystem.outputColorTextureOverride = null;
-        RenderSystem.outputDepthTextureOverride = null;
-    }
-
-    private void trimTargets() {
-        while (targets.size() > MAX_CACHED_PREVIEWS) {
-            Map.Entry<DollGuiPreviewRenderState.PreviewKey, PreviewTarget> eldest = targets.entrySet().iterator().next();
-            eldest.getValue().close();
-            targets.remove(eldest.getKey());
-        }
-    }
-
-    private void clearTargets() {
-        targets.values().forEach(PreviewTarget::close);
-        targets.clear();
-    }
+    *///?}
 
     @Override
     public Class<DollGuiPreviewRenderState> getRenderStateClass() {
@@ -114,62 +78,127 @@ public final class DollGuiPreviewRenderer extends PictureInPictureRenderer<DollG
     }
 
     public static void invalidateAll() {
-        invalidationGeneration++;
     }
 
+    //? >= 26.2 {
     @Override
-    protected void renderToTexture(DollGuiPreviewRenderState state, PoseStack poseStack) {
+    public void prepare(
+            DollGuiPreviewRenderState state,
+            GuiRenderState guiRenderState,
+            FeatureRenderDispatcher featureRenderDispatcher,
+            int guiScale
+    ) {
+        PreviewKey key = state.key(guiScale);
+        PreviewTarget target = targets.computeIfAbsent(key,
+                ignored -> new PreviewTarget(key.width(), key.height()));
+
+        GpuTexture color = target.color;
+        GpuTextureView colorView = target.colorView;
+        GpuTexture depth = target.depth;
+        GpuTextureView depthView = target.depthView;
+        RenderSystem.outputColorTextureOverride = colorView;
+        RenderSystem.outputDepthTextureOverride = depthView;
+        RenderSystem.getDevice().createCommandEncoder()
+                .clearColorAndDepthTextures(color, GuiRenderer.CLEAR_COLOR, depth, 0.0);
+        projection.setupOrtho(-1000.0F, 1000.0F, key.width(), key.height(), true);
+        RenderSystem.setProjectionMatrix(projectionBuffer.getBuffer(projection), ProjectionType.ORTHOGRAPHIC);
+
+        PoseStack poseStack = new PoseStack();
+        poseStack.translate(key.width() / 2.0F, key.height() / 2.0F, 0.0F);
+        poseStack.scale(guiScale * state.scale(), -guiScale * state.scale(), guiScale * state.scale());
+        SubmitNodeStorage storage = new SubmitNodeStorage();
+        DollBoneRenderer.submit(state.style(), ItemDisplayContext.GUI, false, poseStack, storage,
+                15728880, OverlayTexture.NO_OVERLAY, 0);
+        featureRenderDispatcher.renderAllFeatures(storage);
+        RenderSystem.outputColorTextureOverride = null;
+        RenderSystem.outputDepthTextureOverride = null;
+
+        guiRenderState.addBlitToCurrentLayer(new BlitRenderState(
+                RenderPipelines.GUI_TEXTURED_PREMULTIPLIED_ALPHA,
+                TextureSetup.singleTexture(colorView,
+                        RenderSystem.getSamplerCache().getRepeat(FilterMode.NEAREST)), state.pose(),
+                state.x0(), state.y0(), state.x1(), state.y1(),
+                0.0F, 1.0F, 1.0F, 0.0F, -1, state.scissorArea(), null));
     }
+    //?}
+
+    @Override
+    //? >= 26.2 {
+    protected void renderToTexture(
+            DollGuiPreviewRenderState state,
+            PoseStack poseStack,
+            SubmitNodeCollector nodeCollector
+    ) {
+        // PictureInPictureRenderer uses (x, y, -z), while the former GUI item
+        // path used (x, -y, z). Keep the TotemDoll model coordinate system stable.
+        poseStack.scale(1.0F, -1.0F, -1.0F);
+        DollBoneRenderer.submit(
+                state.style(), ItemDisplayContext.GUI, false, poseStack, nodeCollector,
+                15728880, OverlayTexture.NO_OVERLAY, 0
+        );
+    }
+    
+    @Override
+    protected float getTranslateY(int height, int guiScale) {
+        return height / 2.0F;
+    }
+
+    //?} else {
+    /*protected void renderToTexture(DollGuiPreviewRenderState state, PoseStack poseStack) {
+        DollBoneRenderer.render(
+                state.style(), ItemDisplayContext.GUI, false, poseStack, bufferSource,
+                15728880, OverlayTexture.NO_OVERLAY,
+                Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false)
+        );
+    }
+    *///?}
 
     @Override
     protected String getTextureLabel() {
         return "TotemDoll preview";
     }
 
+    //? >= 26.2 {
     @Override
     public void close() {
-        clearTargets();
-        projection.close();
+        targets.values().forEach(PreviewTarget::close);
+        targets.clear();
+        projectionBuffer.close();
         super.close();
     }
 
     private static final class PreviewTarget implements AutoCloseable {
-        final int width;
-        final int height;
-        final GpuTexture texture;
-        final GpuTexture depth;
-        final GpuTextureView view;
-        final GpuTextureView depthView;
-        boolean ready;
+        private final GpuTexture color;
+        private final GpuTextureView colorView;
+        private final GpuTexture depth;
+        private final GpuTextureView depthView;
 
-        PreviewTarget(int width, int height) {
-            this.width = width;
-            this.height = height;
-            GpuDevice device = RenderSystem.getDevice();
-            texture = device.createTexture("TotemDoll GUI preview", 12, TextureFormat.RGBA8, width, height, 1, 1);
-            //? < 1.21.11 {
-            texture.setTextureFilter(FilterMode.NEAREST, false);
-            //? }
-            view = device.createTextureView(texture);
-            depth = device.createTexture("TotemDoll GUI preview depth", 8, TextureFormat.DEPTH32, width, height, 1, 1);
+        private PreviewTarget(int width, int height) {
+            var device = RenderSystem.getDevice();
+            color = device.createTexture(() -> "TotemDoll GUI preview", 13,
+                    GpuFormat.RGBA8_UNORM, width, height, 1, 1);
+            colorView = device.createTextureView(color);
+            depth = device.createTexture(() -> "TotemDoll GUI preview depth", 9,
+                    GpuFormat.D32_FLOAT, width, height, 1, 1);
             depthView = device.createTextureView(depth);
         }
 
         @Override
         public void close() {
-            texture.close();
-            view.close();
-            depth.close();
+            colorView.close();
+            color.close();
             depthView.close();
+            depth.close();
         }
     }
+    //?}
 }
-*///?} else {
-public final class DollGuiPreviewRenderer {
+//?} else {
+/*public final class DollGuiPreviewRenderer {
     private DollGuiPreviewRenderer() {
     }
 
     public static void invalidateAll() {
     }
 }
-//?}
+*///?}
