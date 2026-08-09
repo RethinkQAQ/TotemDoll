@@ -30,29 +30,29 @@ public final class DollFaceUtil {
                           float minX, float minY, float minZ,
                           float maxX, float maxY, float maxZ) {
         //? >= 1.21.11 {
-        return vertex.xFace().select(minX, minY, minZ, maxX, maxY, maxZ);
-        //?} else {
-        /*return shape[vertex.xFace];
-        *///?}
+        /*return vertex.xFace().select(minX, minY, minZ, maxX, maxY, maxZ);
+        *///?} else {
+        return shape[vertex.xFace];
+        //?}
     }
 
     public static float y(FaceInfo.VertexInfo vertex, float[] shape,
         float minX, float minY, float minZ,
                           float maxX, float maxY, float maxZ) {
         //? >= 1.21.11 {
-        return vertex.yFace().select(minX, minY, minZ, maxX, maxY, maxZ);
-        //?} else {
-        /*return shape[vertex.yFace];
-        *///?}
+        /*return vertex.yFace().select(minX, minY, minZ, maxX, maxY, maxZ);
+        *///?} else {
+        return shape[vertex.yFace];
+        //?}
     }
 
     public static float z(FaceInfo.VertexInfo vertex, float[] shape,
         float minX, float minY, float minZ,
                           float maxX, float maxY, float maxZ) {
         //? >= 1.21.11 {
-        return vertex.zFace().select(minX, minY, minZ, maxX, maxY, maxZ);
-        //?} else {
-        /*return shape[vertex.zFace];
-        *///?}
+        /*return vertex.zFace().select(minX, minY, minZ, maxX, maxY, maxZ);
+        *///?} else {
+        return shape[vertex.zFace];
+        //?}
     }
 }

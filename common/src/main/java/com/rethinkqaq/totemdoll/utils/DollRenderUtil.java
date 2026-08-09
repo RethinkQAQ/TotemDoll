@@ -21,23 +21,23 @@
 package com.rethinkqaq.totemdoll.utils;
 
 //? >= 1.21.11 {
-import net.minecraft.client.renderer.rendertype.RenderType;
+/*import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
-//?} else {
-/*import net.minecraft.client.renderer.RenderType;
-*///?}
+*///?} else {
+import net.minecraft.client.renderer.RenderType;
+//?}
 
 public final class DollRenderUtil {
     private DollRenderUtil() {
     }
 
     //? >= 1.21.11 {
-    public static RenderType entityTranslucent(DollResourceId texture) {
+    /*public static RenderType entityTranslucent(DollResourceId texture) {
         return RenderTypes.entityTranslucent(DollMinecraftResourceUtil.nativeId(texture));
     }
-    //?} else {
-    /*public static RenderType entityTranslucent(DollResourceId texture) {
+    *///?} else {
+    public static RenderType entityTranslucent(DollResourceId texture) {
         return RenderType.entityTranslucent(DollMinecraftResourceUtil.nativeId(texture));
     }
-    *///?}
+    //?}
 }

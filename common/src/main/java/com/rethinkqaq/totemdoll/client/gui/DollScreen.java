@@ -22,10 +22,10 @@ package com.rethinkqaq.totemdoll.client.gui;
 
 import com.rethinkqaq.totemdoll.utils.DollGuiGraphics;
 //? >= 26.1.2 {
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-//?} else {
-/*import net.minecraft.client.gui.GuiGraphics;
-*///?}
+/*import net.minecraft.client.gui.GuiGraphicsExtractor;
+*///?} else {
+import net.minecraft.client.gui.GuiGraphics;
+//?}
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -34,17 +34,17 @@ import java.util.function.Predicate;
 
 abstract class DollScreen extends Screen {
     //? >= 26.1.2 {
-    private GuiGraphicsExtractor activeGraphics;
-    //?} else {
-    /*private GuiGraphics activeGraphics;
-    *///?}
+    /*private GuiGraphicsExtractor activeGraphics;
+    *///?} else {
+    private GuiGraphics activeGraphics;
+    //?}
 
     protected DollScreen(Component title) {
         super(title);
     }
 
     //? >= 26.1.2 {
-    @Override
+    /*@Override
     public final void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
         activeGraphics = graphics;
         try {
@@ -54,8 +54,8 @@ abstract class DollScreen extends Screen {
             activeGraphics = null;
         }
     }
-    //?} else {
-    /*@Override
+    *///?} else {
+    @Override
     public final void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         activeGraphics = graphics;
         try {
@@ -65,7 +65,7 @@ abstract class DollScreen extends Screen {
             activeGraphics = null;
         }
     }
-    *///?}
+    //?}
 
     protected abstract void renderContent(DollGuiGraphics graphics, int mouseX, int mouseY, float partialTick);
 

@@ -26,18 +26,18 @@ import net.minecraft.client.gui.screens.Screen;
 public final class DollScreenAdapter {
     public static void setScreen(Minecraft client, Screen screen) {
         //? >= 26.2 {
-        client.gui.setScreen(screen);
-        //?} else {
-        /*client.setScreen(screen);
-        *///?}
+        /*client.gui.setScreen(screen);
+        *///?} else {
+        client.setScreen(screen);
+        //?}
     }
 
     public static Screen currentScreen(Minecraft client) {
         //? >= 26.2 {
-        return client.gui.screen();
-        //?} else {
-        /*return client.screen;
-        *///?}
+        /*return client.gui.screen();
+        *///?} else {
+        return client.screen;
+        //?}
     }
 
     private DollScreenAdapter() {

@@ -33,10 +33,10 @@ import net.minecraft.client.gui.screens.Screen;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 //? >= 1.21.11 {
-import net.minecraft.resources.Identifier;
-//?} else {
-/*import net.minecraft.resources.ResourceLocation;
-*///?}
+/*import net.minecraft.resources.Identifier;
+*///?} else {
+import net.minecraft.resources.ResourceLocation;
+//?}
 import net.minecraft.network.chat.Component;
 import org.lwjgl.util.tinyfd.TinyFileDialogs;
 
@@ -50,10 +50,10 @@ public final class DollCreateScreen extends DollScreen {
     private EditBox nameBox;
     private Path skinPath;
     //? >= 1.21.11 {
-    private Identifier previewTexture;
-    //?} else {
-    /*private ResourceLocation previewTexture;
-    *///?}
+    /*private Identifier previewTexture;
+    *///?} else {
+    private ResourceLocation previewTexture;
+    //?}
     private Component status;
 
     public DollCreateScreen(Screen parent, DollStyle template) {
@@ -108,21 +108,21 @@ public final class DollCreateScreen extends DollScreen {
             try (var input = java.nio.file.Files.newInputStream(selected)) {
                 DynamicTexture texture = new DynamicTexture(
                         //? >= 1.21.5 {
-                        () -> "totemdoll_skin_preview",
-                        //?}
+                        /*() -> "totemdoll_skin_preview",
+                        *///?}
                         NativeImage.read(input)
                 );
 
                 //? >= 1.21.4 {
-                previewTexture = DollMinecraftResourceUtil.nativeId(
+                /*previewTexture = DollMinecraftResourceUtil.nativeId(
                         DollResourceId.of("totemdoll", "dynamic/skin_preview"));
                 this.minecraft.getTextureManager().register(previewTexture, texture);
-                //?} else {
-                /*previewTexture = this.minecraft.getTextureManager().register(
+                *///?} else {
+                previewTexture = this.minecraft.getTextureManager().register(
                         "totemdoll_skin_preview",
                         texture
                 );
-                *///?}
+                //?}
             }
             if (nameBox.getValue().isBlank()) {
                 String fileName = selected.getFileName().toString();

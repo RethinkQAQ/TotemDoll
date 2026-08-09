@@ -21,7 +21,7 @@
 package com.rethinkqaq.totemdoll.client;
 
 //? >= 1.21.4 {
-import com.rethinkqaq.totemdoll.config.TotemDollConfig;
+/*import com.rethinkqaq.totemdoll.config.TotemDollConfig;
 import com.rethinkqaq.totemdoll.doll.DollStyle;
 import com.rethinkqaq.totemdoll.doll.bone.DollBoneModels;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
@@ -50,8 +50,8 @@ public final class DollThirdPersonState {
                 && context != ItemDisplayContext.FIRST_PERSON_LEFT_HAND
                 && context != ItemDisplayContext.FIRST_PERSON_RIGHT_HAND
                 //? >= 1.21.10 {
-                && context != ItemDisplayContext.ON_SHELF
-                //?}
+                /^&& context != ItemDisplayContext.ON_SHELF
+                ^///?}
                 ) {
             STYLES.remove(renderState);
             return;
@@ -67,8 +67,8 @@ public final class DollThirdPersonState {
         if (style != null && DollBoneModels.contains(style.id())) {
             STYLES.put(renderState, style);
             //? >= 1.21.6 {
-            DollGuiModelIdentity.mark(renderState, context, style);
-            //?}
+            /^DollGuiModelIdentity.mark(renderState, context, style);
+            ^///?}
         } else {
             STYLES.remove(renderState);
         }
@@ -81,9 +81,9 @@ public final class DollThirdPersonState {
     private DollThirdPersonState() {
     }
 }
-//?} else {
-/*public final class DollThirdPersonState {
+*///?} else {
+public final class DollThirdPersonState {
     private DollThirdPersonState() {
     }
 }
-*///?}
+//?}

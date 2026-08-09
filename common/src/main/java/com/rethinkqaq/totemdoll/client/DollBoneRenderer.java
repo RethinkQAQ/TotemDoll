@@ -40,26 +40,26 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.Minecraft;
 //? < 26.2 {
-/*import net.minecraft.client.renderer.MultiBufferSource;*/
+import net.minecraft.client.renderer.MultiBufferSource;
 //?}
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemDisplayContext;
 import org.joml.Vector3f;
 
 //? >= 1.21.11 {
-import net.minecraft.client.renderer.rendertype.RenderType;
-//?} else {
-/*import net.minecraft.client.renderer.RenderType;
- *///?}
+/*import net.minecraft.client.renderer.rendertype.RenderType;
+*///?} else {
+import net.minecraft.client.renderer.RenderType;
+ //?}
 import net.minecraft.client.renderer.FaceInfo;
 //? >= 1.21.10 {
-import net.minecraft.client.renderer.SubmitNodeCollector;
-//?}
-//? >= 26.1.2 {
-import net.minecraft.client.resources.model.cuboid.ItemTransform;
-//?} else {
-/*import net.minecraft.client.renderer.block.model.ItemTransform;
+/*import net.minecraft.client.renderer.SubmitNodeCollector;
 *///?}
+//? >= 26.1.2 {
+/*import net.minecraft.client.resources.model.cuboid.ItemTransform;
+*///?} else {
+import net.minecraft.client.renderer.block.model.ItemTransform;
+//?}
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -72,7 +72,7 @@ public final class DollBoneRenderer {
     private static final Map<DollResourceId, RuntimeModel> CACHE = new ConcurrentHashMap<>();
 
     //? < 26.2 {
-    /*public static boolean render(DollStyle style, ItemDisplayContext context, boolean leftHand,
+    public static boolean render(DollStyle style, ItemDisplayContext context, boolean leftHand,
                                  PoseStack poseStack, MultiBufferSource buffers, int light, int overlay,
                                  float partialTick) {
         DollBoneModel model = DollBoneModels.get(style.id());
@@ -93,30 +93,30 @@ public final class DollBoneRenderer {
             ).apply(
                     leftHand,
                     //? >= 1.21.5 {
-                    poseStack.last()
-                    //?} else {
-                    *//*poseStack
-                    *//*//?}
+                    /*poseStack.last()
+                    *///?} else {
+                    poseStack
+                    //?}
             );
         }
         //? >= 1.21.5 {
-        if (display == null) {
+        /*if (display == null) {
             poseStack.translate(-0.5F, -0.5F, -0.5F);
         }
-        //?} else {
-        *//*poseStack.translate(-0.5F, -0.5F, -0.5F);
-        *//*//?}
+        *///?} else {
+        poseStack.translate(-0.5F, -0.5F, -0.5F);
+        //?}
         DollResourceId texture = resolveTexture(style, model);
         var consumer = buffers.getBuffer(DollRenderUtil.entityTranslucent(texture));
         for (RuntimePart root : runtime.roots)
             renderPart(root, poseStack, consumer, light, overlay);
         poseStack.popPose();
         return true;
-    }*/
+    }
     //?}
 
 //? >= 1.21.10 {
-    public static boolean submit(DollStyle style, ItemDisplayContext context, boolean leftHand,
+    /*public static boolean submit(DollStyle style, ItemDisplayContext context, boolean leftHand,
                                  PoseStack poseStack, SubmitNodeCollector nodeCollector, int light,
                                  int overlay, int outlineColor) {
         RenderData data = resolve(style, DollBoneModels.get(style.id()));
@@ -158,7 +158,7 @@ public final class DollBoneRenderer {
         return true;
     }
 
-    //?}
+    *///?}
 
     private static String displayContext(ItemDisplayContext context) {
         return switch (context) {
@@ -169,8 +169,8 @@ public final class DollBoneRenderer {
             case THIRD_PERSON_LEFT_HAND, THIRD_PERSON_RIGHT_HAND -> "thirdperson";
             case HEAD -> "head";
             //? >= 1.21.10 {
-            case ON_SHELF -> "on_shelf";
-            //?}
+            /*case ON_SHELF -> "on_shelf";
+            *///?}
             default -> "fixed";
         };
     }

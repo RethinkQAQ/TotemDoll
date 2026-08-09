@@ -22,18 +22,18 @@ package com.rethinkqaq.totemdoll.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 //? >= 1.21.6 {
-import com.rethinkqaq.totemdoll.client.gui.DollGuiPreviewAccess;
+/*import com.rethinkqaq.totemdoll.client.gui.DollGuiPreviewAccess;
 import com.rethinkqaq.totemdoll.client.gui.DollGuiPreviewRenderState;
 //? >= 26.1.2 {
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+/^import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.state.gui.GuiRenderState;
-//?} else {
-/*import net.minecraft.client.gui.GuiGraphics;
+^///?} else {
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.render.state.GuiRenderState;
-*///?}
+//?}
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Shadow;
-//?} else if >= 1.21.4 {
+*///?} else if >= 1.21.4 {
 /*import com.mojang.blaze3d.vertex.PoseStack;
 import com.rethinkqaq.totemdoll.client.DollBoneRenderer;
 import com.rethinkqaq.totemdoll.client.DollPreviewContext;
@@ -55,35 +55,35 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 *///?} else {
-/*import com.rethinkqaq.totemdoll.utils.Dummy;
-*///?}
+import com.rethinkqaq.totemdoll.utils.Dummy;
+//?}
 
 @Mixin(
         //? >= 26.1.2 {
-        GuiGraphicsExtractor.class
-        //?} else if >= 1.21.4 {
+        /*GuiGraphicsExtractor.class
+        *///?} else if >= 1.21.4 {
         /*GuiGraphics.class
         *///?} else {
-        /*Dummy.class
-        *///?}
+        Dummy.class
+        //?}
 )
 public abstract class GuiGraphicsMixin
         //? >= 1.21.6 {
-        implements DollGuiPreviewAccess
-        //?}
+        /*implements DollGuiPreviewAccess
+        *///?}
 {
     //? >= 1.21.6 {
-    @Shadow @Final private GuiRenderState guiRenderState;
+    /*@Shadow @Final private GuiRenderState guiRenderState;
 
     @Override
     public void totemdoll$submitPreview(DollGuiPreviewRenderState state) {
         //? >= 26.1 {
-        guiRenderState.addPicturesInPictureState(state);
-        //?} else {
-        /*guiRenderState.submitPicturesInPictureState(state);
-        *///?}
+        /^guiRenderState.addPicturesInPictureState(state);
+        ^///?} else {
+        guiRenderState.submitPicturesInPictureState(state);
+        //?}
     }
-    //?} else if >= 1.21.4 {
+    *///?} else if >= 1.21.4 {
     /*@Shadow @Final private PoseStack pose;
     @Shadow @Final private MultiBufferSource.BufferSource bufferSource;
 

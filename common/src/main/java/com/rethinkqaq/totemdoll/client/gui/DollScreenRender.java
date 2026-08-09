@@ -21,10 +21,10 @@
 package com.rethinkqaq.totemdoll.client.gui;
 
 //? >= 26.1.2 {
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-//?} else {
-/*import net.minecraft.client.gui.GuiGraphics;
-*///?}
+/*import net.minecraft.client.gui.GuiGraphicsExtractor;
+*///?} else {
+import net.minecraft.client.gui.GuiGraphics;
+//?}
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
@@ -36,10 +36,10 @@ final class DollScreenRender {
     static void renderChildren(
             Screen screen,
             //? >= 26.1.2 {
-            GuiGraphicsExtractor graphics,
-            //?} else {
-            /*GuiGraphics graphics,
-            *///?}
+            /*GuiGraphicsExtractor graphics,
+            *///?} else {
+            GuiGraphics graphics,
+            //?}
             int mouseX,
             int mouseY,
             float partialTick
@@ -50,10 +50,10 @@ final class DollScreenRender {
     static void renderChildren(
             Screen screen,
             //? >= 26.1.2 {
-            GuiGraphicsExtractor graphics,
-            //?} else {
-            /*GuiGraphics graphics,
-            *///?}
+            /*GuiGraphicsExtractor graphics,
+            *///?} else {
+            GuiGraphics graphics,
+            //?}
             int mouseX,
             int mouseY,
             float partialTick,
@@ -62,10 +62,10 @@ final class DollScreenRender {
         for (var child : screen.children()) {
             if (filter.test(child) && child instanceof Renderable renderable) {
                 //? >= 26.1.2 {
-                renderable.extractRenderState(graphics, mouseX, mouseY, partialTick);
-                //?} else {
-                /*renderable.render(graphics, mouseX, mouseY, partialTick);
-                *///?}
+                /*renderable.extractRenderState(graphics, mouseX, mouseY, partialTick);
+                *///?} else {
+                renderable.render(graphics, mouseX, mouseY, partialTick);
+                //?}
             }
         }
     }

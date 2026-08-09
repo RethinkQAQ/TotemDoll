@@ -21,7 +21,7 @@
 package com.rethinkqaq.totemdoll.client.gui;
 
 //? >= 1.21.6 {
-import com.mojang.blaze3d.ProjectionType;
+/*import com.mojang.blaze3d.ProjectionType;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.GpuTexture;
 import com.mojang.blaze3d.textures.GpuTextureView;
@@ -31,7 +31,7 @@ import com.rethinkqaq.totemdoll.client.DollBoneRenderer;
 import com.rethinkqaq.totemdoll.client.gui.DollGuiPreviewRenderState.PreviewKey;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
 //? >= 26.2 {
-import com.mojang.blaze3d.GpuFormat;
+/^import com.mojang.blaze3d.GpuFormat;
 import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.renderer.Projection;
 import net.minecraft.client.renderer.ProjectionMatrixBuffer;
@@ -42,35 +42,35 @@ import net.minecraft.client.gui.render.GuiRenderer;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.state.gui.BlitRenderState;
 import net.minecraft.client.renderer.state.gui.GuiRenderState;
-//?} else {
-/*import com.rethinkqaq.totemdoll.utils.Dummy;
-*///?}
+^///?} else {
+import com.rethinkqaq.totemdoll.utils.Dummy;
+//?}
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.item.ItemDisplayContext;
 //? >= 26.2 {
 //?} else {
-/*import net.minecraft.client.Minecraft;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-*///?}
+//?}
 
 import java.util.HashMap;
 import java.util.Map;
 
 public final class DollGuiPreviewRenderer extends PictureInPictureRenderer<DollGuiPreviewRenderState> {
     //? >= 26.2 {
-    private final Map<PreviewKey, PreviewTarget> targets = new HashMap<>();
+    /^private final Map<PreviewKey, PreviewTarget> targets = new HashMap<>();
     private final Projection projection = new Projection();
     private final ProjectionMatrixBuffer projectionBuffer = new ProjectionMatrixBuffer("TotemDoll GUI preview");
-    //?}
+    ^///?}
     //? >= 26.2 {
-    public DollGuiPreviewRenderer() {
+    /^public DollGuiPreviewRenderer() {
         super();
     }
-    //?} else {
-    /*public DollGuiPreviewRenderer(MultiBufferSource.BufferSource bufferSource) {
+    ^///?} else {
+    public DollGuiPreviewRenderer(MultiBufferSource.BufferSource bufferSource) {
         super(bufferSource);
     }
-    *///?}
+    //?}
 
     @Override
     public Class<DollGuiPreviewRenderState> getRenderStateClass() {
@@ -81,7 +81,7 @@ public final class DollGuiPreviewRenderer extends PictureInPictureRenderer<DollG
     }
 
     //? >= 26.2 {
-    @Override
+    /^@Override
     public void prepare(
             DollGuiPreviewRenderState state,
             GuiRenderState guiRenderState,
@@ -120,11 +120,11 @@ public final class DollGuiPreviewRenderer extends PictureInPictureRenderer<DollG
                 state.x0(), state.y0(), state.x1(), state.y1(),
                 0.0F, 1.0F, 1.0F, 0.0F, -1, state.scissorArea(), null));
     }
-    //?}
+    ^///?}
 
     @Override
     //? >= 26.2 {
-    protected void renderToTexture(
+    /^protected void renderToTexture(
             DollGuiPreviewRenderState state,
             PoseStack poseStack,
             SubmitNodeCollector nodeCollector
@@ -143,8 +143,8 @@ public final class DollGuiPreviewRenderer extends PictureInPictureRenderer<DollG
         return height / 2.0F;
     }
 
-    //?} else {
-    /*protected void renderToTexture(DollGuiPreviewRenderState state, PoseStack poseStack) {
+    ^///?} else {
+    protected void renderToTexture(DollGuiPreviewRenderState state, PoseStack poseStack) {
         poseStack.scale(1.0F, -1.0F, -1.0F);
         float verticalOffset = 0.75F * 37.6F / state.scale();
         poseStack.translate(0.0F, verticalOffset, 0.0F);
@@ -154,7 +154,7 @@ public final class DollGuiPreviewRenderer extends PictureInPictureRenderer<DollG
                 Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false)
         );
     }
-    *///?}
+    //?}
 
     @Override
     protected String getTextureLabel() {
@@ -162,7 +162,7 @@ public final class DollGuiPreviewRenderer extends PictureInPictureRenderer<DollG
     }
 
     //? >= 26.2 {
-    @Override
+    /^@Override
     public void close() {
         targets.values().forEach(PreviewTarget::close);
         targets.clear();
@@ -194,14 +194,14 @@ public final class DollGuiPreviewRenderer extends PictureInPictureRenderer<DollG
             depth.close();
         }
     }
-    //?}
+    ^///?}
 }
-//?} else {
-/*public final class DollGuiPreviewRenderer {
+*///?} else {
+public final class DollGuiPreviewRenderer {
     private DollGuiPreviewRenderer() {
     }
 
     public static void invalidateAll() {
     }
 }
-*///?}
+//?}

@@ -23,7 +23,7 @@ package com.rethinkqaq.totemdoll.mixin;
 import org.spongepowered.asm.mixin.Mixin;
 import com.rethinkqaq.totemdoll.utils.Dummy;
 //? >= 1.21.10 {
-import com.mojang.blaze3d.vertex.PoseStack;
+/*import com.mojang.blaze3d.vertex.PoseStack;
 import com.rethinkqaq.totemdoll.client.DollBoneRenderer;
 import com.rethinkqaq.totemdoll.client.DollThirdPersonState;
 import com.rethinkqaq.totemdoll.doll.DollStyle;
@@ -34,7 +34,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-//?} else if >= 1.21.4 {
+*///?} else if >= 1.21.4 {
 /*import com.mojang.blaze3d.vertex.PoseStack;
 import com.rethinkqaq.totemdoll.client.DollBoneRenderer;
 import com.rethinkqaq.totemdoll.client.DollThirdPersonState;
@@ -48,19 +48,19 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 *///?} else {
-/*import com.rethinkqaq.totemdoll.utils.Dummy;
-*///?}
+import com.rethinkqaq.totemdoll.utils.Dummy;
+//?}
 
 @Mixin(
         //? >= 1.21.4 {
-        ItemStackRenderState.class
-        //?} else {
-        /*Dummy.class
-        *///?}
+        /*ItemStackRenderState.class
+        *///?} else {
+        Dummy.class
+        //?}
 )
 public abstract class ItemStackRenderStateMixin {
     //? >= 1.21.10 {
-    @Shadow
+    /*@Shadow
     private ItemDisplayContext displayContext;
 
     private DollStyle totemdoll$style() {
@@ -81,7 +81,7 @@ public abstract class ItemStackRenderStateMixin {
             callback.cancel();
         }
     }
-    //?} else if >= 1.21.4 {
+    *///?} else if >= 1.21.4 {
     /*@Shadow
     private ItemDisplayContext displayContext;
 

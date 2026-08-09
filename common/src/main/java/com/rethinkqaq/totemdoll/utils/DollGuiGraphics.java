@@ -24,49 +24,49 @@ import com.rethinkqaq.totemdoll.client.gui.DollGuiPreviewAccess;
 import com.rethinkqaq.totemdoll.client.gui.DollGuiPreviewRenderState;
 import net.minecraft.client.gui.Font;
 //? >= 26.1.2 {
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-//?} else {
-/*import net.minecraft.client.gui.GuiGraphics;
-*///?}
+/*import net.minecraft.client.gui.GuiGraphicsExtractor;
+*///?} else {
+import net.minecraft.client.gui.GuiGraphics;
+//?}
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 //? >= 1.21.11 {
-import net.minecraft.client.renderer.RenderPipelines;
+/*import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
-//?} else if >= 1.21.6 {
+*///?} else if >= 1.21.6 {
 /*import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.ResourceLocation;
 *///?} else if >= 1.21.3 {
 /*import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 *///?} else {
-/*import net.minecraft.resources.ResourceLocation;
-*///?}
+import net.minecraft.resources.ResourceLocation;
+//?}
 
 /** Version-independent wrapper for Minecraft's GUI extraction object. */
 public final class DollGuiGraphics {
     //? >= 26.1.2 {
-    private final GuiGraphicsExtractor graphics;
-    //?} else {
-    /*private final GuiGraphics graphics;
-    *///?}
+    /*private final GuiGraphicsExtractor graphics;
+    *///?} else {
+    private final GuiGraphics graphics;
+    //?}
 
     private DollGuiGraphics(
             //? >= 26.1.2 {
-            GuiGraphicsExtractor graphics
-            //?} else {
-            /*GuiGraphics graphics
-            *///?}
+            /*GuiGraphicsExtractor graphics
+            *///?} else {
+            GuiGraphics graphics
+            //?}
     ) {
         this.graphics = graphics;
     }
 
     public static DollGuiGraphics wrap(
             //? >= 26.1.2 {
-            GuiGraphicsExtractor graphics
-            //?} else {
-            /*GuiGraphics graphics
-            *///?}
+            /*GuiGraphicsExtractor graphics
+            *///?} else {
+            GuiGraphics graphics
+            //?}
     ) {
         return new DollGuiGraphics(graphics);
     }
@@ -77,18 +77,18 @@ public final class DollGuiGraphics {
 
     public void text(Font font, Component text, int x, int y, int color) {
         //? >= 26.1.2 {
-        graphics.text(font, text, x, y, color);
-        //?} else {
-        /*graphics.drawString(font, text, x, y, color);
-        *///?}
+        /*graphics.text(font, text, x, y, color);
+        *///?} else {
+        graphics.drawString(font, text, x, y, color);
+        //?}
     }
 
     public void centeredText(Font font, Component text, int x, int y, int color) {
         //? >= 26.1.2 {
-        graphics.centeredText(font, text, x, y, color);
-        //?} else {
-        /*graphics.drawCenteredString(font, text, x, y, color);
-        *///?}
+        /*graphics.centeredText(font, text, x, y, color);
+        *///?} else {
+        graphics.drawCenteredString(font, text, x, y, color);
+        //?}
     }
 
     public void enableScissor(int left, int top, int right, int bottom) {
@@ -101,64 +101,64 @@ public final class DollGuiGraphics {
 
     public void pushPose() {
         //? >= 1.21.6 {
-        graphics.pose().pushMatrix();
-        //?} else {
-        /*graphics.pose().pushPose();
-        *///?}
+        /*graphics.pose().pushMatrix();
+        *///?} else {
+        graphics.pose().pushPose();
+        //?}
     }
 
     public void popPose() {
         //? >= 1.21.6 {
-        graphics.pose().popMatrix();
-        //?} else {
-        /*graphics.pose().popPose();
-        *///?}
+        /*graphics.pose().popMatrix();
+        *///?} else {
+        graphics.pose().popPose();
+        //?}
     }
 
     public void translate(float x, float y, float z) {
         //? >= 1.21.6 {
-        graphics.pose().translate(x, y);
-        //?} else {
-        /*graphics.pose().translate(x, y, z);
-        *///?}
+        /*graphics.pose().translate(x, y);
+        *///?} else {
+        graphics.pose().translate(x, y, z);
+        //?}
     }
 
     public void scale(float x, float y, float z) {
         //? >= 1.21.6 {
-        graphics.pose().scale(x, y);
-        //?} else {
-        /*graphics.pose().scale(x, y, z);
-        *///?}
+        /*graphics.pose().scale(x, y);
+        *///?} else {
+        graphics.pose().scale(x, y, z);
+        //?}
     }
 
     public void renderItem(ItemStack stack, int x, int y) {
         //? >= 26.1.2 {
-        graphics.item(stack, x, y);
-        //?} else {
-        /*graphics.renderItem(stack, x, y);
-        *///?}
+        /*graphics.item(stack, x, y);
+        *///?} else {
+        graphics.renderItem(stack, x, y);
+        //?}
     }
 
     public void blitTexture(
             //? >= 1.21.11 {
-            Identifier texture,
-            //?} else {
-            /*ResourceLocation texture,
-            *///?}
+            /*Identifier texture,
+            *///?} else {
+            ResourceLocation texture,
+            //?}
             int x, int y, int u, int v, int width, int height, int textureWidth, int textureHeight
     ) {
         //? >= 1.21.6 {
-        graphics.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, u, v, width, height, textureWidth, textureHeight);
-        //?} else if >= 1.21.3 {
+        /*graphics.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, u, v, width, height, textureWidth, textureHeight);
+        *///?} else if >= 1.21.3 {
         /*graphics.blit(RenderType::guiTextured, texture, x, y, u, v, width, height, textureWidth, textureHeight);
         *///?} else {
-        /*graphics.blit(texture, x, y, u, v, width, height, textureWidth, textureHeight);
-        *///?}
+        graphics.blit(texture, x, y, u, v, width, height, textureWidth, textureHeight);
+        //?}
     }
 
     public void submitPreview(DollGuiPreviewRenderState state) {
         //? >= 1.21.6 {
-        ((DollGuiPreviewAccess) graphics).totemdoll$submitPreview(state);
-        //?}
+        /*((DollGuiPreviewAccess) graphics).totemdoll$submitPreview(state);
+        *///?}
     }
 }

@@ -29,10 +29,10 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 //? >= 26.1.2 {
-import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
-//?} else {
-/*import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-*///?}
+/*import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
+*///?} else {
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+//?}
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.KeyMapping;
@@ -40,9 +40,9 @@ import net.minecraft.client.Minecraft;
 import org.lwjgl.glfw.GLFW;
 
 //? >= 1.21.10 {
-import com.rethinkqaq.totemdoll.utils.DollMinecraftResourceUtil;
+/*import com.rethinkqaq.totemdoll.utils.DollMinecraftResourceUtil;
 import com.rethinkqaq.totemdoll.utils.DollResourceId;
-//?}
+*///?}
 
 public final class TotemDollFabricClient implements ClientModInitializer {
 
@@ -56,20 +56,20 @@ public final class TotemDollFabricClient implements ClientModInitializer {
                 DollStyleLoader.reload(Minecraft.getInstance().getResourceManager()));
         KeyMapping openConfig =
                 //? >= 26.1.2 {
-                KeyMappingHelper.registerKeyMapping(
-                //?} else {
-                /*KeyBindingHelper.registerKeyBinding(
-                *///?}
+                /*KeyMappingHelper.registerKeyMapping(
+                *///?} else {
+                KeyBindingHelper.registerKeyBinding(
+                //?}
                         new KeyMapping(
                                 "key.totemdoll.open_config",
                                 InputConstants.Type.KEYSYM,
                                 GLFW.GLFW_KEY_F9,
                                 //? >= 1.21.10 {
-                                KeyMapping.Category.register(DollMinecraftResourceUtil.nativeId(
+                                /*KeyMapping.Category.register(DollMinecraftResourceUtil.nativeId(
                                         DollResourceId.ofVanilla("totemdoll")))
-                                //?} else {
-                                /*"key.categories.totemdoll"
-                                 *///?}
+                                *///?} else {
+                                "key.categories.totemdoll"
+                                 //?}
                         )
                 );
         ClientTickEvents.END_CLIENT_TICK.register(client -> {

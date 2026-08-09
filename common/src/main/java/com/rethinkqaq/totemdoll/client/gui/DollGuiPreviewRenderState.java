@@ -24,12 +24,12 @@ import com.rethinkqaq.totemdoll.doll.DollStyle;
 import com.rethinkqaq.totemdoll.utils.DollResourceId;
 
 //? >= 1.21.6 {
-import net.minecraft.client.gui.navigation.ScreenRectangle;
+/*import net.minecraft.client.gui.navigation.ScreenRectangle;
 //? >= 26.1.2 {
-import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState;
-//?} else {
-/*import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
-*///?}
+/^import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState;
+^///?} else {
+import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
+//?}
 
 public record DollGuiPreviewRenderState(
         DollStyle style, int x0, int y0, int x1, int y1, float scale,
@@ -53,9 +53,9 @@ public record DollGuiPreviewRenderState(
     public record PreviewKey(DollResourceId styleId, int width, int height, float scale) {
     }
 }
-//?} else {
-/*public final class DollGuiPreviewRenderState {
+*///?} else {
+public final class DollGuiPreviewRenderState {
     public DollGuiPreviewRenderState(DollStyle style, int x, int y, int width, int height, float scale) {
     }
 }
-*///?}
+//?}

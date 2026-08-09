@@ -29,8 +29,8 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 
 //? >= 1.21.10 {
-import net.minecraft.client.input.MouseButtonEvent;
-//?}
+/*import net.minecraft.client.input.MouseButtonEvent;
+*///?}
 
 public final class DollCardWidget extends DollWidget {
 
@@ -159,14 +159,14 @@ public final class DollCardWidget extends DollWidget {
 
     @Override
     //? >= 1.21.10 {
-    public void onClick(MouseButtonEvent event, boolean isDoubleClick) {
+    /*public void onClick(MouseButtonEvent event, boolean isDoubleClick) {
         handleClick(event.x(), event.y());
     }
-    //?} else {
-    /*public void onClick(double mouseX, double mouseY) {
+    *///?} else {
+    public void onClick(double mouseX, double mouseY) {
         handleClick(mouseX, mouseY);
     }
-    *///?}
+    //?}
 
     private void handleClick(double mouseX, double mouseY) {
         double relativeX = mouseX - getX();

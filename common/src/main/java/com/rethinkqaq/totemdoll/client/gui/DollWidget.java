@@ -22,10 +22,10 @@ package com.rethinkqaq.totemdoll.client.gui;
 
 import com.rethinkqaq.totemdoll.utils.DollGuiGraphics;
 //? >= 26.1.2 {
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-//?} else {
-/*import net.minecraft.client.gui.GuiGraphics;
-*///?}
+/*import net.minecraft.client.gui.GuiGraphicsExtractor;
+*///?} else {
+import net.minecraft.client.gui.GuiGraphics;
+//?}
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.network.chat.Component;
 
@@ -35,18 +35,18 @@ abstract class DollWidget extends AbstractWidget {
     }
 
     //? >= 26.1.2 {
-    @Override
+    /*@Override
     protected final void extractWidgetRenderState(
             GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick
     ) {
         renderContent(DollGuiGraphics.wrap(graphics), mouseX, mouseY, partialTick);
     }
-    //?} else {
-    /*@Override
+    *///?} else {
+    @Override
     protected final void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         renderContent(DollGuiGraphics.wrap(graphics), mouseX, mouseY, partialTick);
     }
-    *///?}
+    //?}
 
     protected abstract void renderContent(DollGuiGraphics graphics, int mouseX, int mouseY, float partialTick);
 }
