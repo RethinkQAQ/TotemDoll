@@ -21,10 +21,10 @@
 package com.rethinkqaq.totemdoll.client.gui;
 
 import com.rethinkqaq.totemdoll.config.TotemDollConfig;
+import com.rethinkqaq.totemdoll.utils.DollGuiGraphics;
 import com.rethinkqaq.totemdoll.doll.DollStyle;
 import com.rethinkqaq.totemdoll.doll.DollStyles;
 import com.rethinkqaq.totemdoll.doll.DollAnimationManager;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public final class DollSelectionScreen extends Screen implements DollScreenParent {
+public final class DollSelectionScreen extends DollScreen implements DollScreenParent {
 
     private static final int SIDEBAR_WIDTH = 104;
     private static final int HEADER_HEIGHT = 92;
@@ -108,10 +108,10 @@ public final class DollSelectionScreen extends Screen implements DollScreenParen
 
     private Runnable secondaryAction(DollStyle style) {
         if (tab == Tab.MY_STYLES) {
-            return () -> this.minecraft.setScreen(new DollStyleManageScreen(this, style));
+            return () -> DollScreenAdapter.setScreen(this.minecraft, new DollStyleManageScreen(this, style));
         }
         if (style.supportsSkin()) {
-            return () -> this.minecraft.setScreen(new DollCreateScreen(this, style));
+            return () -> DollScreenAdapter.setScreen(this.minecraft, new DollCreateScreen(this, style));
         }
         return null;
     }
@@ -125,7 +125,7 @@ public final class DollSelectionScreen extends Screen implements DollScreenParen
 
     private void switchTab(Tab target) {
         if (target != tab) {
-            this.minecraft.setScreen(new DollSelectionScreen(parent, target));
+            DollScreenAdapter.setScreen(this.minecraft, new DollSelectionScreen(parent, target));
         }
     }
 
@@ -199,7 +199,7 @@ public final class DollSelectionScreen extends Screen implements DollScreenParen
     @Override
     public void onClose() {
         if (this.minecraft != null) {
-            this.minecraft.setScreen(parent);
+            DollScreenAdapter.setScreen(this.minecraft, parent);
         }
     }
 
@@ -209,38 +209,33 @@ public final class DollSelectionScreen extends Screen implements DollScreenParen
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        this.renderTransparentBackground(graphics);
+    protected void renderContent(DollGuiGraphics gui, int mouseX, int mouseY, float partialTick) {
         if (cards.isEmpty()) {
             Component emptyTitle = Component.translatable("screen.totemdoll.empty_title");
             Component emptyHint = Component.translatable("screen.totemdoll.empty_hint");
             int centerX = SIDEBAR_WIDTH + (this.width - SIDEBAR_WIDTH) / 2;
-            graphics.drawCenteredString(this.font, emptyTitle, centerX, HEADER_HEIGHT + 72, 0xFFFFFFFF);
-            graphics.drawCenteredString(this.font, emptyHint, centerX, HEADER_HEIGHT + 88, 0xFFA0A0A0);
+            gui.centeredText(this.font, emptyTitle, centerX, HEADER_HEIGHT + 72, 0xFFFFFFFF);
+            gui.centeredText(this.font, emptyHint, centerX, HEADER_HEIGHT + 88, 0xFFA0A0A0);
         }
         int cardTop = HEADER_HEIGHT + 22;
         int cardBottom = this.height - FOOTER_HEIGHT;
-        graphics.enableScissor(0, cardTop, this.width, cardBottom);
-        DollScreenRender.renderChildren(
-                this,
-                graphics,
+        gui.enableScissor(0, cardTop, this.width, cardBottom);
+        renderChildren(
                 mouseX,
                 mouseY,
                 partialTick,
                 child -> child instanceof DollCardWidget
         );
-        graphics.disableScissor();
+        gui.disableScissor();
 
         // Draw fixed panels after the scrollable cards. Card previews can extend
         // beyond their widget bounds, so the opaque header/sidebar masks that
         // overlap. Regular widgets are rendered afterwards so the panels do not
         // cover the sidebar buttons.
-        renderHeader(graphics);
-        renderSidebar(graphics);
+        renderHeader(gui);
+        renderSidebar(gui);
 
-        DollScreenRender.renderChildren(
-                this,
-                graphics,
+        renderChildren(
                 mouseX,
                 mouseY,
                 partialTick,
@@ -248,14 +243,14 @@ public final class DollSelectionScreen extends Screen implements DollScreenParen
         );
     }
 
-    private void renderHeader(GuiGraphics graphics) {
+    private void renderHeader(DollGuiGraphics graphics) {
         graphics.fill(8, 8, this.width - 8, HEADER_HEIGHT, 0xFF181818);
         graphics.fill(8, HEADER_HEIGHT - 2, this.width - 8, HEADER_HEIGHT, 0xFF4A4A4A);
         DollStyle selected = TotemDollConfig.selectedStyle();
         DollGuiPreview.render(graphics, selected, 20, 12, 56, 56, 54.4F);
-        graphics.drawString(this.font, Component.translatable("screen.totemdoll.current_preview"), 82, 18, 0xFFA0A0A0);
-        graphics.drawString(this.font, selected.label(), 82, 36, 0xFFFFFFFF);
-        graphics.drawString(
+        graphics.text(this.font, Component.translatable("screen.totemdoll.current_preview"), 82, 18, 0xFFA0A0A0);
+        graphics.text(this.font, selected.label(), 82, 36, 0xFFFFFFFF);
+        graphics.text(
                 this.font,
                 Component.translatable("screen.totemdoll.current_type", selected.isLocal()
                         ? Component.translatable("screen.totemdoll.origin_local")
@@ -265,7 +260,7 @@ public final class DollSelectionScreen extends Screen implements DollScreenParen
                 0xFFA0A0A0
         );
         if (selected.isLocal() && selected.templateId() != null) {
-            graphics.drawString(
+            graphics.text(
                     this.font,
                     Component.translatable(
                             "screen.totemdoll.from_template",
@@ -278,10 +273,10 @@ public final class DollSelectionScreen extends Screen implements DollScreenParen
         }
     }
 
-    private void renderSidebar(GuiGraphics graphics) {
+    private void renderSidebar(DollGuiGraphics graphics) {
         graphics.fill(8, HEADER_HEIGHT + 8, SIDEBAR_WIDTH - 4, this.height - FOOTER_HEIGHT, 0xFF181818);
         graphics.fill(SIDEBAR_WIDTH - 6, HEADER_HEIGHT + 8, SIDEBAR_WIDTH - 4, this.height - FOOTER_HEIGHT, 0xFF3D3D3D);
-        graphics.drawString(this.font, Component.translatable("screen.totemdoll.library"), 18, HEADER_HEIGHT + 18, 0xFFA0A0A0);
+        graphics.text(this.font, Component.translatable("screen.totemdoll.library"), 18, HEADER_HEIGHT + 18, 0xFFA0A0A0);
         int indicatorY = tab == Tab.TEMPLATES ? HEADER_HEIGHT + 28 : HEADER_HEIGHT + 54;
         graphics.fill(10, indicatorY, 13, indicatorY + 20, 0xFF55D878);
     }

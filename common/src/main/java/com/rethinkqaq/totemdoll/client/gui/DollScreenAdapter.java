@@ -18,32 +18,28 @@
  * with Totem Doll. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.rethinkqaq.totemdoll.platform;
+package com.rethinkqaq.totemdoll.client.gui;
 
-import com.rethinkqaq.totemdoll.platform.services.IPlatformHelper;
-import net.neoforged.fml.ModList;
-import net.neoforged.fml.loading.FMLLoader;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 
-public class NeoForgePlatformHelper implements IPlatformHelper {
-
-    @Override
-    public String getPlatformName() {
-
-        return "NeoForge";
-    }
-
-    @Override
-    public boolean isModLoaded(String modId) {
-
-        return ModList.get().isLoaded(modId);
-    }
-
-    @Override
-    public boolean isDevelopmentEnvironment() {
-//? >= 1.21.10 {
-        return !FMLLoader.getCurrent().isProduction();
+public final class DollScreenAdapter {
+    public static void setScreen(Minecraft client, Screen screen) {
+        //? >= 26.2 {
+        client.gui.setScreen(screen);
         //?} else {
-        /*return !FMLLoader.isProduction();
+        /*client.setScreen(screen);
         *///?}
+    }
+
+    public static Screen currentScreen(Minecraft client) {
+        //? >= 26.2 {
+        return client.gui.screen();
+        //?} else {
+        /*return client.screen;
+        *///?}
+    }
+
+    private DollScreenAdapter() {
     }
 }

@@ -22,44 +22,44 @@ package com.rethinkqaq.totemdoll.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 //? >= 1.21.4 {
-/*import com.rethinkqaq.totemdoll.client.DollThirdPersonState;
+import com.rethinkqaq.totemdoll.client.DollThirdPersonState;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 //? >= 1.21.10 {
-/^import net.minecraft.world.entity.ItemOwner;
-^///?}
+import net.minecraft.world.entity.ItemOwner;
+//?}
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 //? >= 1.21.6 {
-/^import net.minecraft.world.level.Level;
-^///?}
+import net.minecraft.world.level.Level;
+//?}
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-*///?} else {
-import com.rethinkqaq.totemdoll.utils.Dummy;
-//?}
+//?} else {
+/*import com.rethinkqaq.totemdoll.utils.Dummy;
+*///?}
 
 @Mixin(
         //? >= 1.21.4 {
-        /*ItemModelResolver.class
-        *///?} else {
-        Dummy.class
-        //?}
+        ItemModelResolver.class
+        //?} else {
+        /*Dummy.class
+        *///?}
 )
 public abstract class ItemModelResolverMixin {
 
     //? >= 1.21.4 {
-    /*@Inject(method = "updateForLiving", at = @At("HEAD"))
+    @Inject(method = "updateForLiving", at = @At("HEAD"))
     private void totemdoll$markLivingItem(
             ItemStackRenderState renderState,
             ItemStack stack,
             ItemDisplayContext context,
             //? < 1.21.5 {
-            boolean leftHand,
-            //?}
+            /*boolean leftHand,
+            *///?}
             LivingEntity entity,
             CallbackInfo callback
     ) {
@@ -78,22 +78,22 @@ public abstract class ItemModelResolverMixin {
     }
 
     //? >= 1.21.6 {
-    /^@Inject(method = "updateForTopItem", at = @At("RETURN"))
+    @Inject(method = "updateForTopItem", at = @At("RETURN"))
     private void totemdoll$markGuiItem(
             ItemStackRenderState renderState,
             ItemStack stack,
             ItemDisplayContext context,
             Level level,
 //? >= 1.21.10 {
-            /^¹ItemOwner entity,
-            ¹^///?} else {
-            LivingEntity entity,
-            //?}
+            ItemOwner entity,
+            //?} else {
+            /*LivingEntity entity,
+            *///?}
             int seed,
             CallbackInfo callback
     ) {
         DollThirdPersonState.mark(renderState, stack, context);
     }
-    ^///?}
-    *///?}
+    //?}
+    //?}
 }

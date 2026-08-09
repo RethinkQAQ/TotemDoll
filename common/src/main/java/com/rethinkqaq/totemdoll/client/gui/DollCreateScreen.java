@@ -26,40 +26,34 @@ import com.rethinkqaq.totemdoll.doll.DollLocalStyleStore;
 import com.rethinkqaq.totemdoll.doll.DollStyle;
 import com.rethinkqaq.totemdoll.utils.DollMinecraftResourceUtil;
 import com.rethinkqaq.totemdoll.utils.DollResourceId;
-import net.minecraft.client.gui.GuiGraphics;
+import com.rethinkqaq.totemdoll.utils.DollGuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 //? >= 1.21.11 {
-/*import net.minecraft.resources.Identifier;
-*///? } else {
-import net.minecraft.resources.ResourceLocation;
-//?}
+import net.minecraft.resources.Identifier;
+//?} else {
+/*import net.minecraft.resources.ResourceLocation;
+*///?}
 import net.minecraft.network.chat.Component;
 import org.lwjgl.util.tinyfd.TinyFileDialogs;
-
-//? >= 1.21.6 {
-/*import net.minecraft.client.renderer.RenderPipelines;
-*///?} else if >= 1.21.3 {
-/*import net.minecraft.client.renderer.RenderType;*/
-//?}
 
 import java.io.IOException;
 import java.nio.file.Path;
 
-public final class DollCreateScreen extends Screen {
+public final class DollCreateScreen extends DollScreen {
 
     private final Screen parent;
     private final DollStyle template;
     private EditBox nameBox;
     private Path skinPath;
     //? >= 1.21.11 {
-    /*private Identifier previewTexture;
-    *///? } else {
-    private ResourceLocation previewTexture;
-    //?}
+    private Identifier previewTexture;
+    //?} else {
+    /*private ResourceLocation previewTexture;
+    *///?}
     private Component status;
 
     public DollCreateScreen(Screen parent, DollStyle template) {
@@ -114,21 +108,21 @@ public final class DollCreateScreen extends Screen {
             try (var input = java.nio.file.Files.newInputStream(selected)) {
                 DynamicTexture texture = new DynamicTexture(
                         //? >= 1.21.5 {
-                        /*() -> "totemdoll_skin_preview",
-                        *///?}
+                        () -> "totemdoll_skin_preview",
+                        //?}
                         NativeImage.read(input)
                 );
 
                 //? >= 1.21.4 {
-                /*previewTexture = DollMinecraftResourceUtil.nativeId(
+                previewTexture = DollMinecraftResourceUtil.nativeId(
                         DollResourceId.of("totemdoll", "dynamic/skin_preview"));
                 this.minecraft.getTextureManager().register(previewTexture, texture);
-                *///?} else {
-                previewTexture = this.minecraft.getTextureManager().register(
+                //?} else {
+                /*previewTexture = this.minecraft.getTextureManager().register(
                         "totemdoll_skin_preview",
                         texture
                 );
-                //?}
+                *///?}
             }
             if (nameBox.getValue().isBlank()) {
                 String fileName = selected.getFileName().toString();
@@ -164,7 +158,7 @@ public final class DollCreateScreen extends Screen {
                     : parent;
             TotemDollClient.reloadGeneratedStyles().thenRun(() -> this.minecraft.execute(() -> {
                 TotemDollConfig.select(createdId);
-                this.minecraft.setScreen(new DollSelectionScreen(rootParent, DollSelectionScreen.Tab.MY_STYLES));
+                DollScreenAdapter.setScreen(this.minecraft, new DollSelectionScreen(rootParent, DollSelectionScreen.Tab.MY_STYLES));
             }));
         } catch (IOException exception) {
             status = Component.translatable("screen.totemdoll.import_failed", exception.getMessage());
@@ -174,7 +168,7 @@ public final class DollCreateScreen extends Screen {
     @Override
     public void onClose() {
         releasePreviewTexture();
-        this.minecraft.setScreen(parent);
+        DollScreenAdapter.setScreen(this.minecraft, parent);
     }
 
     @Override
@@ -191,19 +185,18 @@ public final class DollCreateScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        this.renderTransparentBackground(graphics);
-        graphics.drawCenteredString(this.font, this.title, this.width / 2, 20, 0xFFFFFFFF);
-        graphics.drawCenteredString(
+    protected void renderContent(DollGuiGraphics gui, int mouseX, int mouseY, float partialTick) {
+        gui.centeredText(this.font, this.title, this.width / 2, 20, 0xFFFFFFFF);
+        gui.centeredText(
                 this.font,
                 Component.translatable("screen.totemdoll.from_template", template.label()),
                 this.width / 2,
                 38,
                 0xFFA0A0A0
         );
-        DollGuiPreview.render(graphics, template, this.width / 2 - 28, 46, 56, 56, 51.2F);
-        graphics.drawString(this.font, Component.translatable("screen.totemdoll.name"), this.width / 2 - 110, 100, 0xFFFFFFFF);
-        graphics.drawCenteredString(
+        DollGuiPreview.render(gui, template, this.width / 2 - 28, 46, 56, 56, 51.2F);
+        gui.text(this.font, Component.translatable("screen.totemdoll.name"), this.width / 2 - 110, 100, 0xFFFFFFFF);
+        gui.centeredText(
                 this.font,
                 skinPath == null
                         ? Component.translatable("screen.totemdoll.no_skin")
@@ -212,7 +205,7 @@ public final class DollCreateScreen extends Screen {
                 172,
                 skinPath == null ? 0xFFA0A0A0 : 0xFF80C080
         );
-        graphics.drawCenteredString(
+        gui.centeredText(
                 this.font,
                 Component.translatable("screen.totemdoll.skin_format_hint"),
                 this.width / 2,
@@ -222,14 +215,9 @@ public final class DollCreateScreen extends Screen {
         if (previewTexture != null) {
             int previewX = Math.min(this.width - 72, this.width / 2 + 140);
             int previewCenter = previewX + 32;
-            graphics.blit(
-                    //? >= 1.21.6 {
-                    /*RenderPipelines.GUI_TEXTURED,
-                    *///?} else if >= 1.21.3 {
-                    /*RenderType::guiTextured,*/
-                    //?}
+            gui.blitTexture(
                     previewTexture, previewX, 104, 0, 0, 64, 64, 64, 64);
-            graphics.drawCenteredString(
+            gui.centeredText(
                     this.font,
                     Component.translatable("screen.totemdoll.skin_preview"),
                     previewCenter,
@@ -238,8 +226,8 @@ public final class DollCreateScreen extends Screen {
             );
         }
         if (status != null) {
-            graphics.drawCenteredString(this.font, status, this.width / 2, this.height - 70, 0xFFFF8080);
+            gui.centeredText(this.font, status, this.width / 2, this.height - 70, 0xFFFF8080);
         }
-        DollScreenRender.renderChildren(this, graphics, mouseX, mouseY, partialTick);
+        renderChildren(mouseX, mouseY, partialTick);
     }
 }

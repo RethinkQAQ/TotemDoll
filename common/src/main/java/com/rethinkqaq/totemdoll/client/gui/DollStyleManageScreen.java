@@ -20,12 +20,12 @@
 
 package com.rethinkqaq.totemdoll.client.gui;
 
+import com.rethinkqaq.totemdoll.utils.DollGuiGraphics;
 import com.rethinkqaq.totemdoll.client.TotemDollClient;
 import com.rethinkqaq.totemdoll.config.TotemDollConfig;
 import com.rethinkqaq.totemdoll.doll.DollLocalStyleStore;
 import com.rethinkqaq.totemdoll.doll.DollStyle;
 import com.rethinkqaq.totemdoll.doll.DollStyles;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.ConfirmScreen;
@@ -33,7 +33,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.lwjgl.util.tinyfd.TinyFileDialogs;
 
-public final class DollStyleManageScreen extends Screen implements DollScreenParent {
+public final class DollStyleManageScreen extends DollScreen implements DollScreenParent {
 
     private final Screen parent;
     private final DollStyle style;
@@ -84,12 +84,12 @@ public final class DollStyleManageScreen extends Screen implements DollScreenPar
     }
 
     private void confirmDelete() {
-        this.minecraft.setScreen(new ConfirmScreen(
+        DollScreenAdapter.setScreen(this.minecraft, new ConfirmScreen(
                 confirmed -> {
                     if (confirmed) {
                         delete();
                     } else {
-                        this.minecraft.setScreen(this);
+                        DollScreenAdapter.setScreen(this.minecraft, this);
                     }
                 },
                 Component.translatable("screen.totemdoll.delete_confirm_title"),
@@ -100,7 +100,7 @@ public final class DollStyleManageScreen extends Screen implements DollScreenPar
     private void delete() {
         if (!DollLocalStyleStore.delete(style)) {
             status = Component.translatable("screen.totemdoll.delete_failed");
-            this.minecraft.setScreen(this);
+            DollScreenAdapter.setScreen(this.minecraft, this);
             return;
         }
         TotemDollConfig.select(DollStyles.ALEX_ID);
@@ -109,7 +109,7 @@ public final class DollStyleManageScreen extends Screen implements DollScreenPar
 
     private void createFromStyle() {
         if (style.templateId() != null) {
-            this.minecraft.setScreen(new DollCreateScreen(this, DollStyles.get(style.templateId())));
+            DollScreenAdapter.setScreen(this.minecraft, new DollCreateScreen(this, DollStyles.get(style.templateId())));
         }
     }
 
@@ -124,7 +124,7 @@ public final class DollStyleManageScreen extends Screen implements DollScreenPar
         status = Component.translatable("screen.totemdoll.loading");
         Screen rootParent = rootParent();
         TotemDollClient.reloadGeneratedStyles().thenRun(() -> this.minecraft.execute(() ->
-                this.minecraft.setScreen(new DollSelectionScreen(rootParent, DollSelectionScreen.Tab.MY_STYLES))
+                DollScreenAdapter.setScreen(this.minecraft, new DollSelectionScreen(rootParent, DollSelectionScreen.Tab.MY_STYLES))
         ));
     }
 
@@ -135,18 +135,17 @@ public final class DollStyleManageScreen extends Screen implements DollScreenPar
 
     @Override
     public void onClose() {
-        this.minecraft.setScreen(parent);
+        DollScreenAdapter.setScreen(this.minecraft, parent);
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        this.renderTransparentBackground(graphics);
-        graphics.drawCenteredString(this.font, this.title, this.width / 2, 22, 0xFFFFFFFF);
-        graphics.drawCenteredString(this.font, style.label(), this.width / 2, 44, 0xFFA0A0A0);
-        DollGuiPreview.render(graphics, style, this.width / 2 - 24, 48, 48, 48, 44.8F);
+    protected void renderContent(DollGuiGraphics gui, int mouseX, int mouseY, float partialTick) {
+        gui.centeredText(this.font, this.title, this.width / 2, 22, 0xFFFFFFFF);
+        gui.centeredText(this.font, style.label(), this.width / 2, 44, 0xFFA0A0A0);
+        DollGuiPreview.render(gui, style, this.width / 2 - 24, 48, 48, 48, 44.8F);
         if (status != null) {
-            graphics.drawCenteredString(this.font, status, this.width / 2, this.height - 64, 0xFFFF8080);
+            gui.centeredText(this.font, status, this.width / 2, this.height - 64, 0xFFFF8080);
         }
-        DollScreenRender.renderChildren(this, graphics, mouseX, mouseY, partialTick);
+        renderChildren(mouseX, mouseY, partialTick);
     }
 }

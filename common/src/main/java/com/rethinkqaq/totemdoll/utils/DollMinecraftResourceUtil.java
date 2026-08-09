@@ -21,17 +21,17 @@
 package com.rethinkqaq.totemdoll.utils;
 
 //? >= 1.21.11 {
-/*import net.minecraft.resources.Identifier;
-*///? } else {
-import net.minecraft.resources.ResourceLocation;
-//? }
+import net.minecraft.resources.Identifier;
+//?} else {
+/*import net.minecraft.resources.ResourceLocation;
+*///?}
 
 public final class DollMinecraftResourceUtil {
     private DollMinecraftResourceUtil() {
     }
 
     //? >= 1.21.11 {
-    /*public static Identifier nativeId(DollResourceId id) {
+    public static Identifier nativeId(DollResourceId id) {
         return Identifier.fromNamespaceAndPath(id.namespace(), id.path());
     }
 
@@ -50,8 +50,8 @@ public final class DollMinecraftResourceUtil {
     public static Identifier resolve(Identifier source, String relative) {
         return nativeId(DollResourceId.resolve(fromNative(source), relative));
     }
-    *///? } else {
-    public static ResourceLocation nativeId(DollResourceId id) {
+    //?} else {
+    /*public static ResourceLocation nativeId(DollResourceId id) {
         return ResourceLocation.fromNamespaceAndPath(id.namespace(), id.path());
     }
 
@@ -70,7 +70,7 @@ public final class DollMinecraftResourceUtil {
     public static ResourceLocation resolve(ResourceLocation source, String relative) {
         return nativeId(DollResourceId.resolve(fromNative(source), relative));
     }
-    //?}
+    *///?}
 
     public static DollResourceId parse(String value) {
         return DollResourceId.parse(value);

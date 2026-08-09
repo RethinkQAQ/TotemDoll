@@ -22,10 +22,11 @@ package com.rethinkqaq.totemdoll;
 
 import com.rethinkqaq.totemdoll.client.TotemDollClient;
 //? >= 1.21.6 {
-/*import com.rethinkqaq.totemdoll.client.gui.DollGuiPreviewRenderer;
+import com.rethinkqaq.totemdoll.client.gui.DollGuiPreviewRenderer;
 import com.rethinkqaq.totemdoll.client.gui.DollGuiPreviewRenderState;
-*///?}
+//?}
 import com.rethinkqaq.totemdoll.client.gui.DollSelectionScreen;
+import com.rethinkqaq.totemdoll.client.gui.DollScreenAdapter;
 import com.rethinkqaq.totemdoll.doll.DollStyleLoader;
 import com.rethinkqaq.totemdoll.doll.DollAnimationManager;
 import com.rethinkqaq.totemdoll.utils.DollMinecraftResourceUtil;
@@ -41,8 +42,8 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 //? >= 1.21.6 {
-/*import net.neoforged.neoforge.client.event.RegisterPictureInPictureRenderersEvent;
-*///?}
+import net.neoforged.neoforge.client.event.RegisterPictureInPictureRenderersEvent;
+//?}
 import net.neoforged.neoforge.common.NeoForge;
 import org.lwjgl.glfw.GLFW;
 
@@ -54,27 +55,27 @@ public class TotemDollMod {
             InputConstants.Type.KEYSYM,
             GLFW.GLFW_KEY_F9,
 //? >= 1.21.10 {
-            /*KeyMapping.Category.register(DollMinecraftResourceUtil.nativeId(
+            KeyMapping.Category.register(DollMinecraftResourceUtil.nativeId(
                     DollResourceId.ofVanilla("totemdoll")))
-            *///?} else {
-            "key.categories.totemdoll"
-            //?}
+            //?} else {
+            /*"key.categories.totemdoll"
+            *///?}
     );
 
     public TotemDollMod(IEventBus eventBus) {
         CommonClass.init();
         if (
 //? >= 1.21.10 {
-                /*FMLEnvironment.getDist().isClient()
-                *///?} else {
-                FMLEnvironment.dist.isClient()
-                //?}
+                FMLEnvironment.getDist().isClient()
+                //?} else {
+                /*FMLEnvironment.dist.isClient()
+                *///?}
         ) {
             eventBus.addListener(this::registerAdditionalModels);
             eventBus.addListener(this::registerKeyMappings);
             //? >= 1.21.6 {
-            /*eventBus.addListener(this::registerPictureInPictureRenderer);
-            *///?}
+            eventBus.addListener(this::registerPictureInPictureRenderer);
+            //?}
             NeoForge.EVENT_BUS.addListener(this::onClientTick);
             TotemDollClient.init(FMLPaths.CONFIGDIR.get(), FMLPaths.GAMEDIR.get());
         }
@@ -82,10 +83,10 @@ public class TotemDollMod {
 
     private void registerAdditionalModels(
             //? >= 1.21.5 {
-            /*ModelEvent.RegisterStandalone event
-            *///?} else {
-            ModelEvent.RegisterAdditional event
-            //?}
+            ModelEvent.RegisterStandalone event
+            //?} else {
+            /*ModelEvent.RegisterAdditional event
+            *///?}
     ) {
         DollStyleLoader.reload(Minecraft.getInstance().getResourceManager());
     }
@@ -95,17 +96,17 @@ public class TotemDollMod {
     }
 
     //? >= 1.21.6 {
-    /*private void registerPictureInPictureRenderer(RegisterPictureInPictureRenderersEvent event) {
+    private void registerPictureInPictureRenderer(RegisterPictureInPictureRenderersEvent event) {
         event.register(DollGuiPreviewRenderState.class, DollGuiPreviewRenderer::new);
     }
-    *///?}
+    //?}
 
     private void onClientTick(ClientTickEvent.Post event) {
         DollAnimationManager.tick();
         TotemDollClient.reloadInitialStylesIfReady();
         while (OPEN_CONFIG.consumeClick()) {
             Minecraft client = Minecraft.getInstance();
-            client.setScreen(new DollSelectionScreen(client.screen));
+            DollScreenAdapter.setScreen(client, new DollSelectionScreen(DollScreenAdapter.currentScreen(client)));
         }
     }
 }

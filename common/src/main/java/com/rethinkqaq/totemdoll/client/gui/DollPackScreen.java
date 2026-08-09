@@ -20,10 +20,10 @@
 
 package com.rethinkqaq.totemdoll.client.gui;
 
+import com.rethinkqaq.totemdoll.utils.DollGuiGraphics;
 import com.rethinkqaq.totemdoll.client.TotemDollClient;
 import com.rethinkqaq.totemdoll.doll.DollLocalStyleStore;
 import com.rethinkqaq.totemdoll.Constants;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -31,7 +31,7 @@ import net.minecraft.network.chat.Component;
 import org.lwjgl.util.tinyfd.TinyFileDialogs;
 import java.nio.file.Path;
 
-public final class DollPackScreen extends Screen implements DollScreenParent {
+public final class DollPackScreen extends DollScreen implements DollScreenParent {
     private final Screen parent;
     private Component status;
     public DollPackScreen(Screen parent) { super(Component.translatable("screen.totemdoll.pack_title")); this.parent = parent; }
@@ -44,7 +44,7 @@ public final class DollPackScreen extends Screen implements DollScreenParent {
         try {
             DollLocalStyleStore.importZip(Path.of(file));
             TotemDollClient.reloadGeneratedStyles().thenRun(() -> Minecraft.getInstance().execute(() ->
-                    Minecraft.getInstance().setScreen(new DollSelectionScreen(parent, DollSelectionScreen.Tab.TEMPLATES))));
+                    DollScreenAdapter.setScreen(Minecraft.getInstance(), new DollSelectionScreen(parent, DollSelectionScreen.Tab.TEMPLATES))));
         } catch (Exception exception) {
             Constants.LOG.warn("Could not import style pack {}", file, exception);
         }
@@ -56,10 +56,10 @@ public final class DollPackScreen extends Screen implements DollScreenParent {
     }
     private void chooseZip() { String file = TinyFileDialogs.tinyfd_openFileDialog(title.getString(), "", null, "ZIP style pack", false); if (file != null) importPack(Path.of(file), true); }
     private void importPack(Path path, boolean zip) {
-        try { DollLocalStyleStore.importZip(path); status = Component.translatable("screen.totemdoll.import_success"); TotemDollClient.reloadGeneratedStyles().thenRun(() -> minecraft.execute(() -> minecraft.setScreen(new DollSelectionScreen(parent, DollSelectionScreen.Tab.TEMPLATES)))); }
+        try { DollLocalStyleStore.importZip(path); status = Component.translatable("screen.totemdoll.import_success"); TotemDollClient.reloadGeneratedStyles().thenRun(() -> minecraft.execute(() -> DollScreenAdapter.setScreen(minecraft, new DollSelectionScreen(parent, DollSelectionScreen.Tab.TEMPLATES)))); }
         catch (Exception exception) { status = Component.translatable("screen.totemdoll.pack_import_failed", exception.getMessage()); }
     }
-    @Override public void onClose() { minecraft.setScreen(parent); }
+    @Override public void onClose() { DollScreenAdapter.setScreen(minecraft, parent); }
     @Override public Screen rootParent() { return parent instanceof DollScreenParent p ? p.rootParent() : parent; }
-    @Override public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) { renderTransparentBackground(graphics); graphics.drawCenteredString(font, title, width / 2, 22, 0xFFFFFFFF); graphics.drawCenteredString(font, Component.translatable("screen.totemdoll.import_hint"), width / 2, 84, 0xFFA0A0A0); if (status != null) graphics.drawCenteredString(font, status, width / 2, height - 54, 0xFFE0C070); DollScreenRender.renderChildren(this, graphics, mouseX, mouseY, partialTick); }
+    @Override protected void renderContent(DollGuiGraphics graphics, int mouseX, int mouseY, float partialTick) { graphics.centeredText(font, title, width / 2, 22, 0xFFFFFFFF); graphics.centeredText(font, Component.translatable("screen.totemdoll.import_hint"), width / 2, 84, 0xFFA0A0A0); if (status != null) graphics.centeredText(font, status, width / 2, height - 54, 0xFFE0C070); renderChildren(mouseX, mouseY, partialTick); }
 }
