@@ -15,31 +15,46 @@ pluginManagement {
 
 plugins {
     id("dev.kikugie.stonecutter") version "0.7.11"
-    id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
-fun enabledVersions(property: String) = providers.gradleProperty(property).orNull
-    ?.split(',')?.map(String::trim)?.filter(String::isNotEmpty).orEmpty()
+val supportedVersions = providers.gradleProperty("stonecutter_enabled_versions")
+    .get().split(",").map(String::trim).filter(String::isNotEmpty)
 
-val commonVersions = enabledVersions("stonecutter_enabled_common_versions")
-val fabricVersions = enabledVersions("stonecutter_enabled_fabric_versions")
-val neoForgeVersions = enabledVersions("stonecutter_enabled_neoforge_versions")
-val distributions = linkedMapOf(
-    "common" to commonVersions,
-    "fabric" to fabricVersions,
-    "neoforge" to neoForgeVersions
+fun enabledPlatforms(version: String): Set<String> {
+    val properties = java.util.Properties()
+    val propertiesFile = file("versions/$version/gradle.properties")
+    check(propertiesFile.isFile) {
+        "Missing version properties file: ${propertiesFile.path}"
+    }
+    propertiesFile.inputStream().use(properties::load)
+    return properties.getProperty("enable_platforms")
+        ?.split(",")
+        ?.map(String::trim)
+        ?.filter(String::isNotEmpty)
+        ?.toSet()
+        ?: error("Version $version is missing enable_platforms in ${propertiesFile.path}")
+}
+
+val platformVersions = mapOf(
+    "fabric" to supportedVersions.filter { "fabric" in enabledPlatforms(it) },
+    "neoforge" to supportedVersions.filter { "neoforge" in enabledPlatforms(it) }
 )
-val allVersions = distributions.values.flatten().distinct()
 
 stonecutter {
     kotlinController = true
     centralScript = "build.gradle.kts"
 
     create(rootProject) {
-        versions(*allVersions.toTypedArray())
-        distributions.forEach { (branchName, branchVersions) ->
+        versions(*supportedVersions.toTypedArray())
+
+        branch("common") {
+            versions(*supportedVersions.toTypedArray())
+        }
+
+        platformVersions.forEach { (branchName, versions) ->
             branch(branchName) {
-                versions(*branchVersions.toTypedArray())
+                versions(*versions.toTypedArray())
             }
         }
     }

@@ -1,6 +1,6 @@
 plugins {
     id("multiloader-loader")
-    id("fabric-loom") version "1.17-SNAPSHOT"
+    id("fabric-loom-compat")
     id("com.github.hierynomus.license") version "0.16.1"
 }
 
@@ -8,10 +8,12 @@ apply(from = rootProject.file("license.gradle"))
 
 dependencies {
     minecraft("com.mojang:minecraft:${commonMod.mc}")
-    mappings(loom.layered {
-        officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-${commonMod.mc}:${commonMod.dep("parchment")}@zip")
-    })
+    if (stonecutter.eval(commonMod.mc, "<=1.21.11")) {
+        mappings(loom.layered {
+            officialMojangMappings()
+            parchment("org.parchmentmc.data:parchment-${commonMod.mc}:${commonMod.dep("parchment")}@zip")
+        })
+    }
     modImplementation("net.fabricmc:fabric-loader:${commonMod.dep("fabric-loader")}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${commonMod.dep("fabric-api")}+${commonMod.mc}")
     modImplementation("com.terraformersmc:modmenu:${commonMod.dep("modmenu")}")

@@ -8,9 +8,11 @@ apply(from = rootProject.file("license.gradle"))
 
 neoForge {
     version = commonMod.dep("neoforge")
-    parchment {
-        minecraftVersion = commonMod.mc
-        mappingsVersion = commonMod.dep("parchment")
+    if (stonecutter.eval(commonMod.mc, "<=1.21.11")) {
+        parchment {
+            minecraftVersion = commonMod.mc
+            mappingsVersion = commonMod.dep("parchment")
+        }
     }
     runs {
         register("client") {
