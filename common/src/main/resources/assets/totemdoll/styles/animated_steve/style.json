@@ -31,12 +31,22 @@
                        "screen_wave":  {
                                            "animation":  "screen_wave",
                                            "trigger":  "on_screen_open",
-                                           "priority":  60
+                                           "priority":  60,
+                                           "interrupt":  true
                                        },
                        "totem_struggle":  {
                                               "animation":  "struggle",
                                               "trigger":  "on_totem_activate",
                                               "priority":  100
+                                          },
+                       "furtive":  {
+                                         "animation":  "furtive",
+                                         "trigger":  "random_idle",
+                                         "priority":  30,
+                                         "interval":  {
+                                                          "min":  240,
+                                                          "max":  400
+                                                      }
                                           }
                    }
 }

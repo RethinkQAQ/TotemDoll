@@ -39,4 +39,6 @@ public record DollAnimationDefinition(
                 || "on_totem_activate".equals(trigger)
                 || "manual".equals(trigger);
     }
+
+    public boolean isLinked() { return "linked".equals(trigger); }
 }

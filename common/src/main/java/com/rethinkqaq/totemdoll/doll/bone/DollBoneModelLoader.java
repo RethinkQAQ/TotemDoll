@@ -24,6 +24,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.rethinkqaq.totemdoll.Constants;
 import com.rethinkqaq.totemdoll.utils.DollResourceId;
 import com.rethinkqaq.totemdoll.utils.DollMinecraftResourceUtil;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -203,7 +204,28 @@ public final class DollBoneModelLoader {
             JsonObject interval = declaration.getAsJsonObject("interval");
             int min = interval == null ? 80 : integer(interval, "min", 80);
             int max = interval == null ? 180 : integer(interval, "max", 180);
-            result.add(new DollActionBinding(id, animation, trigger, priority, min, Math.max(min, max)));
+            boolean interrupt = "on_totem_activate".equals(trigger);
+            if (declaration.has("interrupt") && declaration.get("interrupt").isJsonPrimitive()) {
+                interrupt = declaration.get("interrupt").getAsBoolean();
+            }
+            String textureAnimation = null;
+            if (declaration.has("texture_animation")
+                    && declaration.get("texture_animation").isJsonPrimitive()) {
+                String candidate = declaration.get("texture_animation").getAsString();
+                JsonObject textureAnimations = style.getAsJsonObject("texture_animations");
+                JsonElement textureElement = textureAnimations == null
+                        ? null : textureAnimations.get(candidate);
+                JsonElement textureTrigger = textureElement != null && textureElement.isJsonObject()
+                        ? textureElement.getAsJsonObject().get("trigger") : null;
+                if (textureTrigger != null && textureTrigger.isJsonPrimitive()
+                        && "linked".equals(textureTrigger.getAsString())) {
+                    textureAnimation = candidate;
+                } else {
+                    Constants.LOG.warn("Ignoring invalid linked texture animation {} for action {}", candidate, id);
+                }
+            }
+            result.add(new DollActionBinding(id, animation, trigger, priority, min,
+                    Math.max(min, max), textureAnimation, interrupt));
         }
         return result;
     }

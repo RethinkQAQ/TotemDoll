@@ -20,6 +20,7 @@
 
 package com.rethinkqaq.totemdoll.doll.bone;
 
+import com.rethinkqaq.totemdoll.doll.DollAnimationManager;
 import com.rethinkqaq.totemdoll.doll.DollStyle;
 import com.rethinkqaq.totemdoll.utils.DollResourceId;
 
@@ -42,20 +43,20 @@ public final class DollBoneActionManager {
         DollActionBinding selected = model.bindings().stream()
                 .filter(binding -> binding.trigger().equals(trigger))
                 .max(java.util.Comparator.comparingInt(DollActionBinding::priority)).orElse(null);
-        if (selected != null) state(style.id(), model).start(selected);
+        if (selected != null) state(style, model).request(selected);
     }
 
     public static synchronized void triggerAnimation(DollStyle style, String id) {
         DollBoneModel model = DollBoneModels.get(style.id());
         if (model == null) return;
         model.bindings().stream().filter(binding -> binding.id().equals(id)).findFirst()
-                .ifPresent(binding -> state(style.id(), model).start(binding));
+                .ifPresent(binding -> state(style, model).request(binding));
     }
 
     public static synchronized BonePose pose(DollStyle style, String bone, float partialTick) {
         DollBoneModel model = DollBoneModels.get(style.id());
         if (model == null) return BonePose.IDENTITY;
-        State state = state(style.id(), model);
+        State state = state(style, model);
         if (state.active == null) return BonePose.IDENTITY;
         DollBoneAnimation animation = model.animations().get(state.active.animation());
         if (animation == null) return BonePose.IDENTITY;
@@ -66,33 +67,44 @@ public final class DollBoneActionManager {
     public static synchronized void reset(DollStyle style) { STATES.remove(style.id()); }
     public static synchronized void clear() { STATES.clear(); }
 
-    private static State state(DollResourceId id, DollBoneModel model) {
-        return STATES.computeIfAbsent(id, ignored -> new State(model));
+    private static State state(DollStyle style, DollBoneModel model) {
+        return STATES.computeIfAbsent(style.id(), ignored -> new State(style, model));
     }
 
     private static final class State {
+        private final DollStyle style;
         private final DollBoneModel model;
         private DollActionBinding active;
+        private DollActionBinding pending;
         private int time;
         private int randomWait;
         private int eventTicksRemaining;
 
-        private State(DollBoneModel model) {
+        private State(DollStyle style, DollBoneModel model) {
+            this.style = style;
             this.model = model;
             scheduleRandom();
             model.bindings().stream().filter(binding -> "loop".equals(binding.trigger()))
-                    .max(java.util.Comparator.comparingInt(DollActionBinding::priority)).ifPresent(this::start);
+                    .max(java.util.Comparator.comparingInt(DollActionBinding::priority)).ifPresent(this::startNow);
         }
 
         private void tick() {
             if (active == null) {
-                DollActionBinding random = model.bindings().stream()
-                        .filter(binding -> "random_idle".equals(binding.trigger())).findFirst().orElse(null);
-                if (random != null && --randomWait <= 0) start(random);
+                if (pending != null) {
+                    DollActionBinding next = pending;
+                    pending = null;
+                    startNow(next);
+                } else {
+                    tryStartRandomIdle();
+                }
                 return;
             }
             DollBoneAnimation animation = model.animations().get(active.animation());
-            if (animation == null) { active = null; return; }
+            if (animation == null) {
+                finishAction();
+                return;
+            }
+            if ("loop".equals(active.trigger())) tickRandomWait();
             time++;
             if (eventTicksRemaining > 0) eventTicksRemaining--;
             if (time < animation.length()) return;
@@ -105,23 +117,76 @@ public final class DollBoneActionManager {
             // triggers are allowed to repeat indefinitely.
             if ("loop".equals(active.trigger()) ||
                     (animation.loop() && "random_idle".equals(active.trigger()))) {
+                if (pending != null) {
+                    DollActionBinding next = pending;
+                    pending = null;
+                    scheduleRandom();
+                    startNow(next);
+                    return;
+                }
+                if (tryStartRandomIdle()) return;
                 time = 0;
                 return;
             }
-            active = null;
-            time = 0;
-            eventTicksRemaining = 0;
-            scheduleRandom();
-            model.bindings().stream().filter(binding -> "loop".equals(binding.trigger()))
-                    .max(java.util.Comparator.comparingInt(DollActionBinding::priority)).ifPresent(this::start);
+            finishAction();
         }
 
-        private void start(DollActionBinding binding) {
-            if (active != null && active.priority() > binding.priority()) return;
+        private void request(DollActionBinding binding) {
+            if (binding.interrupt()) {
+                pending = null;
+                startNow(binding);
+                return;
+            }
+            if (active == null) {
+                startNow(binding);
+                return;
+            }
+            if (pending == null || binding.priority() > pending.priority()) pending = binding;
+        }
+
+        private void startNow(DollActionBinding binding) {
+            stopLinkedTexture();
             active = binding;
             time = 0;
             eventTicksRemaining = "on_totem_activate".equals(binding.trigger())
                     ? TOTEM_ACTIVATION_DURATION : 0;
+            DollBoneAnimation animation = model.animations().get(binding.animation());
+            DollAnimationManager.startLinkedTexture(style, binding.textureAnimation(),
+                    "loop".equals(binding.trigger()) || (animation != null && animation.loop()));
+        }
+
+        private boolean tryStartRandomIdle() {
+            DollActionBinding random = model.bindings().stream()
+                    .filter(binding -> "random_idle".equals(binding.trigger())).findFirst().orElse(null);
+            if (random == null || randomWait > 0) return false;
+            startNow(random);
+            return true;
+        }
+
+        private void tickRandomWait() {
+            if (randomWait > 0) randomWait--;
+        }
+
+        private void finishAction() {
+            stopLinkedTexture();
+            active = null;
+            time = 0;
+            eventTicksRemaining = 0;
+            scheduleRandom();
+            if (pending != null) {
+                DollActionBinding next = pending;
+                pending = null;
+                startNow(next);
+                return;
+            }
+            model.bindings().stream().filter(binding -> "loop".equals(binding.trigger()))
+                    .max(java.util.Comparator.comparingInt(DollActionBinding::priority)).ifPresent(this::startNow);
+        }
+
+        private void stopLinkedTexture() {
+            if (active != null) {
+                DollAnimationManager.stopLinkedTexture(style, active.textureAnimation());
+            }
         }
 
         private void scheduleRandom() {

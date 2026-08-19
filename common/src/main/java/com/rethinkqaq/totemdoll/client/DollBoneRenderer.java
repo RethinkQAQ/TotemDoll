@@ -188,9 +188,12 @@ public final class DollBoneRenderer {
                 && style.textures().containsKey("activate")) {
             return style.textures().get("activate");
         }
-        if (style.hasDynamicTextures() && !style.animations().isEmpty()) {
-            DollAnimationDefinition animation = style.animations().get(0);
-            int frame = DollAnimationManager.currentFrame(style, animation.id());
+        if (style.hasDynamicTextures()) {
+            DollAnimationDefinition animation = DollAnimationManager.activeTextureAnimation(style);
+            if (animation == null) return texture;
+            int frame = animation.isLinked()
+                    ? DollAnimationManager.currentLinkedFrame(style, animation.id())
+                    : DollAnimationManager.currentFrame(style, animation.id());
             if (frame >= 0 && frame < animation.frames().size()) {
                 return style.textures().getOrDefault(animation.frames().get(frame), texture);
             }

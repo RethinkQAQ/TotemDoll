@@ -149,7 +149,8 @@ public final class DollStyleLoader {
                         || "loop".equals(trigger)
                         || "on_screen_open".equals(trigger)
                         || "on_totem_activate".equals(trigger)
-                        || "manual".equals(trigger);
+                        || "manual".equals(trigger)
+                        || "linked".equals(trigger);
                 if (duration <= 0 || min < 0 || max < min || !supportedTrigger) continue;
                 result.add(new DollAnimationDefinition(id, List.copyOf(frames), duration, trigger, min, max));
             } catch (Exception ignored) { }

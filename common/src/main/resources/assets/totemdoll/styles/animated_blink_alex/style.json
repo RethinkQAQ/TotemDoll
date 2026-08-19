@@ -14,14 +14,16 @@
                      "open":  "textures/open.png",
                      "half":  "textures/half.png",
                      "close":  "textures/close.png",
-                     "activate":  "textures/activate.png"
+                     "activate":  "textures/activate.png",
+                     "alex_left":  "textures/alex_left.png",
+                     "alex_right":  "textures/alex_right.png"
                  },
     "features":  {
                      "animations":  true,
                      "dynamic_textures":  true
                  },
     "texture_animations":  {
-                               "blink":  {
+                                         "blink":  {
                                              "type":  "frame_sequence",
                                              "frames":  [
                                                             "open",
@@ -35,8 +37,17 @@
                                              "interval":  {
                                                               "min":  80,
                                                               "max":  180
-                                                          }
-                                         }
+                                                         }
+                                         },
+                               "furtive_texture":  {
+                                                          "type":  "frame_sequence",
+                                                          "frames":  [
+                                                                         "alex_left",
+                                                                         "alex_right"
+                                                                     ],
+                                                          "frame_duration":  25,
+                                                          "trigger":  "linked"
+                                                      }
                            },
     "animations":  {
                        "idle_head_shake":  {
@@ -47,12 +58,23 @@
                        "screen_wave":  {
                                            "animation":  "screen_wave",
                                            "trigger":  "on_screen_open",
-                                           "priority":  60
+                                           "priority":  60,
+                                           "interrupt":  true
                                        },
                        "totem_struggle":  {
                                               "animation":  "struggle",
                                               "trigger":  "on_totem_activate",
                                               "priority":  100
+                                          },
+                       "furtive":  {
+                                         "animation":  "furtive",
+                                         "trigger":  "random_idle",
+                                         "priority":  30,
+                                         "interval":  {
+                                                          "min":  240,
+                                                          "max":  400
+                                                      },
+                                         "texture_animation":  "furtive_texture"
                                           }
                    }
 }
