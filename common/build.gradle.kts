@@ -22,13 +22,17 @@ dependencies {
             parchment("org.parchmentmc.data:parchment-${commonMod.mc}:${commonMod.dep("parchment")}@zip")
         })
     }
-    compileOnly("org.spongepowered:mixin:0.8.5")
-    compileOnly("io.github.llamalad7:mixinextras-common:0.3.5")
-    annotationProcessor("io.github.llamalad7:mixinextras-common:0.3.5")
 }
 
-loom {
-    mixin { defaultRefmapName.set("${commonMod.id}.refmap.json") }
+configureTotemDollMixinSupport(TotemDollMixinTarget.COMMON)
+
+if (!commonMod.unobfuscated) {
+    loom {
+        mixin {
+            useLegacyMixinAp.set(true)
+            defaultRefmapName.set("${commonMod.id}.refmap.json")
+        }
+    }
 }
 
 val commonJava: Configuration by configurations.creating {

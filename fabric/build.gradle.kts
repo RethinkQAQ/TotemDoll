@@ -19,8 +19,18 @@ dependencies {
     modImplementation("com.terraformersmc:modmenu:${commonMod.dep("modmenu")}")
 }
 
+configureTotemDollMixinSupport(TotemDollMixinTarget.FABRIC)
+
+if (!commonMod.unobfuscated) {
+    loom {
+        mixin {
+            useLegacyMixinAp.set(true)
+            defaultRefmapName.set("${commonMod.id}.refmap.json")
+        }
+    }
+}
+
 loom {
-    mixin { defaultRefmapName.set("${commonMod.id}.refmap.json") }
     runs {
         named("client") {
             client()

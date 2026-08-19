@@ -7,8 +7,7 @@ issueTrackerURL="https://github.com/${modGitHub}/issues"
 modId="${modId}"
 version="${modVersion}"
 displayName="${modName}"
-logoFile="itemdoll.png"
-logoBlur=false
+iconFile="itemdoll.png"
 authors="${modAuthor}"
 description='''${modDescription}'''
 

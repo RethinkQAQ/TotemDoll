@@ -6,6 +6,8 @@ plugins {
 
 apply(from = rootProject.file("license.gradle"))
 
+configureTotemDollMixinSupport(TotemDollMixinTarget.NEOFORGE)
+
 neoForge {
     version = commonMod.dep("neoforge")
     if (stonecutter.eval(commonMod.mc, "<=1.21.11")) {
