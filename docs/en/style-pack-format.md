@@ -51,9 +51,45 @@ Display transforms may be declared in `style.json` or `geometry.json`, with styl
 
 ## Animation
 
-Bone animation files use ticks, degrees, and scale multipliers. Top-level `animations` bind actions to `loop`, `random_idle`, `on_screen_open`, `on_totem_activate`, or `manual` triggers.
+Bone animation files use ticks, degrees, and scale multipliers. One tick is 0.05 seconds. Top-level `animations` bind actions to `loop`, `random_idle`, `on_screen_open`, `on_totem_activate`, or `manual` triggers.
+
+Each action binding may also define:
+
+- `priority`: the action priority used when several bindings share a trigger.
+- `interrupt`: when `true`, immediately interrupts the current action; when `false` or omitted, waits for the current action to finish. An unconfigured `on_totem_activate` action defaults to interrupting immediately.
+- `interval`: the random wait range for `random_idle`, in ticks. The default is 80–180 ticks.
+- `texture_animation`: binds a texture frame animation. The texture starts when the bone action actually starts and stops when the action ends.
+
+For example:
+
+```json
+{
+  "animations": {
+    "screen_wave": {
+      "animation": "screen_wave",
+      "trigger": "on_screen_open",
+      "priority": 60,
+      "interrupt": true
+    },
+    "sneak": {
+      "animation": "sneak",
+      "trigger": "random_idle",
+      "texture_animation": "sneak_texture"
+    }
+  }
+}
+```
 
 Texture sequences use `texture_animations`; frame names must reference logical entries in `textures`. Frame durations and random intervals use ticks.
+
+Texture animations support these triggers:
+
+- `loop`: play continuously.
+- `random_idle`: play independently after a random wait.
+- `on_screen_open`, `on_totem_activate`, `manual`: start from the corresponding event.
+- `linked`: start only through a bone action's `texture_animation` field and never use an independent random timer.
+
+The linked texture follows the bone action's lifetime. If the bone action loops, the linked texture also loops. When independent and linked texture animations coexist, the active linked texture takes precedence.
 
 ## Tooling
 

@@ -14,13 +14,23 @@
     "target": "base",
     "mapping": "minecraft_player"
   },
-  "features": { "animations": true, "dynamic_textures": false },
+  "features": { "animations": true, "dynamic_textures": true },
+  "texture_animations": {
+    "activate_texture": {
+      "type": "frame_sequence",
+      "frames": ["base"],
+      "frame_duration": 20,
+      "trigger": "linked"
+    }
+  },
   "animations": {
     "idle": { "animation": "idle", "trigger": "loop", "priority": 20 },
     "activate": {
       "animation": "totem_activate",
       "trigger": "on_totem_activate",
-      "priority": 100
+      "priority": 100,
+      "interrupt": true,
+      "texture_animation": "activate_texture"
     }
   }
 }

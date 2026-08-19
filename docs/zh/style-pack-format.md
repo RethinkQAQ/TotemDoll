@@ -51,9 +51,45 @@ display 可写在 `style.json` 或 `geometry.json`，style 优先。稳定上下
 
 ## 动画
 
-骨骼动画文件使用 tick、角度和倍率。顶层 `animations` 将动作绑定到 `loop`、`random_idle`、`on_screen_open`、`on_totem_activate` 或 `manual` 触发器。
+骨骼动画文件使用 tick、角度和倍率。1 tick 等于 0.05 秒。顶层 `animations` 将动作绑定到 `loop`、`random_idle`、`on_screen_open`、`on_totem_activate` 或 `manual` 触发器。
+
+每个动作绑定还可以使用：
+
+- `priority`：动作优先级，用于选择同一触发器下的动作。
+- `interrupt`：设为 `true` 时立即打断当前动作；设为 `false` 或省略时等待当前动作播放完毕。未配置的 `on_totem_activate` 默认立即打断。
+- `interval`：`random_idle` 的随机等待区间，单位为 tick，默认值为 80～180。
+- `texture_animation`：绑定一个纹理帧动画。纹理会在骨骼动作真正开始时同步启动，并在动作结束时停止。
+
+例如：
+
+```json
+{
+  "animations": {
+    "screen_wave": {
+      "animation": "screen_wave",
+      "trigger": "on_screen_open",
+      "priority": 60,
+      "interrupt": true
+    },
+    "sneak": {
+      "animation": "sneak",
+      "trigger": "random_idle",
+      "texture_animation": "sneak_texture"
+    }
+  }
+}
+```
 
 纹理帧动画使用 `texture_animations`，帧名称必须引用 `textures` 中的逻辑槽。`frame_duration` 和随机区间都使用 tick。
+
+纹理动画支持以下触发方式：
+
+- `loop`：持续循环播放。
+- `random_idle`：独立随机播放。
+- `on_screen_open`、`on_totem_activate`、`manual`：由对应事件启动。
+- `linked`：只由骨骼动作的 `texture_animation` 字段启动，不使用自己的随机计时器。
+
+联动纹理的播放生命周期跟随骨骼动作；如果骨骼动作循环，联动纹理也会循环。已有独立纹理动画与联动纹理同时存在时，当前联动纹理优先显示。
 
 ## 工具链
 

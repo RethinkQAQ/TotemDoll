@@ -23,7 +23,7 @@ root
 - `style.json`：`format: 3` mesh、纹理和触发规则。
 - `textures/base.png`：模型纹理。
 
-第一版插值支持 `linear`、`step`、`smooth`；触发器支持 `loop`、`random_idle`、`on_screen_open`、`on_totem_activate` 和 `manual`。
+第一版插值支持 `linear`、`step`、`smooth`；骨骼动作触发器支持 `loop`、`random_idle`、`on_screen_open`、`on_totem_activate` 和 `manual`。动作绑定可以用 `interrupt: true` 立即打断当前动作，省略或设为 `false` 时会等待当前动作完成。纹理联动使用 `texture_animation` 指向 `texture_animations` 中 `trigger: "linked"` 的纹理动画。
 
 完整可运行示例位于 `style-template/styles/animated_example/`。
 
