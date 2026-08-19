@@ -23,7 +23,7 @@ package com.rethinkqaq.totemdoll.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 
-//? >= 26.1.2 {
+//? >= 1.21.10 {
 /*import com.rethinkqaq.totemdoll.utils.Dummy;
 *///?} else {
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -45,13 +45,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //? < 1.21.4 {
 import net.minecraft.client.resources.model.BakedModel;
 //?}
-//? < 26.1.2 {
+//? < 1.21.10 {
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 //?}
 
 @Mixin(
-        //? >= 26.1.2 {
+        //? >= 1.21.10 {
         /*Dummy.class
         *///?} else {
         ItemRenderer.class
@@ -59,11 +59,9 @@ import net.minecraft.world.level.Level;
 )
 public abstract class ItemRendererMixin {
 
-    //? < 26.1.2 {
+    //? < 1.21.10 {
     @Inject(
-            //? >= 1.21.10 {
-            /*method = "renderStatic",
-            *///?} else if >= 1.21.5 {
+            //? >= 1.21.5 {
             /*method = "renderStatic(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemDisplayContext;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/world/level/Level;III)V",
             *///?} else if >= 1.21.4 {
             /*method = "renderStatic(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemDisplayContext;ZLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/world/level/Level;III)V",
@@ -72,14 +70,9 @@ public abstract class ItemRendererMixin {
             //?}
             at = @At("HEAD"),
             cancellable = true
-            //? >= 1.21.10 {
-            /*, require = 0
-            *///?}
     )
     private void totemdoll$renderBoneModel(
-            //? >= 1.21.10 {
-            /*ItemStack stack, ItemDisplayContext context, int light, int overlay, PoseStack poseStack, MultiBufferSource buffers, Level level, int seed, CallbackInfo ci
-            *///?} else if >= 1.21.5 {
+            //? >= 1.21.5 {
             /*LivingEntity entity, ItemStack stack, ItemDisplayContext context, PoseStack poseStack, MultiBufferSource buffers, Level level, int light, int overlay, int seed, CallbackInfo ci
             *///?} else if >= 1.21.4 {
             /*LivingEntity entity, ItemStack stack, ItemDisplayContext context, boolean leftHand, PoseStack poseStack, MultiBufferSource buffers, Level level, int light, int overlay, int seed, CallbackInfo ci

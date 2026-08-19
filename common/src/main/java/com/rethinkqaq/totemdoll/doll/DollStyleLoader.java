@@ -21,7 +21,6 @@
 package com.rethinkqaq.totemdoll.doll;
 
 import com.rethinkqaq.totemdoll.Constants;
-import com.rethinkqaq.totemdoll.config.TotemDollConfig;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonArray;
@@ -60,7 +59,6 @@ public final class DollStyleLoader {
         resources.sort(Map.Entry.comparingByKey(Comparator.comparing(DollResourceId::toString)));
         resources.forEach(entry -> loadOne(manager, entry.getKey(), entry.getValue(), styles));
         DollStyles.replaceDiscovered(styles);
-        TotemDollConfig.reconcileSelectedStyle();
         return List.copyOf(styles);
     }
 

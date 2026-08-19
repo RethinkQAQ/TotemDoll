@@ -35,7 +35,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -72,7 +74,12 @@ public final class StylePackStore {
             deleteTree(target);
             throw exception;
         }
-        if (!hasPackManifest(target)) throw new IOException("Style pack has no style.json or pack.json");
+        try {
+            validateImportedPack(target);
+        } catch (Exception exception) {
+            deleteTree(target);
+            throw exception;
+        }
     }
 
     public static void importFolder(Path folder) throws IOException {
@@ -80,9 +87,11 @@ public final class StylePackStore {
         String key = uniqueKey(folder.getFileName().toString());
         Path target = stylesDirectory.resolve("imported").resolve(key);
         copyTree(folder, target);
-        if (!hasPackManifest(target)) {
+        try {
+            validateImportedPack(target);
+        } catch (Exception exception) {
             deleteTree(target);
-            throw new IOException("Style pack has no style.json or pack.json");
+            throw exception;
         }
     }
 
@@ -172,6 +181,49 @@ public final class StylePackStore {
 
     private static boolean hasPackManifest(Path root) {
         return Files.isRegularFile(root.resolve("pack.json")) || Files.isRegularFile(root.resolve("style.json"));
+    }
+
+    private static void validateImportedPack(Path target) throws IOException {
+        if (!hasPackManifest(target)) {
+            throw new IOException("Style pack has no style.json or pack.json");
+        }
+
+        Set<DollResourceId> ids = new HashSet<>();
+        try (var files = Files.walk(target)) {
+            for (Path styleFile : files
+                    .filter(path -> path.getFileName().toString().equals("style.json"))
+                    .toList()) {
+                JsonObject style = read(styleFile);
+                if (style == null || !style.has("id")) continue;
+                DollResourceId id = DollResourceId.tryParse(style.get("id").getAsString());
+                if (id == null) throw new IOException("Invalid style id in " + styleFile.getFileName());
+                if (!ids.add(id) || DollStyles.contains(id) || importedStyleExists(id, target)) {
+                    throw new IOException("Duplicate style id: " + id);
+                }
+            }
+        }
+    }
+
+    private static boolean importedStyleExists(DollResourceId id, Path currentPack) throws IOException {
+        Path imported = stylesDirectory.resolve("imported");
+        if (!Files.isDirectory(imported)) return false;
+        try (var packs = Files.list(imported)) {
+            for (Path pack : packs.filter(Files::isDirectory).toList()) {
+                if (pack.equals(currentPack)) continue;
+                try (var files = Files.walk(pack)) {
+                    for (Path styleFile : files
+                            .filter(path -> path.getFileName().toString().equals("style.json"))
+                            .toList()) {
+                        JsonObject style = read(styleFile);
+                        if (style != null && style.has("id")
+                                && id.equals(DollResourceId.tryParse(style.get("id").getAsString()))) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
     private static JsonObject read(Path path) throws IOException { return GSON.fromJson(Files.readString(path), JsonObject.class); }
     private static void write(Path path, JsonObject value) throws IOException { Files.createDirectories(path.getParent()); Files.writeString(path, GSON.toJson(value)); }

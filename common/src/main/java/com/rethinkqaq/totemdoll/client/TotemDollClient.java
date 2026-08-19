@@ -60,7 +60,8 @@ public final class TotemDollClient {
     public static CompletableFuture<Void> reloadGeneratedStyles() {
         Minecraft client = Minecraft.getInstance();
         enableGeneratedPack(client);
-        return client.reloadResourcePacks();
+        return client.reloadResourcePacks()
+                .thenRun(TotemDollConfig::reconcileSelectedStyle);
     }
 
     private static void enableGeneratedPack(Minecraft client) {

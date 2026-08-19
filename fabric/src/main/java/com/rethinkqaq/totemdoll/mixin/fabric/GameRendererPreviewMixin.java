@@ -22,14 +22,27 @@ package com.rethinkqaq.totemdoll.mixin.fabric;
 
 import org.spongepowered.asm.mixin.Mixin;
 //? >= 1.21.6 {
-/*import com.rethinkqaq.totemdoll.client.gui.DollGuiPreviewRenderer;
+/*import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.rethinkqaq.totemdoll.client.gui.DollGuiPreviewRenderer;
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.client.gui.render.GuiRenderer;
+//? >= 26.1.2 {
+/^import net.minecraft.client.renderer.state.gui.GuiRenderState;
+^///?} else {
+import net.minecraft.client.gui.render.state.GuiRenderState;
+//?}
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
 import net.minecraft.client.renderer.GameRenderer;
+//? < 26.2 {
+/^import net.minecraft.client.renderer.MultiBufferSource;
+^///?}
+//? >= 1.21.10 {
+/^import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
+^///?}
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyArgs;
-import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 *///?} else {
 import com.rethinkqaq.totemdoll.utils.Dummy;
 //?}
@@ -43,36 +56,37 @@ import com.rethinkqaq.totemdoll.utils.Dummy;
 )
 public abstract class GameRendererPreviewMixin {
     //? >= 1.21.6 {
-    /*@ModifyArgs(
+    /*@WrapOperation(
             method = "<init>",
-//? >= 26.2 {
-            /^at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/render/GuiRenderer;<init>(Lnet/minecraft/client/renderer/state/gui/GuiRenderState;Lnet/minecraft/client/renderer/feature/FeatureRenderDispatcher;Ljava/util/List;)V")
-^///?} else if >= 1.21.10 {
-            /^at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/render/GuiRenderer;<init>(Lnet/minecraft/client/renderer/state/gui/GuiRenderState;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/feature/FeatureRenderDispatcher;Ljava/util/List;)V")
-            ^///?} else {
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/render/GuiRenderer;<init>(Lnet/minecraft/client/gui/render/state/GuiRenderState;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Ljava/util/List;)V")
-            //?}
+            at = @At(value = "NEW", target = "Lnet/minecraft/client/gui/render/GuiRenderer;")
     )
-    private void totemdoll$addPreviewRenderer(Args args) {
-        //? >= 26.2 {
-        /^int rendererIndex = 2;
-        ^///?} else if >= 1.21.10 {
-        /^int rendererIndex = 4;
-        ^///?} else {
-        int rendererIndex = 2;
-        //?}
-        addPreviewRenderer(args, rendererIndex);
-    }
-
-    private static void addPreviewRenderer(Args args, int rendererIndex) {
-        List<PictureInPictureRenderer<?>> renderers = args.get(rendererIndex);
+    private GuiRenderer totemdoll$wrapGuiRenderer(
+            GuiRenderState guiRenderState,
+            //? >= 26.2 {
+/^            FeatureRenderDispatcher featureRenderDispatcher,
+            List<PictureInPictureRenderer<?>> renderers,
+            ^///?} else if >= 1.21.10 {
+/^            MultiBufferSource.BufferSource bufferSource,
+            SubmitNodeCollector submitNodeCollector,
+            FeatureRenderDispatcher featureRenderDispatcher,
+            List<PictureInPictureRenderer<?>> renderers,
+            ^///?} else {
+            MultiBufferSource.BufferSource bufferSource,
+            List<PictureInPictureRenderer<?>> renderers,
+            //?}
+            Operation<GuiRenderer> original
+    ) {
         List<PictureInPictureRenderer<?>> result = new ArrayList<>(renderers);
         //? >= 26.2 {
-        /^result.add(new DollGuiPreviewRenderer());
+/^        result.add(new DollGuiPreviewRenderer());
+        return original.call(guiRenderState, featureRenderDispatcher, result);
+        ^///?} else if >= 1.21.10 {
+/^        result.add(new DollGuiPreviewRenderer(bufferSource));
+        return original.call(guiRenderState, bufferSource, submitNodeCollector, featureRenderDispatcher, result);
         ^///?} else {
-        result.add(new DollGuiPreviewRenderer(args.get(1)));
+        result.add(new DollGuiPreviewRenderer(bufferSource));
+        return original.call(guiRenderState, bufferSource, result);
         //?}
-        args.set(rendererIndex, result);
     }
     *///?} else {
     
