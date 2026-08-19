@@ -64,7 +64,6 @@ tasks {
         "modLicense" to commonMod.license,
         "modGitHub" to commonMod.github,
         "minecraftVersion" to commonMod.prop("minecraft_version"),
-        "minMinecraftVersion" to commonMod.prop("min_minecraft_version"),
         "fabricLoaderVersion" to commonMod.dep("fabric-loader"),
         "fabricLoaderMinVersion" to commonMod.dep("fabric-loader-min"),
         "fabricApiVersion" to commonMod.dep("fabric-api"),

@@ -114,9 +114,9 @@ jobs:
                   if not version_properties.exists():
                       raise SystemExit(f'Missing version properties: {version_properties}')
                   version_config = read_properties(version_properties)
-                  min_minecraft_version = version_config.get('min_minecraft_version')
-                  if not min_minecraft_version:
-                      raise SystemExit(f'Missing min_minecraft_version: {version_properties}')
+                  publish_versions = [item.strip() for item in version_config.get('publish_version', '').split(',') if item.strip()]
+                  if not publish_versions:
+                      raise SystemExit(f'Missing publish_version: {version_properties}')
                   with zipfile.ZipFile(jar) as zf:
                       names = set(zf.namelist())
                       if loader == 'fabric':
@@ -156,8 +156,8 @@ jobs:
                   groups[group_name].append({
                       'loader': loader,
                       'minecraft_version': minecraft_version,
-                      'min_minecraft_version': min_minecraft_version,
-                      'game_version_base': min_minecraft_version,
+                      'publish_version': publish_versions,
+                      'game_versions': '\n'.join(publish_versions),
                       'minecraft_version_range': version_range,
                       'mod_id': mod_id,
                       'mod_version': mod_version,
@@ -177,8 +177,8 @@ jobs:
               manifest = {
                   'loader': items[0]['loader'],
                   'minecraft_version': items[0]['minecraft_version'],
-                  'min_minecraft_version': items[0]['min_minecraft_version'],
-                  'game_version_base': items[0]['game_version_base'],
+                  'publish_version': items[0]['publish_version'],
+                  'game_versions': items[0]['game_versions'],
                   'minecraft_version_range': items[0]['minecraft_version_range'],
                   'mod_id': items[0]['mod_id'],
                   'mod_version': items[0]['mod_version'],
@@ -191,14 +191,13 @@ jobs:
                   f'# {group_name}', '',
                   f'- Loader: `{manifest["loader"]}`',
                   f'- Minecraft: `{manifest["minecraft_version"]}`',
-                  f'- Minimum Minecraft: `{manifest["min_minecraft_version"]}`',
-                  f'- Game version base: `{manifest["game_version_base"]}`',
+                  f'- Publish versions: `{manifest["game_versions"]}`',
                   f'- Minecraft range: `{manifest["minecraft_version_range"]}`',
                   f'- Mod: `{manifest["mod_id"]}`',
                   f'- Mod version: `{manifest["mod_version"]}`', '',
                   f'- Platform version: `{manifest["platform_version"]}`',
-                  f'- Game version range sent to mc-publish: `{manifest["minecraft_version_range"]}`',
-                  '- Game version filter: `releases`', '',
+                  f'- Game versions sent to mc-publish: `{manifest["game_versions"]}`',
+                  '- Game version filter: `none` (explicit compatibility list)', '',
                   '## Files', '',
               ]
               summary.extend(f'- `{jar_name}`' for jar_name in manifest['jars'])
@@ -207,8 +206,8 @@ jobs:
                   'group': group_name,
                   'loader': manifest['loader'],
                   'minecraft_version': manifest['minecraft_version'],
-                  'min_minecraft_version': manifest['min_minecraft_version'],
-                  'game_version_base': manifest['game_version_base'],
+                  'publish_version': manifest['publish_version'],
+                  'game_versions': manifest['game_versions'],
                   'minecraft_version_range': manifest['minecraft_version_range'],
                   'mod_version': manifest['mod_version'],
                   'platform_version': manifest['platform_version'],
@@ -223,13 +222,13 @@ jobs:
               f'- Mod version: `{os.environ.get("BUILD_VERSION", "unknown")}`',
               f'- Build suffix: `{os.environ.get("BUILD_SUFFIX") or "none"}`', '',
               '## Build Artifacts Summary', '',
-              '| Loader | Minecraft | Game base | Mod version | Platform version | JAR | Artifact |',
+              '| Loader | Minecraft | Publish versions | Mod version | Platform version | JAR | Artifact |',
               '| --- | --- | --- | --- | --- | --- | --- |',
           ]
           for entry in matrix_entries:
               for item in groups[entry['group']]:
                   artifact_name = f'mod-jars-{entry["group"]}'
-                  lines.append(f'| {item["loader"]} | {item["minecraft_version"]} | {entry["game_version_base"]} | {item["mod_version"]} | `{entry["platform_version"]}` | `{item["jar"]}` | `{artifact_name}` |')
+                  lines.append(f'| {item["loader"]} | {item["minecraft_version"]} | `{entry["game_versions"]}` | {item["mod_version"]} | `{entry["platform_version"]}` | `{item["jar"]}` | `{artifact_name}` |')
           Path(os.environ['GITHUB_STEP_SUMMARY']).write_text('\n'.join(lines) + '\n')
 
           with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
