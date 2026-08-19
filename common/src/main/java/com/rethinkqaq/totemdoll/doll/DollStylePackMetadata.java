@@ -20,9 +20,17 @@
 
 package com.rethinkqaq.totemdoll.doll;
 
-public enum DollStyleOrigin {
-    BUILTIN,
-    RESOURCE_PACK,
-    LOCAL,
-    IMPORTED
+public record DollStylePackMetadata(
+        String id,
+        String name,
+        String author,
+        String licenseName,
+        String licenseSummary,
+        String readmeName,
+        String readmeSummary,
+        String storageKey
+) {
+    public String displayName() {
+        return name == null || name.isBlank() ? storageKey : name;
+    }
 }

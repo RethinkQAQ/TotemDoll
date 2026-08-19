@@ -40,7 +40,8 @@ public record DollStyle(
         Map<String, DollResourceId> textures,
         List<DollAnimationDefinition> animations,
         String modelType,
-        DollResourceId definitionSource
+        DollResourceId definitionSource,
+        DollStylePackMetadata packMetadata
 ) {
 
     public Component label() {
@@ -58,7 +59,7 @@ public record DollStyle(
     }
 
     public boolean isLocal() {
-        return userCreated || origin == DollStyleOrigin.LOCAL;
+        return userCreated || origin == DollStyleOrigin.LOCAL || origin == DollStyleOrigin.IMPORTED;
     }
 
     public boolean hasAnimations() {

@@ -174,6 +174,16 @@ public final class DollLocalStyleStore {
     }
 
     public static boolean delete(DollStyle style) {
+        if (style.origin() == DollStyleOrigin.IMPORTED) {
+            if (!StylePackStore.deleteImported(style)) return false;
+            try {
+                rebuildGeneratedPack();
+                return true;
+            } catch (IOException exception) {
+                Constants.LOG.error("Could not rebuild styles after deleting imported pack", exception);
+                return false;
+            }
+        }
         if (!style.userCreated() || stylesDirectory == null) {
             return false;
         }

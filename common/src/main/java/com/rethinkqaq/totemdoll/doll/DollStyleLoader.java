@@ -36,6 +36,7 @@ import com.rethinkqaq.totemdoll.client.DollBoneRenderer;
 import com.rethinkqaq.totemdoll.client.gui.DollGuiPreviewRenderer;
 
 import java.io.Reader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -85,11 +86,13 @@ public final class DollStyleLoader {
             DollResourceId template = root.has("template") ? requiredId(root, "template") : null;
             DollSkinDefinition skin = readSkin(root);
             DollStyleOrigin origin = readOrigin(root, source);
+            DollStylePackMetadata packMetadata = origin == DollStyleOrigin.IMPORTED
+                    ? readPackMetadata(manager, source) : null;
             Map<String, DollResourceId> textures = readTextures(source, root);
             List<DollAnimationDefinition> animations = readTextureAnimations(root, textures);
             output.add(new DollStyle(id, name, nameKey, modelId, false, template,
                     origin == DollStyleOrigin.LOCAL, skin, origin, textures, animations,
-                    modelType, source));
+                    modelType, source, packMetadata));
         } catch (Exception exception) {
             Constants.LOG.error("Could not load style {}", source, exception);
         }
@@ -101,6 +104,33 @@ public final class DollStyleLoader {
             catch (IllegalArgumentException ignored) { }
         }
         return Constants.MOD_ID.equals(source.namespace()) ? DollStyleOrigin.BUILTIN : DollStyleOrigin.RESOURCE_PACK;
+    }
+
+    private static DollStylePackMetadata readPackMetadata(ResourceManager manager, DollResourceId source) {
+        try {
+            DollResourceId location = resolve(source, "pack_metadata.json");
+            try (Reader reader = openPackMetadata(manager, location)) {
+                JsonObject object = GSON.fromJson(reader, JsonObject.class);
+                return new DollStylePackMetadata(
+                        stringOrNull(object, "id"), stringOrNull(object, "name"), stringOrNull(object, "author"),
+                        stringOrNull(object, "license_name"), stringOrNull(object, "license_summary"),
+                        stringOrNull(object, "readme_name"), stringOrNull(object, "readme_summary"),
+                        stringOrNull(object, "storage_key"));
+            }
+        } catch (Exception exception) {
+            Constants.LOG.warn("Could not load imported style pack metadata for {}", source, exception);
+            return null;
+        }
+    }
+
+    private static Reader openPackMetadata(ResourceManager manager, DollResourceId location) throws IOException {
+        return manager.getResource(DollMinecraftResourceUtil.nativeId(location))
+                .orElseThrow(() -> new IOException("Missing pack metadata"))
+                .openAsReader();
+    }
+
+    private static String stringOrNull(JsonObject object, String key) {
+        return object != null && object.has(key) ? object.get(key).getAsString() : null;
     }
 
     private static DollSkinDefinition readSkin(JsonObject root) {

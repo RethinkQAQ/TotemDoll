@@ -24,6 +24,7 @@
   "screen.totemdoll.current_preview": "当前使用",
   "screen.totemdoll.origin_builtin": "内置",
   "screen.totemdoll.origin_resource_pack": "资源包",
+  "screen.totemdoll.origin_imported": "导入样式包",
   "screen.totemdoll.origin_local": "我的样式",
   "screen.totemdoll.skin_supported": "支持自定义皮肤",
   "screen.totemdoll.dynamic_texture": "动态纹理",

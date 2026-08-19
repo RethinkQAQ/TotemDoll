@@ -52,10 +52,12 @@ public final class DollStyleManageScreen extends DollScreen implements DollScree
         nameBox.setMaxLength(48);
         nameBox.setValue(style.displayName());
         this.addRenderableWidget(nameBox);
-        this.addRenderableWidget(Button.builder(
+        Button renameButton = Button.builder(
                 Component.translatable("screen.totemdoll.rename"),
                 button -> rename()
-        ).bounds(this.width / 2 - 110, 124, 106, 20).build());
+        ).bounds(this.width / 2 - 110, 124, 106, 20).build();
+        renameButton.active = style.userCreated();
+        this.addRenderableWidget(renameButton);
         this.addRenderableWidget(Button.builder(
                 Component.translatable("screen.totemdoll.delete"),
                 button -> confirmDelete()
@@ -64,10 +66,12 @@ public final class DollStyleManageScreen extends DollScreen implements DollScree
                 Component.translatable("screen.totemdoll.create_from_style"),
                 button -> createFromStyle()
         ).bounds(this.width / 2 - 110, 154, 220, 20).build());
-        this.addRenderableWidget(Button.builder(
+        Button exportButton = Button.builder(
                 Component.translatable("screen.totemdoll.export"),
                 button -> exportStyle()
-        ).bounds(this.width / 2 - 110, 184, 220, 20).build());
+        ).bounds(this.width / 2 - 110, 184, 220, 20).build();
+        exportButton.active = style.userCreated();
+        this.addRenderableWidget(exportButton);
         this.addRenderableWidget(Button.builder(
                 Component.translatable("gui.cancel"),
                 button -> onClose()

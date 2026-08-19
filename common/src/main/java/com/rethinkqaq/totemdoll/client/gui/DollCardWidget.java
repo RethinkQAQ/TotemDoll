@@ -28,6 +28,9 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+
 //? >= 1.21.10 {
 /*import net.minecraft.client.input.MouseButtonEvent;
 *///?}
@@ -154,7 +157,62 @@ public final class DollCardWidget extends DollWidget {
             case BUILTIN -> Component.translatable("screen.totemdoll.origin_builtin");
             case RESOURCE_PACK -> Component.translatable("screen.totemdoll.origin_resource_pack");
             case LOCAL -> Component.translatable("screen.totemdoll.origin_local");
+            case IMPORTED -> style.packMetadata() == null
+                    ? Component.translatable("screen.totemdoll.origin_imported")
+                    : Component.literal(style.packMetadata().displayName());
         };
+    }
+
+    public void renderTooltip(DollGuiGraphics graphics, int mouseX, int mouseY, int screenWidth, int screenHeight) {
+        if (!isHoveredOrFocused()) return;
+        List<String> lines = new ArrayList<>();
+        lines.add(style.label().getString());
+        lines.add("ID: " + style.id());
+        if (style.packMetadata() != null) {
+            var pack = style.packMetadata();
+            lines.add("Pack: " + pack.displayName());
+            if (pack.author() != null && !pack.author().isBlank()) lines.add("Author: " + pack.author());
+            if (pack.licenseName() != null) {
+                lines.add("License: " + pack.licenseName());
+                addSummary(lines, pack.licenseSummary());
+            }
+            if (pack.readmeName() != null) {
+                lines.add("README: " + pack.readmeName());
+                addSummary(lines, pack.readmeSummary());
+            }
+        }
+
+        int width = lines.stream().mapToInt(font::width).max().orElse(80) + 8;
+        width = Math.min(width, 240);
+        int lineHeight = 10;
+        int height = lines.size() * lineHeight + 8;
+        int left = mouseX + 12;
+        int top = mouseY + 12;
+        if (left + width > screenWidth) left = Math.max(4, mouseX - width - 8);
+        if (top + height > screenHeight) top = Math.max(4, mouseY - height - 8);
+
+        graphics.pushPose();
+        //? < 1.21.6 {
+        graphics.translate(0.0F, 0.0F, 400.0F);
+        //?}
+        graphics.fill(left - 1, top - 1, left + width + 1, top + height + 1, 0xFFB0B0B0);
+        graphics.fill(left, top, left + width, top + height, 0xF0101010);
+        for (int index = 0; index < lines.size(); index++) {
+            String line = lines.get(index);
+            if (font.width(line) > width - 8) {
+                line = trim(Component.literal(line), width - 8).getString();
+            }
+            graphics.text(font, Component.literal(line), left + 4, top + 4 + index * lineHeight,
+                    index == 0 ? 0xFFFFFFFF : 0xFFE0E0E0);
+        }
+        graphics.popPose();
+    }
+
+    private void addSummary(List<String> lines, String summary) {
+        if (summary == null || summary.isBlank()) return;
+        for (String line : summary.split("\\R")) {
+            if (!line.isBlank()) lines.add(line);
+        }
     }
 
     @Override

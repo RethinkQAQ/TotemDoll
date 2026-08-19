@@ -25,6 +25,7 @@
   "screen.totemdoll.current_preview": "Currently in use",
   "screen.totemdoll.origin_builtin": "Built-in",
   "screen.totemdoll.origin_resource_pack": "Resource pack",
+  "screen.totemdoll.origin_imported": "Imported style pack",
   "screen.totemdoll.origin_local": "My style",
   "screen.totemdoll.skin_supported": "Custom skin supported",
   "screen.totemdoll.dynamic_texture": "Dynamic texture",

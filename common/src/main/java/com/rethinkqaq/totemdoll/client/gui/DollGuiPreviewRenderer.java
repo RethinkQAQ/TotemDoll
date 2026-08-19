@@ -59,9 +59,9 @@ import com.rethinkqaq.totemdoll.utils.Dummy;
 //?}
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.client.Minecraft;
 //? >= 26.2 {
 //?} else {
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 //?}
 
@@ -105,7 +105,8 @@ public final class DollGuiPreviewRenderer extends PictureInPictureRenderer<DollG
     public static void invalidateAll() {
         //? >= 1.21.6 {
         /^if (instance != null) {
-            instance.targetCache.clear();
+            DollGuiPreviewRenderer renderer = instance;
+            Minecraft.getInstance().execute(renderer.targetCache::clear);
         }
         ^///?}
     }

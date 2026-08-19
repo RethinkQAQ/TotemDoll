@@ -45,7 +45,7 @@ public final class DollStyles {
             false,
             null,
             DollStyleOrigin.BUILTIN,
-            Map.of(), List.of(), "mesh", null
+            Map.of(), List.of(), "mesh", null, null
     );
 
     private static final Map<DollResourceId, DollStyle> STYLES = new LinkedHashMap<>();

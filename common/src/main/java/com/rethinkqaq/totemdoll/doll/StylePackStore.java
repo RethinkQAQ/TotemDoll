@@ -30,6 +30,7 @@ import com.rethinkqaq.totemdoll.utils.DollResourceId;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -47,6 +48,8 @@ import java.util.zip.ZipOutputStream;
 public final class StylePackStore {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final long MAX_BYTES = 64L * 1024L * 1024L;
+    private static final int MAX_DOCUMENT_CHARS = 2048;
+    private static final int MAX_DOCUMENT_LINES = 8;
     private static Path stylesDirectory;
     private static Path generatedPackDirectory;
 
@@ -100,9 +103,10 @@ public final class StylePackStore {
         if (!Files.isDirectory(imported)) return;
         try (var packs = Files.list(imported)) {
             for (Path pack : packs.filter(Files::isDirectory).toList()) {
+                DollStylePackMetadata metadata = readPackMetadata(pack, pack.getFileName().toString());
                 try (var styles = Files.walk(pack)) {
                     for (Path style : styles.filter(path -> path.getFileName().toString().equals("style.json")).toList()) {
-                        compileStyle(pack.getFileName().toString(), style);
+                        compileStyle(pack.getFileName().toString(), style, metadata);
                     }
                 } catch (Exception exception) {
                     Constants.LOG.warn("Skipping imported style pack {}", pack, exception);
@@ -111,7 +115,7 @@ public final class StylePackStore {
         }
     }
 
-    private static void compileStyle(String packKey, Path styleFile) throws IOException {
+    private static void compileStyle(String packKey, Path styleFile, DollStylePackMetadata metadata) throws IOException {
         JsonObject style = read(styleFile);
         if (!style.has("format") || style.get("format").getAsInt() != 3) throw new IOException("Expected format 3");
         DollResourceId id = DollResourceId.tryParse(style.get("id").getAsString());
@@ -138,12 +142,125 @@ public final class StylePackStore {
             Files.copy(safeResolve(root, value), target, StandardCopyOption.REPLACE_EXISTING);
         }
         style.addProperty("origin", "imported");
+        writePackMetadata(styleTarget.getParent().resolve("pack_metadata.json"), metadata);
         write(styleTarget, style);
+    }
+
+    public static boolean deleteImported(DollStyle style) {
+        if (stylesDirectory == null || style.origin() != DollStyleOrigin.IMPORTED) return false;
+        String storageKey = style.packMetadata() == null ? null : style.packMetadata().storageKey();
+        if (storageKey == null || storageKey.isBlank()) storageKey = storageKeyFromSource(style.definitionSource());
+        if (storageKey == null || storageKey.isBlank()) return false;
+        Path imported = stylesDirectory.resolve("imported").normalize();
+        Path target = imported.resolve(storageKey).normalize();
+        if (!target.startsWith(imported) || !Files.isDirectory(target)) return false;
+        try {
+            deleteTree(target);
+            return true;
+        } catch (IOException exception) {
+            Constants.LOG.error("Could not delete imported style pack {}", storageKey, exception);
+            return false;
+        }
+    }
+
+    private static String storageKeyFromSource(DollResourceId source) {
+        if (source == null) return null;
+        String[] parts = source.path().split("/");
+        for (int index = 0; index + 1 < parts.length; index++) {
+            if ("imported".equals(parts[index])) return parts[index + 1];
+        }
+        return null;
+    }
+
+    private static DollStylePackMetadata readPackMetadata(Path pack, String storageKey) throws IOException {
+        JsonObject object = new JsonObject();
+        if (Files.isRegularFile(pack.resolve("pack.json"))) {
+            try {
+                object = read(pack.resolve("pack.json"));
+            } catch (Exception exception) {
+                Constants.LOG.warn("Could not read metadata from imported style pack {}", pack, exception);
+            }
+        }
+        Path license = findDocument(pack, "license", "copying", "notice");
+        Path readme = findDocument(pack, "readme");
+        return new DollStylePackMetadata(
+                stringOrDefault(object, "id", null),
+                stringOrDefault(object, "name", storageKey),
+                stringOrDefault(object, "author", "Unknown"),
+                license == null ? null : license.getFileName().toString(),
+                license == null ? null : safeSummary(license),
+                readme == null ? null : readme.getFileName().toString(),
+                readme == null ? null : safeSummary(readme),
+                storageKey);
+    }
+
+    private static String safeSummary(Path path) {
+        try {
+            return readSummary(path);
+        } catch (IOException exception) {
+            Constants.LOG.warn("Could not read imported style document {}", path, exception);
+            return null;
+        }
+    }
+
+    private static void writePackMetadata(Path target, DollStylePackMetadata metadata) throws IOException {
+        JsonObject object = new JsonObject();
+        addNullable(object, "id", metadata.id());
+        addNullable(object, "name", metadata.name());
+        addNullable(object, "author", metadata.author());
+        addNullable(object, "license_name", metadata.licenseName());
+        addNullable(object, "license_summary", metadata.licenseSummary());
+        addNullable(object, "readme_name", metadata.readmeName());
+        addNullable(object, "readme_summary", metadata.readmeSummary());
+        addNullable(object, "storage_key", metadata.storageKey());
+        write(target, object);
+    }
+
+    private static void addNullable(JsonObject object, String key, String value) {
+        if (value != null) object.addProperty(key, value);
+    }
+
+    private static String stringOrDefault(JsonObject object, String key, String fallback) {
+        return object.has(key) && !object.get(key).isJsonNull() ? object.get(key).getAsString() : fallback;
+    }
+
+    private static Path findDocument(Path root, String... prefixes) throws IOException {
+        try (var files = Files.list(root)) {
+            return files.filter(Files::isRegularFile)
+                    .filter(path -> {
+                        String name = path.getFileName().toString().toLowerCase(Locale.ROOT);
+                        for (String prefix : prefixes) {
+                            if (name.equals(prefix) || name.startsWith(prefix + ".")) return true;
+                        }
+                        return false;
+                    })
+                    .findFirst().orElse(null);
+        }
+    }
+
+    private static String readSummary(Path path) throws IOException {
+        StringBuilder text = new StringBuilder();
+        try (Reader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
+            char[] buffer = new char[512];
+            int count;
+            while (text.length() < MAX_DOCUMENT_CHARS
+                    && (count = reader.read(buffer, 0, Math.min(buffer.length, MAX_DOCUMENT_CHARS - text.length()))) != -1) {
+                text.append(buffer, 0, count);
+            }
+        }
+        String[] lines = text.toString().replace("\r\n", "\n").split("\n");
+        StringBuilder summary = new StringBuilder();
+        for (int index = 0; index < Math.min(lines.length, MAX_DOCUMENT_LINES); index++) {
+            if (index > 0) summary.append('\n');
+            summary.append(lines[index].trim());
+        }
+        if (lines.length > MAX_DOCUMENT_LINES || text.length() >= MAX_DOCUMENT_CHARS) summary.append("\n...");
+        return summary.toString().trim();
     }
 
 
     public static void exportLocal(DollStyle style, Path zip) throws IOException {
-        if (!style.isLocal()) throw new IOException("Only local styles can be exported");
+        if (!style.userCreated()) throw new IOException("Only user-created styles can be exported");
         Path source = stylesDirectory.resolve(style.id().path()).normalize();
         if (!source.startsWith(stylesDirectory) || !Files.isDirectory(source)) throw new IOException("Local style not found");
         try (OutputStream output = Files.newOutputStream(zip); ZipOutputStream archive = new ZipOutputStream(output)) {

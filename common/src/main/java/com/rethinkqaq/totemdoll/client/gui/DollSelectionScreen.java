@@ -151,6 +151,7 @@ public final class DollSelectionScreen extends DollScreen implements DollScreenP
             case BUILTIN -> 100;
             case RESOURCE_PACK -> 200;
             case LOCAL -> 300;
+            case IMPORTED -> 400;
         };
     }
 
@@ -241,6 +242,10 @@ public final class DollSelectionScreen extends DollScreen implements DollScreenP
                 partialTick,
                 child -> !(child instanceof DollCardWidget)
         );
+        cards.stream()
+                .filter(card -> card.visible && card.isHoveredOrFocused())
+                .findFirst()
+                .ifPresent(card -> card.renderTooltip(gui, mouseX, mouseY, width, height));
     }
 
     private void renderHeader(DollGuiGraphics graphics) {

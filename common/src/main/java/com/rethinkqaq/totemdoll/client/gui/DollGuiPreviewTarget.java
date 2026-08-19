@@ -36,6 +36,7 @@ final class DollGuiPreviewTarget implements AutoCloseable {
     final GpuTexture depth;
     final GpuTextureView depthView;
     private boolean rendered;
+    private boolean closed;
 
     DollGuiPreviewTarget(int width, int height) {
         var device = RenderSystem.getDevice();
@@ -73,6 +74,8 @@ final class DollGuiPreviewTarget implements AutoCloseable {
 
     @Override
     public void close() {
+        if (closed) return;
+        closed = true;
         colorView.close();
         color.close();
         depthView.close();
