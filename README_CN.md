@@ -7,6 +7,11 @@
   </p>
 </div>
 
+[![GitHub License](https://img.shields.io/github/license/RethinkQAQ/TotemDoll)](http://www.gnu.org/licenses/lgpl-3.0.html)
+[![Modrinth Downloads](https://img.shields.io/modrinth/dt/CcfJqGL2?label=Modrith%20Download&color=green)](https://modrinth.com/mod/itemdoll)
+[![CurseForge](https://cf.way2muchnoise.eu/full_1641634_downloads.svg)](https://legacy.curseforge.com/minecraft/mc-mods/totemdoll)
+[![MC Versions](https://cf.way2muchnoise.eu/versions/For%20MC_1641634_all.svg)](https://legacy.curseforge.com/minecraft/mc-mods/totemdoll)
+
 [English](README.md) | [中文](README_CN.md)
 
 ## 简介
