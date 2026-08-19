@@ -197,7 +197,8 @@ jobs:
                   f'- Mod: `{manifest["mod_id"]}`',
                   f'- Mod version: `{manifest["mod_version"]}`', '',
                   f'- Platform version: `{manifest["platform_version"]}`',
-                  '- Version resolver: `releasesIfAny`', '',
+                  f'- Game version range sent to mc-publish: `{manifest["minecraft_version_range"]}`',
+                  '- Game version filter: `releases`', '',
                   '## Files', '',
               ]
               summary.extend(f'- `{jar_name}`' for jar_name in manifest['jars'])
@@ -208,6 +209,7 @@ jobs:
                   'minecraft_version': manifest['minecraft_version'],
                   'min_minecraft_version': manifest['min_minecraft_version'],
                   'game_version_base': manifest['game_version_base'],
+                  'minecraft_version_range': manifest['minecraft_version_range'],
                   'mod_version': manifest['mod_version'],
                   'platform_version': manifest['platform_version'],
                   'path': group_name,

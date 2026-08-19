@@ -46,6 +46,6 @@ jobs:
           version: ${{ matrix.platform_version }}
           version-type: release
           loaders: ${{ matrix.loader }}
-          game-versions: ${{ matrix.game_version_base }}
-          version-resolver: releasesIfAny
+          game-versions: ${{ matrix.minecraft_version_range }}
+          game-version-filter: releases
           changelog: ${{ github.event.release.body }}
