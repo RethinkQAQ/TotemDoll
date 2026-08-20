@@ -43,6 +43,7 @@ public final class DollSelectionScreen extends DollScreen implements DollScreenP
     private final Screen parent;
     private final Tab tab;
     private final List<DollCardWidget> cards = new ArrayList<>();
+    private Component status;
     private int scrollOffset;
     private int contentHeight;
 
@@ -183,6 +184,10 @@ public final class DollSelectionScreen extends DollScreen implements DollScreenP
         return this.height < 300 ? 100 : DollCardWidget.CARD_HEIGHT;
     }
 
+    void showImportError(Component message) {
+        status = message;
+    }
+
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
         int top = HEADER_HEIGHT + 22;
@@ -242,6 +247,9 @@ public final class DollSelectionScreen extends DollScreen implements DollScreenP
                 partialTick,
                 child -> !(child instanceof DollCardWidget)
         );
+        if (status != null) {
+            gui.centeredText(this.font, status, this.width / 2, this.height - 44, 0xFFFF8080);
+        }
         cards.stream()
                 .filter(card -> card.visible && card.isHoveredOrFocused())
                 .findFirst()
