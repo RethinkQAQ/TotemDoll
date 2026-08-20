@@ -187,16 +187,17 @@ jobs:
               }
               group_dir = artifacts / group_name
               (group_dir / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
+              publish_versions_display = ', '.join(manifest['publish_version'])
               summary = [
                   f'# {group_name}', '',
                   f'- Loader: `{manifest["loader"]}`',
                   f'- Minecraft: `{manifest["minecraft_version"]}`',
-                  f'- Publish versions: `{manifest["game_versions"]}`',
+                  f'- Publish versions: `{publish_versions_display}`',
                   f'- Minecraft range: `{manifest["minecraft_version_range"]}`',
                   f'- Mod: `{manifest["mod_id"]}`',
                   f'- Mod version: `{manifest["mod_version"]}`', '',
                   f'- Platform version: `{manifest["platform_version"]}`',
-                  f'- Game versions sent to mc-publish: `{manifest["game_versions"]}`',
+                  f'- Game versions sent to mc-publish: `{publish_versions_display}`',
                   '- Game version filter: `none` (explicit compatibility list)', '',
                   '## Files', '',
               ]
@@ -228,7 +229,8 @@ jobs:
           for entry in matrix_entries:
               for item in groups[entry['group']]:
                   artifact_name = f'mod-jars-{entry["group"]}'
-                  lines.append(f'| {item["loader"]} | {item["minecraft_version"]} | `{entry["game_versions"]}` | {item["mod_version"]} | `{entry["platform_version"]}` | `{item["jar"]}` | `{artifact_name}` |')
+                  publish_versions_display = ', '.join(entry['publish_version'])
+                  lines.append(f'| {item["loader"]} | {item["minecraft_version"]} | `{publish_versions_display}` | {item["mod_version"]} | `{entry["platform_version"]}` | `{item["jar"]}` | `{artifact_name}` |')
           Path(os.environ['GITHUB_STEP_SUMMARY']).write_text('\n'.join(lines) + '\n')
 
           with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
