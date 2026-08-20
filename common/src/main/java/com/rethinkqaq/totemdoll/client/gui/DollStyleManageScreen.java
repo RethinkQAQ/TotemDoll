@@ -93,7 +93,7 @@ public final class DollStyleManageScreen extends DollScreen implements DollScree
                     if (confirmed) {
                         delete();
                     } else {
-                        DollScreenAdapter.setScreen(this.minecraft, this);
+                        DollScreenAdapter.setScreen(this.minecraft, DollScreenAdapter.rootParent(this));
                     }
                 },
                 Component.translatable("screen.totemdoll.delete_confirm_title"),
@@ -139,7 +139,7 @@ public final class DollStyleManageScreen extends DollScreen implements DollScree
 
     @Override
     public void onClose() {
-        DollScreenAdapter.setScreen(this.minecraft, parent);
+        DollScreenAdapter.setScreen(this.minecraft, DollScreenAdapter.rootParent(parent));
     }
 
     @Override

@@ -79,6 +79,11 @@ public final class DollCardWidget extends DollWidget {
         gui.text(font, trim(style.label(), textWidth), textX, getY() + 11, 0xFFFFFFFF);
         gui.text(font, trim(originLabel(), textWidth), textX, getY() + 27, 0xFFA0A0A0);
         int detailY = 42;
+        if (!style.isAvailable()) {
+            drawDetail(gui, Component.translatable("screen.totemdoll.unavailable"), textX, detailY,
+                    textWidth, 0xFFFF8080);
+            detailY += 15;
+        }
         if (style.supportsSkin()) {
             drawDetail(gui, Component.translatable("screen.totemdoll.skin_supported"), textX, detailY, textWidth, 0xFF80C88A);
             detailY += 15;
@@ -127,11 +132,12 @@ public final class DollCardWidget extends DollWidget {
 
         boolean useHovered = mouseX >= left && mouseX < split
                 && mouseY >= top && mouseY < getBottom() - 4;
+        boolean available = style.isAvailable();
         graphics.fill(left, top, split - (hasSecondary ? 2 : 0), getBottom() - 4,
-                useHovered ? 0xFF3E7350 : 0xFF315A40);
+                !available ? 0xFF424242 : useHovered ? 0xFF3E7350 : 0xFF315A40);
         graphics.centeredText(
                 font,
-                Component.translatable("screen.totemdoll.use"),
+                Component.translatable(available ? "screen.totemdoll.use" : "screen.totemdoll.unavailable"),
                 (left + split - (hasSecondary ? 2 : 0)) / 2,
                 top + 6,
                 0xFFFFFFFF
@@ -168,6 +174,10 @@ public final class DollCardWidget extends DollWidget {
         List<String> lines = new ArrayList<>();
         lines.add(style.label().getString());
         lines.add("ID: " + style.id());
+        if (!style.isAvailable() && style.invalidReason() != null) {
+            lines.add(Component.translatable("screen.totemdoll.unavailable").getString());
+            lines.add(style.invalidReason());
+        }
         if (style.packMetadata() != null) {
             var pack = style.packMetadata();
             lines.add("Pack: " + pack.displayName());
@@ -234,7 +244,7 @@ public final class DollCardWidget extends DollWidget {
             onSecondary.run();
             return;
         }
-        onUse.run();
+        if (style.isAvailable()) onUse.run();
     }
 
     @Override

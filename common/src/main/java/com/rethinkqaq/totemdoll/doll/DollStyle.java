@@ -41,7 +41,8 @@ public record DollStyle(
         List<DollAnimationDefinition> animations,
         String modelType,
         DollResourceId definitionSource,
-        DollStylePackMetadata packMetadata
+        DollStylePackMetadata packMetadata,
+        String invalidReason
 ) {
 
     public Component label() {
@@ -64,6 +65,10 @@ public record DollStyle(
 
     public boolean hasAnimations() {
         return hasDynamicTextures() || hasDynamicModel();
+    }
+
+    public boolean isAvailable() {
+        return invalidReason == null;
     }
 
     public boolean isBoneModel() {

@@ -106,7 +106,12 @@ public final class StylePackStore {
                 DollStylePackMetadata metadata = readPackMetadata(pack, pack.getFileName().toString());
                 try (var styles = Files.walk(pack)) {
                     for (Path style : styles.filter(path -> path.getFileName().toString().equals("style.json")).toList()) {
-                        compileStyle(pack.getFileName().toString(), style, metadata);
+                        try {
+                            compileStyle(pack.getFileName().toString(), style, metadata);
+                        } catch (Exception exception) {
+                            Constants.LOG.warn("Style in imported pack is unavailable: {}", style, exception);
+                            writeUnavailableStyle(pack.getFileName().toString(), style, metadata, exception);
+                        }
                     }
                 } catch (Exception exception) {
                     Constants.LOG.warn("Skipping imported style pack {}", pack, exception);
@@ -144,6 +149,36 @@ public final class StylePackStore {
         style.addProperty("origin", "imported");
         writePackMetadata(styleTarget.getParent().resolve("pack_metadata.json"), metadata);
         write(styleTarget, style);
+    }
+
+    private static void writeUnavailableStyle(String packKey, Path styleFile,
+                                              DollStylePackMetadata metadata, Exception exception) {
+        try {
+            JsonObject source = read(styleFile);
+            DollResourceId sourceId = source != null && source.has("id")
+                    ? DollResourceId.tryParse(source.get("id").getAsString()) : null;
+            String relative = styleFile.getParent().relativize(styleFile).toString();
+            DollResourceId id = sourceId != null ? sourceId
+                    : DollResourceId.of(Constants.MOD_ID,
+                    "invalid_" + safeName(packKey) + "_" + safeName(relative));
+            String name = source != null && source.has("name")
+                    ? source.get("name").getAsString() : id.toString();
+            Path target = generatedPackDirectory.resolve("assets").resolve(id.namespace())
+                    .resolve("styles/imported").resolve(safeName(packKey)).resolve(safeName(id.path()))
+                    .resolve("style.json");
+            JsonObject unavailable = new JsonObject();
+            unavailable.addProperty("format", 3);
+            unavailable.addProperty("id", id.toString());
+            unavailable.addProperty("name", name);
+            unavailable.addProperty("origin", "imported");
+            unavailable.addProperty("invalid", true);
+            unavailable.addProperty("invalid_reason", exception.getMessage() == null
+                    ? exception.getClass().getSimpleName() : exception.getMessage());
+            writePackMetadata(target.getParent().resolve("pack_metadata.json"), metadata);
+            write(target, unavailable);
+        } catch (Exception placeholderException) {
+            Constants.LOG.error("Could not create unavailable style entry for {}", styleFile, placeholderException);
+        }
     }
 
     public static boolean deleteImported(DollStyle style) {

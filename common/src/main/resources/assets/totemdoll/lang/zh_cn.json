@@ -64,6 +64,7 @@
     "screen.totemdoll.pack_import_invalid_path": "无法导入：资源路径非法",
     "screen.totemdoll.pack_import_too_large": "无法导入：样式包超过 64 MiB",
     "screen.totemdoll.pack_import_generic": "无法导入：样式包文件损坏或格式不正确",
+    "screen.totemdoll.unavailable": "不可用",
   "screen.totemdoll.export": "导出样式包",
   "screen.totemdoll.export_success": "样式包已导出",
   "screen.totemdoll.delete_confirm_title": "删除图腾娃娃样式？",

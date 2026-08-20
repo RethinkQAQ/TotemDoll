@@ -86,7 +86,7 @@ public final class DollPackScreen extends DollScreen implements DollScreenParent
         try { DollLocalStyleStore.importZip(path); status = Component.translatable("screen.totemdoll.import_success"); TotemDollClient.reloadGeneratedStyles().thenRun(() -> minecraft.execute(() -> DollScreenAdapter.setScreen(minecraft, new DollSelectionScreen(parent, DollSelectionScreen.Tab.TEMPLATES)))); }
         catch (Exception exception) { status = importErrorMessage(exception); }
     }
-    @Override public void onClose() { DollScreenAdapter.setScreen(minecraft, parent); }
-    @Override public Screen rootParent() { return parent instanceof DollScreenParent p ? p.rootParent() : parent; }
+    @Override public void onClose() { DollScreenAdapter.setScreen(minecraft, DollScreenAdapter.rootParent(parent)); }
+    @Override public Screen rootParent() { return DollScreenAdapter.rootParent(parent); }
     @Override protected void renderContent(DollGuiGraphics graphics, int mouseX, int mouseY, float partialTick) { graphics.centeredText(font, title, width / 2, 22, 0xFFFFFFFF); graphics.centeredText(font, Component.translatable("screen.totemdoll.import_hint"), width / 2, 84, 0xFFA0A0A0); if (status != null) graphics.centeredText(font, status, width / 2, height - 54, 0xFFE0C070); renderChildren(mouseX, mouseY, partialTick); }
 }

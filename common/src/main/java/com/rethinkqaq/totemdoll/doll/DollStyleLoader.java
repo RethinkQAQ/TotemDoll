@@ -74,6 +74,17 @@ public final class DollStyleLoader {
                 return;
             }
             DollResourceId id = requiredId(root, "id");
+            DollStyleOrigin origin = readOrigin(root, source);
+            DollStylePackMetadata packMetadata = origin == DollStyleOrigin.IMPORTED
+                    ? readPackMetadata(manager, source) : null;
+            if (root.has("invalid") && root.get("invalid").getAsBoolean()) {
+                String name = root.has("name") ? root.get("name").getAsString() : id.toString();
+                String reason = root.has("invalid_reason") ? root.get("invalid_reason").getAsString() : null;
+                output.add(new DollStyle(id, name, null, DollResourceId.ofVanilla("item/totem_of_undying"),
+                        false, null, false, null, origin, Map.of(), List.of(), "invalid", source,
+                        packMetadata, reason));
+                return;
+            }
             JsonObject model = root.getAsJsonObject("model");
             if (model == null || !model.has("type")) throw new IllegalArgumentException("Missing model.type");
             String modelType = model.get("type").getAsString();
@@ -85,14 +96,11 @@ public final class DollStyleLoader {
             String nameKey = root.has("name_key") ? root.get("name_key").getAsString() : null;
             DollResourceId template = root.has("template") ? requiredId(root, "template") : null;
             DollSkinDefinition skin = readSkin(root);
-            DollStyleOrigin origin = readOrigin(root, source);
-            DollStylePackMetadata packMetadata = origin == DollStyleOrigin.IMPORTED
-                    ? readPackMetadata(manager, source) : null;
             Map<String, DollResourceId> textures = readTextures(source, root);
             List<DollAnimationDefinition> animations = readTextureAnimations(root, textures);
             output.add(new DollStyle(id, name, nameKey, modelId, false, template,
                     origin == DollStyleOrigin.LOCAL, skin, origin, textures, animations,
-                    modelType, source, packMetadata));
+                    modelType, source, packMetadata, null));
         } catch (Exception exception) {
             Constants.LOG.error("Could not load style {}", source, exception);
         }

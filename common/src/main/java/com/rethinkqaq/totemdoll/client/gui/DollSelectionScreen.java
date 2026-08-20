@@ -205,13 +205,13 @@ public final class DollSelectionScreen extends DollScreen implements DollScreenP
     @Override
     public void onClose() {
         if (this.minecraft != null) {
-            DollScreenAdapter.setScreen(this.minecraft, parent);
+            DollScreenAdapter.setScreen(this.minecraft, DollScreenAdapter.rootParent(this));
         }
     }
 
     @Override
     public Screen rootParent() {
-        return parent;
+        return DollScreenAdapter.rootParent(parent);
     }
 
     @Override

@@ -168,7 +168,7 @@ public final class DollCreateScreen extends DollScreen {
     @Override
     public void onClose() {
         releasePreviewTexture();
-        DollScreenAdapter.setScreen(this.minecraft, parent);
+        DollScreenAdapter.setScreen(this.minecraft, DollScreenAdapter.rootParent(parent));
     }
 
     @Override

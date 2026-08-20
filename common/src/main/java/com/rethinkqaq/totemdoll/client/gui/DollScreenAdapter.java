@@ -40,6 +40,14 @@ public final class DollScreenAdapter {
         //?}
     }
 
+    public static Screen rootParent(Screen screen) {
+        Screen current = screen;
+        while (current instanceof DollScreenParent parent && parent.rootParent() != current) {
+            current = parent.rootParent();
+        }
+        return current;
+    }
+
     private DollScreenAdapter() {
     }
 }
