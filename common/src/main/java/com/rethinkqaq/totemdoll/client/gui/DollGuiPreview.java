@@ -24,8 +24,10 @@ import com.rethinkqaq.totemdoll.client.DollPreviewContext;
 import com.rethinkqaq.totemdoll.doll.DollStyle;
 import com.rethinkqaq.totemdoll.doll.bone.DollBoneModels;
 import com.rethinkqaq.totemdoll.utils.DollGuiGraphics;
+import com.rethinkqaq.totemdoll.utils.DollMinecraftResourceUtil;
+import com.rethinkqaq.totemdoll.utils.DollNativeItemUtil;
+import com.rethinkqaq.totemdoll.utils.DollResourceId;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 //? >= 1.21.6 {
 /*import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.FilterMode;
@@ -35,14 +37,18 @@ import net.minecraft.client.gui.render.TextureSetup;
 
 /** Renders a TotemDoll preview using the best GUI path for the active version. */
 public final class DollGuiPreview {
+    private static final DollResourceId TOTEM_TEXTURE =
+            DollResourceId.ofVanilla("textures/item/totem_of_undying.png");
+
     private DollGuiPreview() {
     }
 
     public static void render(DollGuiGraphics graphics, DollStyle style, int x, int y, int width, int height, float modelScale) {
         if (!DollBoneModels.contains(style.id())) {
+            ItemStack totem = DollNativeItemUtil.createTotemStack();
             renderItemPreview(graphics, x, y, width, height, modelScale,
                     () -> DollPreviewContext.renderNative(
-                            () -> graphics.renderItem(new ItemStack(Items.TOTEM_OF_UNDYING), 0, 0)));
+                            () -> renderNativeTotem(graphics, totem)));
             return;
         }
 
@@ -53,8 +59,17 @@ public final class DollGuiPreview {
         *///?} else {
         renderItemPreview(graphics, x, y, width, height, modelScale,
                 () -> DollPreviewContext.renderAs(style,
-                        () -> graphics.renderItem(new ItemStack(Items.TOTEM_OF_UNDYING), 0, 0)));
+                        () -> graphics.renderItem(DollNativeItemUtil.createTotemStack(), 0, 0)));
         //?}
+    }
+
+    private static void renderNativeTotem(DollGuiGraphics graphics, ItemStack totem) {
+        if (totem.isEmpty()) {
+            graphics.blitTexture(DollMinecraftResourceUtil.nativeId(TOTEM_TEXTURE),
+                    0, 0, 0, 0, 16, 16, 16, 16);
+        } else {
+            graphics.renderItem(totem, 0, 0);
+        }
     }
 
     //? >= 1.21.11 {
