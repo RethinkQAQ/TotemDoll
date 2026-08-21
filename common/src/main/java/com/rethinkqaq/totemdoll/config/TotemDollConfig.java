@@ -36,8 +36,15 @@ import java.nio.file.Path;
 public final class TotemDollConfig {
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    public static final float MIN_SKIN_LAYER_THICKNESS = 0.05F;
+    public static final float MAX_SKIN_LAYER_THICKNESS = 1.0F;
+    public static final float MIN_SKIN_LAYER_DISTANCE = 0.0F;
+    public static final float MAX_SKIN_LAYER_DISTANCE = 64.0F;
     private static Path file;
     private static DollResourceId selectedStyle = DollStyles.ALEX_ID;
+    private static boolean skinLayer3dEnabled;
+    private static float skinLayer3dThickness = 0.25F;
+    private static float skinLayer3dDistance = 12.0F;
 
     public static void initialize(Path configDirectory) {
         file = configDirectory.resolve("totemdoll-client.json");
@@ -63,6 +70,25 @@ public final class TotemDollConfig {
         }
     }
 
+    public static boolean skinLayer3dEnabled() { return skinLayer3dEnabled; }
+    public static float skinLayer3dThickness() { return skinLayer3dThickness; }
+    public static float skinLayer3dDistance() { return skinLayer3dDistance; }
+
+    public static void setSkinLayer3dEnabled(boolean enabled) {
+        skinLayer3dEnabled = enabled;
+        save();
+    }
+
+    public static void setSkinLayer3dThickness(float thickness) {
+        skinLayer3dThickness = clamp(thickness, MIN_SKIN_LAYER_THICKNESS, MAX_SKIN_LAYER_THICKNESS);
+        save();
+    }
+
+    public static void setSkinLayer3dDistance(float distance) {
+        skinLayer3dDistance = clamp(distance, MIN_SKIN_LAYER_DISTANCE, MAX_SKIN_LAYER_DISTANCE);
+        save();
+    }
+
     private static void load() {
         if (file == null || !Files.isRegularFile(file)) {
             save();
@@ -77,6 +103,14 @@ public final class TotemDollConfig {
                     selectedStyle = parsed;
                 }
             }
+            if (root != null && root.has("skin_layer_3d")) {
+                JsonObject layer = root.getAsJsonObject("skin_layer_3d");
+                if (layer.has("enabled")) skinLayer3dEnabled = layer.get("enabled").getAsBoolean();
+                if (layer.has("thickness")) skinLayer3dThickness = clamp(
+                        layer.get("thickness").getAsFloat(), MIN_SKIN_LAYER_THICKNESS, MAX_SKIN_LAYER_THICKNESS);
+                if (layer.has("fallback_distance")) skinLayer3dDistance = clamp(
+                        layer.get("fallback_distance").getAsFloat(), MIN_SKIN_LAYER_DISTANCE, MAX_SKIN_LAYER_DISTANCE);
+            }
         } catch (Exception exception) {
             Constants.LOG.warn("Could not read {}, using Alex", file, exception);
             selectedStyle = DollStyles.ALEX_ID;
@@ -89,8 +123,13 @@ public final class TotemDollConfig {
         }
 
         JsonObject root = new JsonObject();
-        root.addProperty("format", 1);
+        root.addProperty("format", 2);
         root.addProperty("selected_style", selectedStyle.toString());
+        JsonObject layer = new JsonObject();
+        layer.addProperty("enabled", skinLayer3dEnabled);
+        layer.addProperty("thickness", skinLayer3dThickness);
+        layer.addProperty("fallback_distance", skinLayer3dDistance);
+        root.add("skin_layer_3d", layer);
 
         try {
             Files.createDirectories(file.getParent());
@@ -102,6 +141,10 @@ public final class TotemDollConfig {
 
     private static DollResourceId fallbackStyle() {
         return DollStyles.contains(DollStyles.ALEX_ID) ? DollStyles.ALEX_ID : DollStyles.VANILLA_ID;
+    }
+
+    private static float clamp(float value, float min, float max) {
+        return Math.max(min, Math.min(max, value));
     }
 
     private TotemDollConfig() {

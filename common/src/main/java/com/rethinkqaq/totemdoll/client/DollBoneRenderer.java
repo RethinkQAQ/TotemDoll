@@ -107,9 +107,10 @@ public final class DollBoneRenderer {
         poseStack.translate(-0.5F, -0.5F, -0.5F);
         //?}
         DollResourceId texture = resolveTexture(style, model);
+        DollSkinLayerRenderer.SkinLayerPlan skinLayers = DollSkinLayerRenderer.resolve(style, model, texture);
         var consumer = buffers.getBuffer(DollRenderUtil.entityTranslucent(texture));
         for (RuntimePart root : runtime.roots)
-            renderPart(root, poseStack, consumer, light, overlay);
+            renderPart(root, poseStack, consumer, light, overlay, skinLayers);
         poseStack.popPose();
         return true;
     }
@@ -140,6 +141,7 @@ public final class DollBoneRenderer {
         }
 
         DollResourceId texture = resolveTexture(style, model);
+        DollSkinLayerRenderer.SkinLayerPlan skinLayers = DollSkinLayerRenderer.resolve(style, model, texture);
 
         DollResourceId finalTexture = texture;
         nodeCollector.submitCustomGeometry(
@@ -150,7 +152,7 @@ public final class DollBoneRenderer {
                     capturedStack.last().pose().set(capturedPose.pose());
                     capturedStack.last().normal().set(capturedPose.normal());
                     for (RuntimePart root : runtime.roots) {
-                        renderPart(root, capturedStack, consumer, light, overlay);
+                        renderPart(root, capturedStack, consumer, light, overlay, skinLayers);
                     }
                 }
         );
@@ -175,7 +177,12 @@ public final class DollBoneRenderer {
         };
     }
 
-    public static void clear() { CACHE.clear(); }
+    public static void clear() {
+        CACHE.clear();
+        DollSkinLayerRenderer.clear();
+    }
+
+    public static void clearSkinLayerCache() { DollSkinLayerRenderer.clear(); }
 
     private static RenderData resolve(DollStyle style, DollBoneModel model) {
         if (model == null) return null;
@@ -241,15 +248,17 @@ public final class DollBoneRenderer {
     }
 
     private static void renderPart(RuntimePart runtime, PoseStack poseStack, VertexConsumer consumer,
-                                   int light, int overlay) {
+                                   int light, int overlay, DollSkinLayerRenderer.SkinLayerPlan skinLayers) {
         poseStack.pushPose();
         runtime.transform.translateAndRotate(poseStack);
         for (ModelPart.Cube cube : runtime.legacyCubes)
             cube.compile(poseStack.last(), consumer, light, overlay, -1);
         for (DollCube cube : runtime.faceCubes)
-            renderCube(cube, runtime.bone, poseStack, consumer, light, overlay);
+            if (!DollSkinLayerRenderer.isOverlayCube(skinLayers, runtime.bone.name(), cube))
+                renderCube(cube, runtime.bone, poseStack, consumer, light, overlay);
+        DollSkinLayerRenderer.render(skinLayers, runtime.bone.name(), poseStack, consumer, light, overlay);
         for (RuntimePart child : runtime.children)
-            renderPart(child, poseStack, consumer, light, overlay);
+            renderPart(child, poseStack, consumer, light, overlay, skinLayers);
         poseStack.popPose();
     }
 
