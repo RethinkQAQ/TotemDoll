@@ -24,7 +24,6 @@ import com.rethinkqaq.totemdoll.doll.bone.DollFace;
 import com.rethinkqaq.totemdoll.utils.DollFaceUtil;
 import com.rethinkqaq.totemdoll.utils.DollMinecraftResourceUtil;
 import com.rethinkqaq.totemdoll.utils.DollResourceId;
-import com.rethinkqaq.totemdoll.utils.UvUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.FaceInfo;
 import net.minecraft.core.Direction;
@@ -34,7 +33,6 @@ import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -109,9 +107,10 @@ public final class DollSkinLayerRenderer {
         return new SkinLayerPlan(quads, overlayCubes);
     }
 
+    /** Builds exposed shell edges from one shared six-face surface grid. */
     private static List<PixelQuad> buildPart(NativeImage image, DollBone renderBone, DollBone outerBone, DollCube outer) {
         float thickness = TotemDollConfig.skinLayer3dThickness();
-        List<PixelQuad> result = new ArrayList<>();
+        List<SurfaceCell> cells = new ArrayList<>();
         for (Map.Entry<String, DollFace> entry : outer.faces().entrySet()) {
             Direction direction = Direction.byName(entry.getKey());
             if (direction == null) continue;
@@ -128,37 +127,29 @@ public final class DollSkinLayerRenderer {
                     GridCell cell = GridCell.fromTexturePixel(face, textureU, textureV);
                     float[][] front = cell.points(outerCorners);
                     float[][] inner = offset(front, direction, -thickness);
-                    float[] uvs = cell.uvs(face);
-                    addVisibleWalls(result, image, direction, textureU, textureV, minU, maxU, minV, maxV, front, inner, uvs, alpha);
+                    cells.add(new SurfaceCell(direction, front, inner, cell.uvs(face), alpha >= VOXEL_ALPHA_THRESHOLD));
                 }
             }
         }
-        return result;
-    }
+        Map<EdgeKey, Integer> visibleEdgeCounts = new HashMap<>();
+        for (SurfaceCell cell : cells) {
+            for (int edge = 0; edge < 4; edge++) {
+                EdgeSegment segment = cell.edge(edge);
+                visibleEdgeCounts.merge(EdgeKey.of(segment.frontA, segment.frontB), 1, Integer::sum);
+            }
+        }
 
-    private static void addVisibleWalls(List<PixelQuad> result, NativeImage image, Direction direction, int u, int v,
-                                        int minU, int maxU, int minV, int maxV, float[][] front, float[][] inner,
-                                        float[] uvs, int alpha) {
-        if (!opaque(image, u - 1, v, minU, maxU, minV, maxV)) addWall(result, front, inner, 0, 1, uvs, alpha);
-        if (!opaque(image, u + 1, v, minU, maxU, minV, maxV)) addWall(result, front, inner, 3, 2, uvs, alpha);
-        if (!opaque(image, u, v - 1, minU, maxU, minV, maxV)) addWall(result, front, inner, 0, 3, uvs, alpha);
-        if (!opaque(image, u, v + 1, minU, maxU, minV, maxV)) addWall(result, front, inner, 1, 2, uvs, alpha);
-    }
-
-    private static boolean opaque(NativeImage image, int u, int v, int minU, int maxU, int minV, int maxV) {
-        return u >= minU && u < maxU && v >= minV && v < maxV
-                && alphaAt(image, u, v) >= VOXEL_ALPHA_THRESHOLD;
-    }
-
-    private static void addWall(List<PixelQuad> result, float[][] front, float[][] inner, int first, int second,
-                                float[] uvs, int alpha) {
-        float[][] wall = new float[][]{front[first], front[second], inner[second], inner[first]};
-        float[] normal = normal(wall);
-        float[] center = center(front);
-        float[] edge = midpoint(front[first], front[second]);
-        if (dot(normal, subtract(edge, center)) < 0) wall = new float[][]{front[second], front[first], inner[first], inner[second]};
-        normal = normal(wall);
-        result.add(new PixelQuad(wall, uvs, normal[0], normal[1], normal[2], alpha));
+        List<PixelQuad> walls = new ArrayList<>();
+        for (SurfaceCell cell : cells) {
+            if (!cell.solid) continue;
+            for (int edge = 0; edge < 4; edge++) {
+                EdgeSegment segment = cell.edge(edge);
+                if (visibleEdgeCounts.getOrDefault(EdgeKey.of(segment.frontA, segment.frontB), 0) == 1) {
+                    walls.add(segment.toQuad(cell.front));
+                }
+            }
+        }
+        return mergeWalls(walls);
     }
 
     private static void renderQuad(PixelQuad quad, Pose pose, VertexConsumer consumer, int light, int overlay) {
@@ -213,6 +204,64 @@ public final class DollSkinLayerRenderer {
     private static float[] center(float[][] points) { return new float[]{(points[0][0] + points[1][0] + points[2][0] + points[3][0]) / 4F, (points[0][1] + points[1][1] + points[2][1] + points[3][1]) / 4F, (points[0][2] + points[1][2] + points[2][2] + points[3][2]) / 4F}; }
     private static float dot(float[] left, float[] right) { return left[0] * right[0] + left[1] * right[1] + left[2] * right[2]; }
 
+    private static List<PixelQuad> mergeWalls(List<PixelQuad> input) {
+        List<PixelQuad> result = new ArrayList<>(input);
+        boolean changed;
+        do {
+            changed = false;
+            outer:
+            for (int first = 0; first < result.size(); first++) {
+                for (int second = first + 1; second < result.size(); second++) {
+                    PixelQuad merged = mergeWalls(result.get(first), result.get(second));
+                    if (merged == null) continue;
+                    result.set(first, merged);
+                    result.remove(second);
+                    changed = true;
+                    break outer;
+                }
+            }
+        } while (changed);
+        return result;
+    }
+
+    /** Merges two collinear wall segments while retaining the UVs at their endpoints. */
+    private static PixelQuad mergeWalls(PixelQuad first, PixelQuad second) {
+        if (!sameNormal(first, second)) return null;
+        float[][] a = first.points;
+        float[][] b = second.points;
+        if (samePoint(a[1], b[0]) && samePoint(a[2], b[3])) {
+            return mergedWall(a[0], b[1], b[2], a[3], uvAt(first.uvs, 0), uvAt(second.uvs, 1), first.normalX, first.normalY, first.normalZ);
+        }
+        if (samePoint(b[1], a[0]) && samePoint(b[2], a[3])) {
+            return mergedWall(b[0], a[1], a[2], b[3], uvAt(second.uvs, 0), uvAt(first.uvs, 1), first.normalX, first.normalY, first.normalZ);
+        }
+        return null;
+    }
+
+    private static PixelQuad mergedWall(float[] frontA, float[] frontB, float[] innerB, float[] innerA,
+                                        float[] uvA, float[] uvB, float normalX, float normalY, float normalZ) {
+        float[][] points = new float[][]{frontA, frontB, innerB, innerA};
+        float[] uvs = new float[]{uvA[0], uvA[1], uvB[0], uvB[1], uvB[0], uvB[1], uvA[0], uvA[1]};
+        return new PixelQuad(points, uvs, normalX, normalY, normalZ, 255);
+    }
+
+    private static boolean sameNormal(PixelQuad first, PixelQuad second) {
+        return Math.abs(first.normalX - second.normalX) < 0.0001F
+                && Math.abs(first.normalY - second.normalY) < 0.0001F
+                && Math.abs(first.normalZ - second.normalZ) < 0.0001F;
+    }
+
+    private static boolean samePoint(float[] first, float[] second) {
+        return Math.abs(first[0] - second[0]) < 0.0001F
+                && Math.abs(first[1] - second[1]) < 0.0001F
+                && Math.abs(first[2] - second[2]) < 0.0001F;
+    }
+
+    private static float[] uvAt(float[] uvs, int vertex) {
+        int index = vertex * 2;
+        return new float[]{uvs[index], uvs[index + 1]};
+    }
+
     private static NativeImage load(DollResourceId texture) {
         var id = DollMinecraftResourceUtil.nativeId(texture);
         try {
@@ -250,6 +299,67 @@ public final class DollSkinLayerRenderer {
     private record CacheKey(DollResourceId style, DollResourceId texture, float thickness) {}
     private record BoneCube(DollBone bone, DollCube cube) {
         private double volume() { return cube.width() * cube.height() * cube.depth(); }
+    }
+    private record SurfaceCell(Direction direction, float[][] front, float[][] inner, float[] uvs, boolean solid) {
+        private EdgeSegment edge(int index) {
+            int first = switch (index) {
+                case 0 -> 0;
+                case 1 -> 3;
+                case 2 -> 0;
+                default -> 1;
+            };
+            int second = switch (index) {
+                case 0 -> 1;
+                case 1 -> 2;
+                case 2 -> 3;
+                default -> 2;
+            };
+            return new EdgeSegment(front[first], front[second], inner[first], inner[second],
+                    uvAt(uvs, first), uvAt(uvs, second));
+        }
+
+        private static float[] uvAt(float[] uvs, int vertex) {
+            return new float[]{uvs[vertex * 2], uvs[vertex * 2 + 1]};
+        }
+    }
+    private record EdgeSegment(float[] frontA, float[] frontB, float[] innerA, float[] innerB,
+                               float[] uvA, float[] uvB) {
+        private PixelQuad toQuad(float[][] cellFront) {
+            float[][] points = new float[][]{frontA, frontB, innerB, innerA};
+            float[] normal = normal(points);
+            float[] center = center(cellFront);
+            if (dot(normal, subtract(midpoint(frontA, frontB), center)) < 0) {
+                points = new float[][]{frontB, frontA, innerA, innerB};
+                normal = normal(points);
+                return new PixelQuad(points,
+                        new float[]{uvB[0], uvB[1], uvA[0], uvA[1], uvA[0], uvA[1], uvB[0], uvB[1]},
+                        normal[0], normal[1], normal[2], 255);
+            }
+            return new PixelQuad(points,
+                    new float[]{uvA[0], uvA[1], uvB[0], uvB[1], uvB[0], uvB[1], uvA[0], uvA[1]},
+                    normal[0], normal[1], normal[2], 255);
+        }
+    }
+    private record PointKey(int x, int y, int z) implements Comparable<PointKey> {
+        private static PointKey of(float[] point) {
+            return new PointKey(Math.round(point[0] * 10000F), Math.round(point[1] * 10000F), Math.round(point[2] * 10000F));
+        }
+
+        @Override
+        public int compareTo(PointKey other) {
+            int xResult = Integer.compare(x, other.x);
+            if (xResult != 0) return xResult;
+            int yResult = Integer.compare(y, other.y);
+            return yResult != 0 ? yResult : Integer.compare(z, other.z);
+        }
+    }
+    private record EdgeKey(PointKey first, PointKey second) {
+        private static EdgeKey of(float[] first, float[] second) {
+            PointKey firstKey = PointKey.of(first);
+            PointKey secondKey = PointKey.of(second);
+            return firstKey.compareTo(secondKey) <= 0
+                    ? new EdgeKey(firstKey, secondKey) : new EdgeKey(secondKey, firstKey);
+        }
     }
     public record SkinLayerPlan(Map<String, List<PixelQuad>> quads,
                                 Map<String, Set<DollCube>> overlayCubes) {
