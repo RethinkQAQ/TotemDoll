@@ -245,6 +245,22 @@ jobs:
           path: combined-artifacts/*.jar
           if-no-files-found: error
 
+      - name: Package release mod jars
+        if: github.event_name == 'release'
+        shell: bash
+        run: |
+          rm -f mod-jars.zip
+          zip -j -q mod-jars.zip combined-artifacts/*.jar
+          unzip -Z1 mod-jars.zip
+
+      - name: Upload release mod jars ZIP
+        if: github.event_name == 'release'
+        uses: actions/upload-artifact@v4
+        with:
+          name: mod-jars
+          path: mod-jars.zip
+          if-no-files-found: error
+
       - name: Upload release staging artifact
         if: github.event_name == 'release'
         uses: actions/upload-artifact@v4
