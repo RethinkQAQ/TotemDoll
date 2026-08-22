@@ -227,7 +227,7 @@ public final class DollSkinLayerRenderer {
     }
 
     private static int alphaAt(NativeImage image, int x, int y) {
-        //? >= 1.21.10 {
+        //? >= 1.21.3 {
         /*return image.getPixel(x, y) >>> 24;
         *///?} else {
         return image.getPixelRGBA(x, y) >>> 24;
