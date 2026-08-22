@@ -43,7 +43,7 @@ public final class TotemDollConfig {
     private static Path file;
     private static DollResourceId selectedStyle = DollStyles.ALEX_ID;
     private static boolean skinLayer3dEnabled;
-    private static float skinLayer3dThickness = 0.25F;
+    private static float skinLayer3dThickness = 0.5F;
     private static float skinLayer3dDistance = 12.0F;
 
     public static void initialize(Path configDirectory) {
