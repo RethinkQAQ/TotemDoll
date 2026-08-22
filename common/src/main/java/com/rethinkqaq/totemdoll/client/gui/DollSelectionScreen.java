@@ -25,6 +25,7 @@ import com.rethinkqaq.totemdoll.utils.DollGuiGraphics;
 import com.rethinkqaq.totemdoll.doll.DollStyle;
 import com.rethinkqaq.totemdoll.doll.DollStyles;
 import com.rethinkqaq.totemdoll.doll.DollAnimationManager;
+import com.rethinkqaq.totemdoll.client.DollBoneRenderer;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -72,7 +73,7 @@ public final class DollSelectionScreen extends DollScreen implements DollScreenP
                 .sorted(styleComparator())
                 .toList();
 
-        for (DollStyle style : styles) {
+        for (DollStyle style : tab == Tab.SETTINGS ? List.<DollStyle>of() : styles) {
             DollCardWidget card = new DollCardWidget(
                     0,
                     0,
@@ -97,6 +98,13 @@ public final class DollSelectionScreen extends DollScreen implements DollScreenP
                 button -> switchTab(Tab.MY_STYLES)
         ).bounds(14, HEADER_HEIGHT + 54, SIDEBAR_WIDTH - 22, 20).build());
         this.addRenderableWidget(Button.builder(
+                tabLabel(Tab.SETTINGS),
+                button -> switchTab(Tab.SETTINGS)
+        ).bounds(14, HEADER_HEIGHT + 80, SIDEBAR_WIDTH - 22, 20).build());
+        if (tab == Tab.SETTINGS) {
+            addSettingsWidgets();
+        }
+        this.addRenderableWidget(Button.builder(
                 Component.translatable("gui.done"),
                 button -> onClose()
         ).bounds(this.width - 108, this.height - 30, 96, 20).build());
@@ -120,7 +128,9 @@ public final class DollSelectionScreen extends DollScreen implements DollScreenP
     private Component tabLabel(Tab target) {
         Component label = Component.translatable(target == Tab.TEMPLATES
                 ? "screen.totemdoll.templates"
-                : "screen.totemdoll.my_styles");
+                : target == Tab.MY_STYLES
+                ? "screen.totemdoll.my_styles"
+                : "screen.totemdoll.settings");
         return target == tab ? Component.literal("> ").append(label) : label;
     }
 
@@ -128,6 +138,51 @@ public final class DollSelectionScreen extends DollScreen implements DollScreenP
         if (target != tab) {
             DollScreenAdapter.setScreen(this.minecraft, new DollSelectionScreen(parent, target));
         }
+    }
+
+    private void addSettingsWidgets() {
+        int left = SIDEBAR_WIDTH + 42;
+        int right = this.width - 42;
+        int contentWidth = Math.max(180, right - left);
+        int top = HEADER_HEIGHT + 34;
+
+        this.addRenderableWidget(Button.builder(
+                Component.translatable(TotemDollConfig.skinLayer3dEnabled()
+                        ? "screen.totemdoll.skin_layer_3d.enabled"
+                        : "screen.totemdoll.skin_layer_3d.disabled"),
+                button -> {
+                    TotemDollConfig.setSkinLayer3dEnabled(!TotemDollConfig.skinLayer3dEnabled());
+                    DollBoneRenderer.clearSkinLayerCache();
+                    DollScreenAdapter.setScreen(this.minecraft, new DollSelectionScreen(parent, Tab.SETTINGS));
+                }
+        ).bounds(left, top, contentWidth, 20).build());
+
+        this.addRenderableWidget(new DollSettingSlider(
+                left, top + 48, contentWidth, 20,
+                (TotemDollConfig.skinLayer3dThickness() - TotemDollConfig.MIN_SKIN_LAYER_THICKNESS)
+                        / (TotemDollConfig.MAX_SKIN_LAYER_THICKNESS - TotemDollConfig.MIN_SKIN_LAYER_THICKNESS),
+                value -> Component.translatable("screen.totemdoll.skin_layer_3d.thickness",
+                        String.format(java.util.Locale.ROOT, "%.2f", TotemDollConfig.MIN_SKIN_LAYER_THICKNESS
+                                + value * (TotemDollConfig.MAX_SKIN_LAYER_THICKNESS
+                                - TotemDollConfig.MIN_SKIN_LAYER_THICKNESS))),
+                value -> {
+                    float raw = TotemDollConfig.MIN_SKIN_LAYER_THICKNESS + value.floatValue()
+                            * (TotemDollConfig.MAX_SKIN_LAYER_THICKNESS
+                            - TotemDollConfig.MIN_SKIN_LAYER_THICKNESS);
+                    float stepped = Math.round(raw / 0.05F) * 0.05F;
+                    TotemDollConfig.setSkinLayer3dThickness(stepped);
+                    DollBoneRenderer.clearSkinLayerCache();
+                }
+        ));
+
+        this.addRenderableWidget(new DollSettingSlider(
+                left, top + 96, contentWidth, 20,
+                TotemDollConfig.skinLayer3dDistance() / TotemDollConfig.MAX_SKIN_LAYER_DISTANCE,
+                value -> Component.translatable("screen.totemdoll.skin_layer_3d.distance",
+                        Math.round(value * TotemDollConfig.MAX_SKIN_LAYER_DISTANCE)),
+                value -> TotemDollConfig.setSkinLayer3dDistance(
+                        Math.round(value * TotemDollConfig.MAX_SKIN_LAYER_DISTANCE))
+        ));
     }
 
     private Comparator<DollStyle> styleComparator() {
@@ -216,7 +271,7 @@ public final class DollSelectionScreen extends DollScreen implements DollScreenP
 
     @Override
     protected void renderContent(DollGuiGraphics gui, int mouseX, int mouseY, float partialTick) {
-        if (cards.isEmpty()) {
+        if (tab != Tab.SETTINGS && cards.isEmpty()) {
             Component emptyTitle = Component.translatable("screen.totemdoll.empty_title");
             Component emptyHint = Component.translatable("screen.totemdoll.empty_hint");
             int centerX = SIDEBAR_WIDTH + (this.width - SIDEBAR_WIDTH) / 2;
@@ -232,6 +287,14 @@ public final class DollSelectionScreen extends DollScreen implements DollScreenP
                 partialTick,
                 child -> child instanceof DollCardWidget
         );
+        if (tab == Tab.SETTINGS) {
+            gui.text(this.font, Component.translatable("screen.totemdoll.settings"),
+                    SIDEBAR_WIDTH + 42, HEADER_HEIGHT + 18, 0xFFFFFFFF);
+            gui.text(this.font, Component.translatable("screen.totemdoll.skin_layer_3d.description"),
+                    SIDEBAR_WIDTH + 42, HEADER_HEIGHT + 62, 0xFFA0A0A0);
+            gui.text(this.font, Component.translatable("screen.totemdoll.skin_layer_3d.distance_hint"),
+                    SIDEBAR_WIDTH + 42, HEADER_HEIGHT + 110, 0xFFA0A0A0);
+        }
         gui.disableScissor();
 
         // Draw fixed panels after the scrollable cards. Card previews can extend
@@ -290,12 +353,17 @@ public final class DollSelectionScreen extends DollScreen implements DollScreenP
         graphics.fill(8, HEADER_HEIGHT + 8, SIDEBAR_WIDTH - 4, this.height - FOOTER_HEIGHT, 0xFF181818);
         graphics.fill(SIDEBAR_WIDTH - 6, HEADER_HEIGHT + 8, SIDEBAR_WIDTH - 4, this.height - FOOTER_HEIGHT, 0xFF3D3D3D);
         graphics.text(this.font, Component.translatable("screen.totemdoll.library"), 18, HEADER_HEIGHT + 18, 0xFFA0A0A0);
-        int indicatorY = tab == Tab.TEMPLATES ? HEADER_HEIGHT + 28 : HEADER_HEIGHT + 54;
+        int indicatorY = switch (tab) {
+            case TEMPLATES -> HEADER_HEIGHT + 28;
+            case MY_STYLES -> HEADER_HEIGHT + 54;
+            case SETTINGS -> HEADER_HEIGHT + 80;
+        };
         graphics.fill(10, indicatorY, 13, indicatorY + 20, 0xFF55D878);
     }
 
     public enum Tab {
         TEMPLATES,
-        MY_STYLES
+        MY_STYLES,
+        SETTINGS
     }
 }
