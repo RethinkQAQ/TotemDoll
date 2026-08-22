@@ -42,6 +42,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class DollSkinLayerRenderer {
     /** Semi-transparent skin pixels stay on the original continuous outer layer. */
     private static final int VOXEL_ALPHA_THRESHOLD = 250;
+    /** Keeps side-wall samples away from neighboring transparent texels. */
+    private static final float UV_PIXEL_INSET = 0.08F;
     private static final Map<CacheKey, SkinLayerPlan> CACHE = new ConcurrentHashMap<>();
     private static final Set<String> SUPPORTED_BONES = Set.of(
             "head", "body", "left_arm", "right_arm", "left_leg", "right_leg"
@@ -123,7 +125,7 @@ public final class DollSkinLayerRenderer {
             for (int textureV = minV; textureV < maxV; textureV++) {
                 for (int textureU = minU; textureU < maxU; textureU++) {
                     int alpha = alphaAt(image, textureU, textureV);
-                    if (alpha < VOXEL_ALPHA_THRESHOLD) continue;
+                    if (alpha <= 0) continue;
                     GridCell cell = GridCell.fromTexturePixel(face, textureU, textureV);
                     float[][] front = cell.points(outerCorners);
                     float[][] inner = offset(front, direction, -thickness);
@@ -131,11 +133,14 @@ public final class DollSkinLayerRenderer {
                 }
             }
         }
-        Map<EdgeKey, Integer> visibleEdgeCounts = new HashMap<>();
+        // A translucent pixel is present in the texture, but it must not fully
+        // occlude a neighboring solid pixel. Only solid-solid edges are internal.
+        Map<EdgeKey, Integer> solidEdgeCounts = new HashMap<>();
         for (SurfaceCell cell : cells) {
+            if (!cell.solid) continue;
             for (int edge = 0; edge < 4; edge++) {
                 EdgeSegment segment = cell.edge(edge);
-                visibleEdgeCounts.merge(EdgeKey.of(segment.frontA, segment.frontB), 1, Integer::sum);
+                solidEdgeCounts.merge(EdgeKey.of(segment.frontA, segment.frontB), 1, Integer::sum);
             }
         }
 
@@ -144,7 +149,7 @@ public final class DollSkinLayerRenderer {
             if (!cell.solid) continue;
             for (int edge = 0; edge < 4; edge++) {
                 EdgeSegment segment = cell.edge(edge);
-                if (visibleEdgeCounts.getOrDefault(EdgeKey.of(segment.frontA, segment.frontB), 0) == 1) {
+                if (solidEdgeCounts.getOrDefault(EdgeKey.of(segment.frontA, segment.frontB), 0) == 1) {
                     walls.add(segment.toQuad(cell.front));
                 }
             }
@@ -314,8 +319,21 @@ public final class DollSkinLayerRenderer {
                 case 2 -> 3;
                 default -> 2;
             };
+            float[] cellCenter = new float[]{
+                    (uvs[0] + uvs[2] + uvs[4] + uvs[6]) / 4F,
+                    (uvs[1] + uvs[3] + uvs[5] + uvs[7]) / 4F
+            };
             return new EdgeSegment(front[first], front[second], inner[first], inner[second],
-                    uvAt(uvs, first), uvAt(uvs, second));
+                    insetUv(uvAt(uvs, first), cellCenter), insetUv(uvAt(uvs, second), cellCenter));
+        }
+
+        private static float[] insetUv(float[] uv, float[] center) {
+            float deltaU = center[0] - uv[0];
+            float deltaV = center[1] - uv[1];
+            float length = (float) Math.sqrt(deltaU * deltaU + deltaV * deltaV);
+            if (length == 0F) return uv;
+            float scale = Math.min(1F, UV_PIXEL_INSET / length);
+            return new float[]{uv[0] + deltaU * scale, uv[1] + deltaV * scale};
         }
 
         private static float[] uvAt(float[] uvs, int vertex) {
