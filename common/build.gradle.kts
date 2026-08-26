@@ -22,8 +22,8 @@ dependencies {
             parchment("org.parchmentmc.data:parchment-${commonMod.mc}:${commonMod.dep("parchment")}@zip")
         })
     }
+    compileOnly("com.github.RethinkQAQ.RethinkConfigUiLib:rethink-config-ui-lib-mc${commonMod.mc}:0.1.2-local")
 }
-
 configureTotemDollMixinSupport(TotemDollMixinTarget.COMMON)
 
 if (!commonMod.unobfuscated) {

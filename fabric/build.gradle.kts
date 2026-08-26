@@ -17,6 +17,9 @@ dependencies {
     modImplementation("net.fabricmc:fabric-loader:${commonMod.dep("fabric-loader")}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${commonMod.dep("fabric-api")}+${commonMod.mc}")
     modImplementation("com.terraformersmc:modmenu:${commonMod.dep("modmenu")}")
+
+    modImplementation("com.github.RethinkQAQ.RethinkConfigUiLib:rethink-config-ui-lib-mc${commonMod.mc}:0.1.2-local")
+    include("com.github.RethinkQAQ.RethinkConfigUiLib:rethink-config-ui-lib-mc${commonMod.mc}:0.1.2-local")
 }
 
 configureTotemDollMixinSupport(TotemDollMixinTarget.FABRIC)

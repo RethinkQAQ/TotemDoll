@@ -27,4 +27,7 @@ neoForge {
             sourceSet(sourceSets.main.get())
         }
     }
+    dependencies {
+        jarJar("com.github.RethinkQAQ.RethinkConfigUiLib:rethink-config-ui-lib-mc${commonMod.mc}:0.1.2-local")
+    }
 }
