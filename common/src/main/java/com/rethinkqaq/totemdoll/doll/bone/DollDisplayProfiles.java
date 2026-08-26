@@ -20,12 +20,16 @@
 
 package com.rethinkqaq.totemdoll.doll.bone;
 
-import com.rethinkqaq.totemdoll.utils.DollResourceId;
-
-import java.util.List;
 import java.util.Map;
 
-public record DollBoneModel(int textureWidth, int textureHeight, DollResourceId texture,
-                            List<DollBone> roots, Map<String, DollBoneAnimation> animations,
-                            List<DollActionBinding> bindings,
-                            DollDisplayProfiles displays) {}
+public record DollDisplayProfiles(Map<String, DollDisplayTransform> normal,
+                                  Map<String, DollDisplayTransform> firstPerson) {
+    public DollDisplayProfiles {
+        normal = Map.copyOf(normal);
+        firstPerson = Map.copyOf(firstPerson);
+    }
+
+    public Map<String, DollDisplayTransform> forFirstPerson(boolean firstPersonPerspective) {
+        return firstPersonPerspective ? firstPerson : normal;
+    }
+}

@@ -20,12 +20,13 @@
 
 package com.rethinkqaq.totemdoll.doll.bone;
 
-import com.rethinkqaq.totemdoll.utils.DollResourceId;
-
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-public record DollBoneModel(int textureWidth, int textureHeight, DollResourceId texture,
-                            List<DollBone> roots, Map<String, DollBoneAnimation> animations,
-                            List<DollActionBinding> bindings,
-                            DollDisplayProfiles displays) {}
+public record DollDisplayOverride(List<String> mods, boolean firstPersonOnly,
+                                  Map<String, DollDisplayTransformPatch> contexts) {
+    public boolean matches(Set<String> loadedMods) {
+        return mods.stream().anyMatch(loadedMods::contains);
+    }
+}

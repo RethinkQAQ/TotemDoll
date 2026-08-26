@@ -32,6 +32,7 @@ import com.rethinkqaq.totemdoll.doll.bone.DollBoneModel;
 import com.rethinkqaq.totemdoll.doll.bone.DollBoneModelLoader;
 import com.rethinkqaq.totemdoll.doll.bone.DollBoneModels;
 import com.rethinkqaq.totemdoll.doll.bone.DollBoneActionManager;
+import com.rethinkqaq.totemdoll.doll.bone.DollDisplayOverrideResolver;
 import com.rethinkqaq.totemdoll.client.DollBoneRenderer;
 import com.rethinkqaq.totemdoll.client.gui.DollGuiPreviewRenderer;
 
@@ -53,18 +54,19 @@ public final class DollStyleLoader {
         DollBoneActionManager.clear();
         DollBoneModels.clear();
         List<DollStyle> styles = new ArrayList<>();
+        Map<String, Boolean> loadedModCache = new LinkedHashMap<>();
         List<Map.Entry<DollResourceId, Resource>> resources = new ArrayList<>();
         for (var entry : manager.listResources("styles", id -> id.getPath().endsWith("/style.json")).entrySet()) {
             resources.add(Map.entry(DollMinecraftResourceUtil.fromNative(entry.getKey()), entry.getValue()));
         }
         resources.sort(Map.Entry.comparingByKey(Comparator.comparing(DollResourceId::toString)));
-        resources.forEach(entry -> loadOne(manager, entry.getKey(), entry.getValue(), styles));
+        resources.forEach(entry -> loadOne(manager, entry.getKey(), entry.getValue(), styles, loadedModCache));
         DollStyles.replaceDiscovered(styles);
         return List.copyOf(styles);
     }
 
     private static void loadOne(ResourceManager manager, DollResourceId source, Resource resource,
-                                List<DollStyle> output) {
+                                List<DollStyle> output, Map<String, Boolean> loadedModCache) {
         try (Reader reader = resource.openAsReader()) {
             JsonObject root = GSON.fromJson(reader, JsonObject.class);
             if (root == null || !root.has("format") || root.get("format").getAsInt() != 3) {
@@ -89,7 +91,7 @@ public final class DollStyleLoader {
             if (model == null || !model.has("type")) throw new IllegalArgumentException("Missing model.type");
             String modelType = model.get("type").getAsString();
             if (!"mesh".equals(modelType)) throw new IllegalArgumentException("Unsupported model type " + modelType);
-            DollBoneModel loadedModel = DollBoneModelLoader.load(manager, source, root, model);
+            DollBoneModel loadedModel = DollBoneModelLoader.load(manager, source, root, model, loadedModCache);
             DollBoneModels.put(id, loadedModel);
             DollResourceId modelId = DollResourceId.ofVanilla("item/totem_of_undying");
             String name = root.has("name") ? root.get("name").getAsString() : id.toString();

@@ -16,6 +16,19 @@ export interface TextureAnimation {
   enabled?: boolean;
 }
 
+export interface DisplayTransform {
+  rotation?: [number, number, number];
+  translation?: [number, number, number];
+  scale?: [number, number, number];
+}
+
+export interface DisplayOverride {
+  mods: string[];
+  match?: "any";
+  perspective?: "firstperson";
+  contexts: Record<string, DisplayTransform>;
+}
+
 export interface StyleDefinition {
   format: 3;
   id: string;
@@ -31,6 +44,7 @@ export interface StyleDefinition {
   features: { animations: boolean; dynamic_textures: boolean };
   animations?: Record<string, ActionBinding>;
   texture_animations?: Record<string, TextureAnimation>;
+  compatibility?: { display_overrides?: DisplayOverride[] };
   [key: string]: unknown;
 }
 

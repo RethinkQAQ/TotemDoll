@@ -47,7 +47,32 @@ Static styles provide geometry only. Animated styles also provide an animation f
 
 ## Display contexts
 
-Display transforms may be declared in `style.json` or `geometry.json`, with style taking precedence. Stable context names are `gui`, `ground`, `fixed`, `firstperson`, `thirdperson`, and `head`. Each transform contains `rotation`, `translation`, and `scale` vectors.
+Display transforms may be declared in `style.json` or `geometry.json`, with style taking precedence. Stable context names are `gui`, `ground`, `fixed`, `firstperson`, `firstperson_righthand`, `firstperson_lefthand`, `thirdperson`, `thirdperson_righthand`, `thirdperson_lefthand`, `head`, and `on_shelf`. Each transform contains `rotation`, `translation`, and `scale` vectors.
+
+### Mod compatibility display overrides
+
+A style may override display transforms when selected mods are loaded. Mod checks happen only while resources are loaded or reloaded, not during rendering:
+
+```json
+"compatibility": {
+  "display_overrides": [
+    {
+      "mods": ["firstperson", "punchy"],
+      "match": "any",
+      "contexts": {
+        "thirdperson_righthand": {
+          "rotation": [70, 0, 0],
+          "translation": [0, 1.5, 1.5],
+          "scale": [0.5, 0.5, 0.5]
+        },
+        "thirdperson_lefthand": {}
+      }
+    }
+  ]
+}
+```
+
+`match` defaults to `any`. Setting `perspective` to `firstperson` limits an override to the first-person camera; omitting it preserves the general behavior. Matching entries are merged in array order; later fields override earlier fields and omitted fields inherit the base display transform. Compatibility overrides affect display transforms only, not models, textures, or animations.
 
 ## Animation
 

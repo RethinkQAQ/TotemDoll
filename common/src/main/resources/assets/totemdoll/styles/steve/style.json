@@ -7,5 +7,24 @@
   "model": { "type": "mesh", "geometry": "models/geometry.json" },
   "textures": { "base": "textures/base.png" },
   "skin": { "supported": true, "format": "minecraft_64x64", "target": "base", "mapping": "minecraft_player" },
-  "features": { "animations": false, "dynamic_textures": false }
+  "features": { "animations": false, "dynamic_textures": false },
+  "compatibility": {
+    "display_overrides": [{
+      "mods": ["firstperson", "punchy"],
+      "match": "any",
+      "perspective": "firstperson",
+      "contexts": {
+        "thirdperson_righthand": {
+          "rotation": [0, -180, 0],
+          "translation": [0, 3.5, 0],
+          "scale": [0.5, 0.5, 0.5]
+        },
+        "thirdperson_lefthand": {
+          "rotation": [0, -180, 0],
+          "translation": [0, 3.5, 0],
+          "scale": [0.5, 0.5, 0.5]
+        }
+      }
+    }]
+  }
 }

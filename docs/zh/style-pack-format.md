@@ -47,7 +47,32 @@ styles/example/
 
 ## 显示上下文
 
-display 可写在 `style.json` 或 `geometry.json`，style 优先。稳定上下文名为 `gui`、`ground`、`fixed`、`firstperson`、`thirdperson` 和 `head`。每项包含 `rotation`、`translation`、`scale` 三元数组。
+display 可写在 `style.json` 或 `geometry.json`，style 优先。稳定上下文名为 `gui`、`ground`、`fixed`、`firstperson`、`firstperson_righthand`、`firstperson_lefthand`、`thirdperson`、`thirdperson_righthand`、`thirdperson_lefthand`、`head` 和 `on_shelf`。每项包含 `rotation`、`translation`、`scale` 三元数组。
+
+### 模组兼容显示覆盖
+
+样式可以根据已加载的模组覆盖显示变换。模组检测只在资源加载和重载时进行，渲染过程中不会重复查询：
+
+```json
+"compatibility": {
+  "display_overrides": [
+    {
+      "mods": ["firstperson", "punchy"],
+      "match": "any",
+      "contexts": {
+        "thirdperson_righthand": {
+          "rotation": [70, 0, 0],
+          "translation": [0, 1.5, 1.5],
+          "scale": [0.5, 0.5, 0.5]
+        },
+        "thirdperson_lefthand": {}
+      }
+    }
+  ]
+}
+```
+
+`match` 缺省时为 `any`。设置 `perspective` 为 `firstperson` 后，覆盖只在第一人称相机中生效；未设置时保持通用行为。多个匹配项按数组顺序合并，后面的已填写字段覆盖前面的字段，未填写字段继承基础 display。兼容覆盖只影响显示变换，不改变模型、纹理或动画。
 
 ## 动画
 

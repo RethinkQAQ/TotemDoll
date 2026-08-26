@@ -41,7 +41,8 @@ public final class DollBoneModelLoader {
     private static final Gson GSON = new Gson();
 
     public static DollBoneModel load(ResourceManager manager, DollResourceId styleSource,
-                                     JsonObject style, JsonObject model) throws IOException {
+                                     JsonObject style, JsonObject model,
+                                     Map<String, Boolean> loadedModCache) throws IOException {
         String geometryPath = safePath(model, "geometry");
         String animationsPath = model.has("animations") ? safePath(model, "animations") : null;
         JsonObject geometry = read(manager, resolve(styleSource, geometryPath));
@@ -63,8 +64,11 @@ public final class DollBoneModelLoader {
         Map<String, DollBoneAnimation> animations = animationsPath == null
                 ? Map.of() : readAnimations(manager, resolve(styleSource, animationsPath));
         List<DollActionBinding> bindings = readBindings(style, animations);
+        Map<String, DollDisplayTransform> display = readDisplay(style, geometry);
+        List<DollDisplayOverride> overrides = DollDisplayOverrideResolver.read(style);
+        DollDisplayProfiles displays = DollDisplayOverrideResolver.resolveProfiles(display, overrides, loadedModCache);
         return new DollBoneModel(textureWidth, textureHeight, texture, List.copyOf(roots),
-                Map.copyOf(animations), List.copyOf(bindings), readDisplay(style, geometry));
+                Map.copyOf(animations), List.copyOf(bindings), displays);
     }
 
     private static Map<String, DollDisplayTransform> readDisplay(JsonObject style, JsonObject geometry) {
@@ -84,19 +88,11 @@ public final class DollBoneModelLoader {
             translation[0] /= 16F;
             translation[1] /= 16F;
             translation[2] /= 16F;
-            result.put(normalizeDisplayContext(context), new DollDisplayTransform(rotation[0], rotation[1], rotation[2],
+            String normalizedContext = "none".equals(context) ? "fixed" : context;
+            result.put(normalizedContext, new DollDisplayTransform(rotation[0], rotation[1], rotation[2],
                     translation[0], translation[1], translation[2], scale[0], scale[1], scale[2]));
         }
         return Map.copyOf(result);
-    }
-
-    private static String normalizeDisplayContext(String context) {
-        return switch (context) {
-            case "firstperson_righthand", "firstperson_lefthand" -> "firstperson";
-            case "thirdperson_righthand", "thirdperson_lefthand" -> "thirdperson";
-            case "none" -> "fixed";
-            default -> context;
-        };
     }
 
     private static DollBone readBone(JsonObject object, int depth, Counter counter) throws IOException {

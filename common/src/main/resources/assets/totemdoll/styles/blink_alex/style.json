@@ -34,5 +34,24 @@
       "trigger": "on_totem_activate",
       "interval": { "min": 0, "max": 0 }
     }
+  },
+  "compatibility": {
+    "display_overrides": [{
+      "mods": ["firstperson", "punchy"],
+      "match": "any",
+      "perspective": "firstperson",
+      "contexts": {
+        "thirdperson_righthand": {
+          "rotation": [0, -180, 0],
+          "translation": [0, 3.5, 0],
+          "scale": [0.5, 0.5, 0.5]
+        },
+        "thirdperson_lefthand": {
+          "rotation": [0, -180, 0],
+          "translation": [0, 3.5, 0],
+          "scale": [0.5, 0.5, 0.5]
+        }
+      }
+    }]
   }
 }

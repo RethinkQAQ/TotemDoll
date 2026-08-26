@@ -22,4 +22,8 @@ package com.rethinkqaq.totemdoll.doll.bone;
 
 public record DollDisplayTransform(float rotationX, float rotationY, float rotationZ,
                                    float translationX, float translationY, float translationZ,
-                                   float scaleX, float scaleY, float scaleZ) {}
+                                   float scaleX, float scaleY, float scaleZ) {
+    public static final DollDisplayTransform IDENTITY = new DollDisplayTransform(
+            0, 0, 0, 0, 0, 0, 1, 1, 1
+    );
+}

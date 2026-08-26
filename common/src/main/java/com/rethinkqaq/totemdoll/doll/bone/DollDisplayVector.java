@@ -20,12 +20,4 @@
 
 package com.rethinkqaq.totemdoll.doll.bone;
 
-import com.rethinkqaq.totemdoll.utils.DollResourceId;
-
-import java.util.List;
-import java.util.Map;
-
-public record DollBoneModel(int textureWidth, int textureHeight, DollResourceId texture,
-                            List<DollBone> roots, Map<String, DollBoneAnimation> animations,
-                            List<DollActionBinding> bindings,
-                            DollDisplayProfiles displays) {}
+public record DollDisplayVector(float x, float y, float z) {}

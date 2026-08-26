@@ -29,6 +29,7 @@ import com.rethinkqaq.totemdoll.doll.bone.DollBoneActionManager;
 import com.rethinkqaq.totemdoll.doll.bone.DollBoneModel;
 import com.rethinkqaq.totemdoll.doll.bone.DollBoneModels;
 import com.rethinkqaq.totemdoll.doll.bone.DollCube;
+import com.rethinkqaq.totemdoll.doll.bone.DollDisplayContext;
 import com.rethinkqaq.totemdoll.doll.bone.DollDisplayTransform;
 import com.rethinkqaq.totemdoll.doll.bone.DollFace;
 import com.rethinkqaq.totemdoll.utils.UvUtil;
@@ -83,8 +84,7 @@ public final class DollBoneRenderer {
         applyPoses(style, runtime, partialTick);
 
         poseStack.pushPose();
-        DollDisplayTransform display = model.display().get(displayContext(context));
-        if (display == null) display = model.display().get("fixed");
+        DollDisplayTransform display = displayTransform(model, context);
         if (display != null) {
             new ItemTransform(
                     new Vector3f(display.rotationX(), display.rotationY(), display.rotationZ()),
@@ -128,8 +128,7 @@ public final class DollBoneRenderer {
         applyPoses(style, runtime, partialTick);
 
         poseStack.pushPose();
-        DollDisplayTransform display = model.display().get(displayContext(context));
-        if (display == null) display = model.display().get("fixed");
+        DollDisplayTransform display = displayTransform(model, context);
         if (display != null) {
             new ItemTransform(
                     new Vector3f(display.rotationX(), display.rotationY(), display.rotationZ()),
@@ -164,16 +163,32 @@ public final class DollBoneRenderer {
 
     private static String displayContext(ItemDisplayContext context) {
         return switch (context) {
-            case GUI -> "gui";
-            case GROUND -> "ground";
-            case FIXED -> "fixed";
-            case FIRST_PERSON_LEFT_HAND, FIRST_PERSON_RIGHT_HAND -> "firstperson";
-            case THIRD_PERSON_LEFT_HAND, THIRD_PERSON_RIGHT_HAND -> "thirdperson";
-            case HEAD -> "head";
+            case GUI -> DollDisplayContext.GUI;
+            case GROUND -> DollDisplayContext.GROUND;
+            case FIXED -> DollDisplayContext.FIXED;
+            case FIRST_PERSON_LEFT_HAND -> DollDisplayContext.FIRSTPERSON_LEFTHAND;
+            case FIRST_PERSON_RIGHT_HAND -> DollDisplayContext.FIRSTPERSON_RIGHTHAND;
+            case THIRD_PERSON_LEFT_HAND -> DollDisplayContext.THIRDPERSON_LEFTHAND;
+            case THIRD_PERSON_RIGHT_HAND -> DollDisplayContext.THIRDPERSON_RIGHTHAND;
+            case HEAD -> DollDisplayContext.HEAD;
             //? >= 1.21.10 {
-            /*case ON_SHELF -> "on_shelf";
+            /*case ON_SHELF -> DollDisplayContext.ON_SHELF;
             *///?}
-            default -> "fixed";
+            default -> DollDisplayContext.FIXED;
+        };
+    }
+
+    private static DollDisplayTransform displayTransform(DollBoneModel model, ItemDisplayContext context) {
+        Map<String, DollDisplayTransform> displays = model.displays().forFirstPerson(firstPersonPerspective(context));
+        return DollDisplayContext.resolve(displays, displayContext(context));
+    }
+
+    private static boolean firstPersonPerspective(ItemDisplayContext context) {
+        return switch (context) {
+            case FIRST_PERSON_LEFT_HAND, FIRST_PERSON_RIGHT_HAND,
+                    THIRD_PERSON_LEFT_HAND, THIRD_PERSON_RIGHT_HAND ->
+                    Minecraft.getInstance().options.getCameraType().isFirstPerson();
+            default -> false;
         };
     }
 

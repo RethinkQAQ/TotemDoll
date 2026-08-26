@@ -63,6 +63,7 @@ styles/example/models/geometry.json
 - 动作绑定的 `texture_animation` 可以联动 `texture_animations` 中 `trigger: "linked"` 的纹理帧动画。
 - `frame_duration`、`interval.min` 和 `interval.max` 都使用 tick，1 tick 等于 0.05 秒。
 - 不要在样式包中使用绝对路径或包含 `..` 的路径。
+- 可以使用 `compatibility.display_overrides` 为 `firstperson`、`punchy` 等模组覆盖特定显示上下文；该字段只修改变换，不修改模型、纹理或动画。
 
 运行时只读取 TotemDoll `format:3` mesh 格式，不直接读取 Minecraft 原版 Item Model JSON。Blockbench 的 Java Item/Block 格式只作为创作输入，发布前必须转换为 `geometry.json` 和 `animations.json`。骨骼动画示例位于 `styles/animated_example/`。
 
