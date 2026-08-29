@@ -22,7 +22,7 @@ package com.rethinkqaq.totemdoll.client.gui;
 
 import com.rethinkqaq.totemdoll.utils.DollGuiGraphics;
 import com.rethinkqaq.totemdoll.client.TotemDollClient;
-import com.rethinkqaq.totemdoll.config.TotemDollConfig;
+import com.rethinkqaq.totemdoll.config.TotemDollConfigRuntime;
 import com.rethinkqaq.totemdoll.doll.DollLocalStyleStore;
 import com.rethinkqaq.totemdoll.doll.DollStyle;
 import com.rethinkqaq.totemdoll.doll.DollStyles;
@@ -107,7 +107,7 @@ public final class DollStyleManageScreen extends DollScreen implements DollScree
             DollScreenAdapter.setScreen(this.minecraft, this);
             return;
         }
-        TotemDollConfig.select(DollStyles.ALEX_ID);
+        TotemDollConfigRuntime.select(DollStyles.ALEX_ID);
         reloadAndReturn();
     }
 

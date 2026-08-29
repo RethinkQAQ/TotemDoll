@@ -20,7 +20,7 @@
 
 package com.rethinkqaq.totemdoll.client.gui;
 
-import com.rethinkqaq.totemdoll.config.TotemDollConfig;
+import com.rethinkqaq.totemdoll.config.TotemDollConfigRuntime;
 import com.rethinkqaq.totemdoll.doll.DollStyle;
 import com.rethinkqaq.totemdoll.doll.DollStyles;
 import com.rethinkqaq.totemdoll.utils.DollGuiGraphics;
@@ -66,7 +66,7 @@ public final class DollCardWidget extends DollWidget {
 
     @Override
     protected void renderContent(DollGuiGraphics gui, int mouseX, int mouseY, float partialTick) {
-        boolean selected = TotemDollConfig.selectedStyle().id().equals(style.id());
+        boolean selected = TotemDollConfigRuntime.selectedStyle().id().equals(style.id());
         int border = selected ? 0xFF5FD776 : isHoveredOrFocused() ? 0xFFD0D0D0 : 0xFF585858;
         int background = selected ? 0xFF203827 : 0xFF202020;
         gui.fill(getX(), getY(), getRight(), getBottom(), border);

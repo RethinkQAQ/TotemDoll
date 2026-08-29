@@ -20,7 +20,7 @@
 
 package com.rethinkqaq.totemdoll.mixin;
 
-import com.rethinkqaq.totemdoll.config.TotemDollConfig;
+import com.rethinkqaq.totemdoll.config.TotemDollConfigRuntime;
 import com.rethinkqaq.totemdoll.doll.DollAnimationManager;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.world.item.ItemStack;
@@ -35,7 +35,7 @@ public abstract class GameRendererMixin {
     @Inject(method = "displayItemActivation", at = @At("HEAD"))
     private void totemdoll$triggerTotemAnimation(ItemStack stack, CallbackInfo callback) {
         if (stack.is(Items.TOTEM_OF_UNDYING)) {
-            DollAnimationManager.trigger(TotemDollConfig.selectedStyle(), "on_totem_activate");
+            DollAnimationManager.trigger(TotemDollConfigRuntime.selectedStyle(), "on_totem_activate");
         }
     }
 }

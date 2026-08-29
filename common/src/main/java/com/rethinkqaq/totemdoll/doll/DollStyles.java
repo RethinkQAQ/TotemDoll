@@ -62,6 +62,11 @@ public final class DollStyles {
         return STYLES.getOrDefault(id, STYLES.getOrDefault(ALEX_ID, VANILLA));
     }
 
+    /** Returns the exact registered style, or {@code null} when an imported id is missing. */
+    public static synchronized DollStyle find(DollResourceId id) {
+        return id == null ? null : STYLES.get(id);
+    }
+
     public static synchronized List<DollStyle> all() {
         return List.copyOf(STYLES.values());
     }
@@ -73,13 +78,17 @@ public final class DollStyles {
     public static synchronized void replaceDiscovered(Collection<DollStyle> styles) {
         STYLES.clear();
         register(VANILLA);
-        styles.forEach(DollStyles::register);
+        for (DollStyle style : styles) {
+            if (style == null || VANILLA_ID.equals(style.id())) continue;
+            register(style);
+        }
         Constants.LOG.info("Loaded {} Totem Doll styles", STYLES.size());
     }
 
     private static void register(DollStyle style) {
+        if (style == null || style.id() == null) return;
         if (STYLES.putIfAbsent(style.id(), style) != null) {
-            throw new IllegalStateException("Duplicate doll style " + style.id());
+            Constants.LOG.warn("Ignoring duplicate Totem Doll style {}", style.id());
         }
     }
 

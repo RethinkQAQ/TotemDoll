@@ -44,6 +44,11 @@ public final class DollGuiPreview {
     }
 
     public static void render(DollGuiGraphics graphics, DollStyle style, int x, int y, int width, int height, float modelScale) {
+        render(graphics, style, x, y, width, height, modelScale, x, y, width, height);
+    }
+
+    public static void render(DollGuiGraphics graphics, DollStyle style, int x, int y, int width, int height,
+                              float modelScale, int clipX, int clipY, int clipWidth, int clipHeight) {
         if (!DollBoneModels.contains(style.id())) {
             ItemStack totem = DollNativeItemUtil.createTotemStack();
             renderItemPreview(graphics, x, y, width, height, modelScale,
@@ -54,7 +59,8 @@ public final class DollGuiPreview {
 
         //? >= 1.21.6 {
         /*graphics.submitPreview(
-                new DollGuiPreviewRenderState(style, x, y, width, height, modelScale)
+                new DollGuiPreviewRenderState(style, x, y, width, height, modelScale,
+                        clipX, clipY, clipWidth, clipHeight)
         );
         *///?} else {
         renderItemPreview(graphics, x, y, width, height, modelScale,

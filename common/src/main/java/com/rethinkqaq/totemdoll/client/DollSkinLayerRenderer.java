@@ -15,7 +15,7 @@ package com.rethinkqaq.totemdoll.client;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.rethinkqaq.totemdoll.config.TotemDollConfig;
+import com.rethinkqaq.totemdoll.config.TotemDollConfigRuntime;
 import com.rethinkqaq.totemdoll.doll.DollStyle;
 import com.rethinkqaq.totemdoll.doll.bone.DollBone;
 import com.rethinkqaq.totemdoll.doll.bone.DollBoneModel;
@@ -50,8 +50,8 @@ public final class DollSkinLayerRenderer {
     );
 
     public static SkinLayerPlan resolve(DollStyle style, DollBoneModel model, DollResourceId texture) {
-        if (!TotemDollConfig.skinLayer3dEnabled() || model == null || texture == null) return null;
-        CacheKey key = new CacheKey(style.id(), texture, TotemDollConfig.skinLayer3dThickness());
+        if (!TotemDollConfigRuntime.skinLayer3dEnabled() || model == null || texture == null) return null;
+        CacheKey key = new CacheKey(style.id(), texture, TotemDollConfigRuntime.skinLayer3dThickness());
         return CACHE.computeIfAbsent(key, ignored -> build(model, texture));
     }
 
@@ -111,7 +111,7 @@ public final class DollSkinLayerRenderer {
 
     /** Builds exposed shell edges from one shared six-face surface grid. */
     private static List<PixelQuad> buildPart(NativeImage image, DollBone renderBone, DollBone outerBone, DollCube outer) {
-        float thickness = TotemDollConfig.skinLayer3dThickness();
+        float thickness = TotemDollConfigRuntime.skinLayer3dThickness();
         List<SurfaceCell> cells = new ArrayList<>();
         for (Map.Entry<String, DollFace> entry : outer.faces().entrySet()) {
             Direction direction = Direction.byName(entry.getKey());

@@ -20,7 +20,7 @@
 
 package com.rethinkqaq.totemdoll.client;
 
-import com.rethinkqaq.totemdoll.config.TotemDollConfig;
+import com.rethinkqaq.totemdoll.config.TotemDollConfigRuntime;
 import com.rethinkqaq.totemdoll.doll.DollLocalStyleStore;
 import com.rethinkqaq.totemdoll.doll.DollStyles;
 import net.minecraft.client.Minecraft;
@@ -35,7 +35,7 @@ public final class TotemDollClient {
 
     public static void init(Path configDirectory, Path gameDirectory) {
         DollStyles.init();
-        TotemDollConfig.initialize(configDirectory);
+        TotemDollConfigRuntime.initialize(configDirectory);
         DollLocalStyleStore.initialize(configDirectory, gameDirectory);
         // The client instance is not available during NeoForge mod construction.
         // The first client tick enables the generated pack after Minecraft and
@@ -61,7 +61,7 @@ public final class TotemDollClient {
         Minecraft client = Minecraft.getInstance();
         enableGeneratedPack(client);
         return client.reloadResourcePacks()
-                .thenRun(TotemDollConfig::reconcileSelectedStyle);
+                .thenRun(TotemDollConfigRuntime::reconcileSelectedStyle);
     }
 
     private static void enableGeneratedPack(Minecraft client) {

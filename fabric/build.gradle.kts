@@ -18,8 +18,9 @@ dependencies {
     modImplementation("net.fabricmc.fabric-api:fabric-api:${commonMod.dep("fabric-api")}+${commonMod.mc}")
     modImplementation("com.terraformersmc:modmenu:${commonMod.dep("modmenu")}")
 
-    modImplementation("com.github.RethinkQAQ.RethinkConfigUiLib:rethink-config-ui-lib-mc${commonMod.mc}:0.1.2-local")
-    include("com.github.RethinkQAQ.RethinkConfigUiLib:rethink-config-ui-lib-mc${commonMod.mc}:0.1.2-local")
+    val rcui = "${commonMod.prop("rcui.group")}:${commonMod.prop("rcui.artifact_base")}-fabric:${commonMod.mc}-${commonMod.prop("rcui.version")}"
+    modImplementation(rcui) { isTransitive = false }
+    include(rcui)
 }
 
 configureTotemDollMixinSupport(TotemDollMixinTarget.FABRIC)

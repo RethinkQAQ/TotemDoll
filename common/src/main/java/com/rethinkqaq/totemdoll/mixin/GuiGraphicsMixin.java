@@ -37,7 +37,7 @@ import org.spongepowered.asm.mixin.Shadow;
 /*import com.mojang.blaze3d.vertex.PoseStack;
 import com.rethinkqaq.totemdoll.client.DollBoneRenderer;
 import com.rethinkqaq.totemdoll.client.DollPreviewContext;
-import com.rethinkqaq.totemdoll.config.TotemDollConfig;
+import com.rethinkqaq.totemdoll.config.TotemDollConfigRuntime;
 import com.rethinkqaq.totemdoll.doll.DollStyle;
 import com.rethinkqaq.totemdoll.doll.bone.DollBoneModels;
 import net.minecraft.client.Minecraft;
@@ -100,7 +100,7 @@ public abstract class GuiGraphicsMixin
         }
         DollStyle style = DollPreviewContext.current();
         if (style == null) {
-            style = TotemDollConfig.selectedStyle();
+            style = TotemDollConfigRuntime.selectedStyle();
         }
         if (style == null || !DollBoneModels.contains(style.id())) {
             return;
