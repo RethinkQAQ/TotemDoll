@@ -33,7 +33,7 @@ import com.rethinkqaq.totemdoll.doll.bone.DollBoneModelLoader;
 import com.rethinkqaq.totemdoll.doll.bone.DollBoneModels;
 import com.rethinkqaq.totemdoll.doll.bone.DollBoneActionManager;
 import com.rethinkqaq.totemdoll.client.DollBoneRenderer;
-import com.rethinkqaq.totemdoll.client.gui.DollGuiPreviewRenderer;
+import com.rethinkqaq.totemdoll.client.gui.preview.DollGuiPreviewRenderer;
 
 import java.io.Reader;
 import java.io.IOException;

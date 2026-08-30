@@ -58,11 +58,11 @@ public final class DollSkinLayerRenderer {
     public static void clear() { CACHE.clear(); }
 
     public static void render(SkinLayerPlan plan, String boneName, PoseStack stack,
-                              VertexConsumer consumer, int light, int overlay) {
+                              VertexConsumer consumer, int light, int overlay, boolean previewLighting) {
         if (plan == null) return;
         List<PixelQuad> quads = plan.quads.get(boneName);
         if (quads == null) return;
-        for (PixelQuad quad : quads) renderQuad(quad, stack.last(), consumer, light, overlay);
+        for (PixelQuad quad : quads) renderQuad(quad, stack.last(), consumer, light, overlay, previewLighting);
     }
 
     public static boolean isOverlayCube(SkinLayerPlan plan, String boneName, DollCube cube) {
@@ -157,7 +157,21 @@ public final class DollSkinLayerRenderer {
         return mergeWalls(walls);
     }
 
-    private static void renderQuad(PixelQuad quad, Pose pose, VertexConsumer consumer, int light, int overlay) {
+    private static void renderQuad(PixelQuad quad, Pose pose, VertexConsumer consumer, int light, int overlay,
+                                   boolean previewLighting) {
+        float normalX = quad.normalX;
+        float normalY = quad.normalY;
+        float normalZ = quad.normalZ;
+        // Keep the generated skin shell in the same preview-lighting space as
+        // the base model. Otherwise its exposed side walls retain world-facing
+        // normals and become dark seams in the PIP preview.
+        //? >= 1.21.5 {
+        /*if (previewLighting) {
+            normalX = 0.0F;
+            normalY = 1.0F;
+            normalZ = 0.0F;
+        }
+        *///?}
         for (int vertex = 0; vertex < 4; vertex++) {
             float[] point = quad.points[vertex];
             consumer.addVertex(pose, point[0] / 16F, point[1] / 16F, point[2] / 16F)
@@ -167,7 +181,7 @@ public final class DollSkinLayerRenderer {
                     .setUv(quad.uvs[vertex * 2] / 16F, quad.uvs[vertex * 2 + 1] / 16F)
                     .setOverlay(overlay)
                     .setLight(light)
-                    .setNormal(pose, quad.normalX, quad.normalY, quad.normalZ);
+                    .setNormal(pose, normalX, normalY, normalZ);
         }
     }
 

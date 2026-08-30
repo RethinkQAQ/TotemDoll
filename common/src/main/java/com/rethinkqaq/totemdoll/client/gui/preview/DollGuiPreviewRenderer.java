@@ -18,7 +18,7 @@
  * with Totem Doll. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.rethinkqaq.totemdoll.client.gui;
+package com.rethinkqaq.totemdoll.client.gui.preview;
 
 //? >= 1.21.6 {
 /*import com.mojang.blaze3d.ProjectionType;
@@ -26,7 +26,8 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.FilterMode;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.rethinkqaq.totemdoll.client.DollBoneRenderer;
-import com.rethinkqaq.totemdoll.client.gui.DollGuiPreviewRenderState.PreviewKey;
+import com.rethinkqaq.totemdoll.client.DollPreviewContext;
+import com.rethinkqaq.totemdoll.client.gui.preview.DollGuiPreviewRenderState.PreviewKey;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
 //? >= 1.21.6 && < 26.1.2 {
 /^import net.minecraft.client.gui.render.TextureSetup;
@@ -117,10 +118,9 @@ public final class DollGuiPreviewRenderer extends PictureInPictureRenderer<DollG
         // Let Minecraft own the PIP target and GUI-layer composition. The former
         // custom target/blit path could cover ordinary RCUI elements with the
         // preview layer after the model had rendered.
-        if (Minecraft.getInstance() != null) {
-            super.prepare(state, guiRenderState, guiScale);
-            return;
-        }
+        // Vanilla owns one shared PIP target. This screen submits several
+        // previews per frame, so keep a target per preview key to prevent the
+        // last rendered style from replacing every earlier blit.
         PreviewKey key = state.key(guiScale);
         DollGuiPreviewTarget target = targetCache.getOrCreate(key);
 
@@ -183,7 +183,7 @@ public final class DollGuiPreviewRenderer extends PictureInPictureRenderer<DollG
             poseStack.scale(guiScale * state.scale(), -guiScale * state.scale(), guiScale * state.scale());
             SubmitNodeStorage storage = new SubmitNodeStorage();
             DollBoneRenderer.submit(state.style(), ItemDisplayContext.GUI, false, poseStack, storage,
-                    15728880, OverlayTexture.NO_OVERLAY, 0);
+                    15728880, OverlayTexture.NO_OVERLAY, 0, true);
             featureRenderDispatcher.renderAllFeatures(storage);
         } finally {
             RenderSystem.restoreProjectionMatrix();
@@ -204,10 +204,9 @@ public final class DollGuiPreviewRenderer extends PictureInPictureRenderer<DollG
 /^@Override
     public void prepare(DollGuiPreviewRenderState state, GuiRenderState guiRenderState, int guiScale) {
         // TotemDoll supplies only renderToTexture; native PIP owns composition.
-        if (Minecraft.getInstance() != null) {
-            super.prepare(state, guiRenderState, guiScale);
-            return;
-        }
+        // Vanilla owns one shared PIP target. This screen submits several
+        // previews per frame, so keep a target per preview key to prevent the
+        // last rendered style from replacing every earlier blit.
         PreviewKey key = state.key(guiScale);
         DollGuiPreviewTarget target = targetCache.getOrCreate(key);
 
@@ -256,10 +255,10 @@ public final class DollGuiPreviewRenderer extends PictureInPictureRenderer<DollG
         // PictureInPictureRenderer uses (x, y, -z), while the former GUI item
         // path used (x, -y, z). Keep the TotemDoll model coordinate system stable.
         poseStack.scale(1.0F, -1.0F, -1.0F);
-        DollBoneRenderer.submit(
+            DollPreviewContext.renderWithPreviewLighting(() -> DollBoneRenderer.submit(
                 state.style(), ItemDisplayContext.GUI, false, poseStack, nodeCollector,
-                15728880, OverlayTexture.NO_OVERLAY, 0
-        );
+                15728880, OverlayTexture.NO_OVERLAY, 0, true
+        ));
     }
     
     @Override
@@ -272,11 +271,11 @@ public final class DollGuiPreviewRenderer extends PictureInPictureRenderer<DollG
         poseStack.scale(1.0F, -1.0F, -1.0F);
         float verticalOffset = 0.75F * 37.6F / state.scale();
         poseStack.translate(0.0F, verticalOffset, 0.0F);
-        DollBoneRenderer.render(
+        DollPreviewContext.renderWithPreviewLighting(() -> DollBoneRenderer.render(
                 state.style(), ItemDisplayContext.GUI, false, poseStack, bufferSource,
                 15728880, OverlayTexture.NO_OVERLAY,
-                Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false)
-        );
+                Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false), true
+        ));
     }
     //?}
 

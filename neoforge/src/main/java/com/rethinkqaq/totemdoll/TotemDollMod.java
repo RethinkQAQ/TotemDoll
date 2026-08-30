@@ -22,11 +22,11 @@ package com.rethinkqaq.totemdoll;
 
 import com.rethinkqaq.totemdoll.client.TotemDollClient;
 //? >= 1.21.6 {
-/*import com.rethinkqaq.totemdoll.client.gui.DollGuiPreviewRenderer;
-import com.rethinkqaq.totemdoll.client.gui.DollGuiPreviewRenderState;
+/*import com.rethinkqaq.totemdoll.client.gui.preview.DollGuiPreviewRenderer;
+import com.rethinkqaq.totemdoll.client.gui.preview.DollGuiPreviewRenderState;
 *///?}
 import com.rethinkqaq.totemdoll.client.gui.DollSelectionScreen;
-import com.rethinkqaq.totemdoll.client.gui.DollScreenAdapter;
+import com.rethinkqaq.totemdoll.client.gui.screen.DollScreenAdapter;
 import com.rethinkqaq.totemdoll.doll.DollStyleLoader;
 import com.rethinkqaq.totemdoll.doll.DollAnimationManager;
 import com.rethinkqaq.totemdoll.utils.DollMinecraftResourceUtil;
@@ -35,9 +35,11 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.fml.loading.FMLPaths;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
@@ -54,7 +56,7 @@ public class TotemDollMod {
             "key.totemdoll.open_config",
             InputConstants.Type.KEYSYM,
             GLFW.GLFW_KEY_F9,
-//? >= 1.21.10 {
+            //? >= 1.21.10 {
             /*KeyMapping.Category.register(DollMinecraftResourceUtil.nativeId(
                     DollResourceId.ofVanilla("totemdoll")))
             *///?} else {
@@ -62,16 +64,17 @@ public class TotemDollMod {
             //?}
     );
 
-    public TotemDollMod(IEventBus eventBus) {
+    public TotemDollMod(IEventBus eventBus, ModContainer container) {
         CommonClass.init();
         if (
-//? >= 1.21.10 {
+                //? >= 1.21.10 {
                 /*FMLEnvironment.getDist().isClient()
                 *///?} else {
                 FMLEnvironment.dist.isClient()
                 //?}
         ) {
             eventBus.addListener(this::registerAdditionalModels);
+            container.registerExtensionPoint(IConfigScreenFactory.class, (minecraft, parent) -> new DollSelectionScreen(parent));
             eventBus.addListener(this::registerKeyMappings);
             //? >= 1.21.6 {
             /*eventBus.addListener(this::registerPictureInPictureRenderer);

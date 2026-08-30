@@ -20,8 +20,8 @@
 
 package com.rethinkqaq.totemdoll.utils;
 
-import com.rethinkqaq.totemdoll.client.gui.DollGuiPreviewAccess;
-import com.rethinkqaq.totemdoll.client.gui.DollGuiPreviewRenderState;
+import com.rethinkqaq.totemdoll.client.gui.preview.DollGuiPreviewAccess;
+import com.rethinkqaq.totemdoll.client.gui.preview.DollGuiPreviewRenderState;
 import net.minecraft.client.gui.Font;
 //? >= 26.1.2 {
 /*import net.minecraft.client.gui.GuiGraphicsExtractor;

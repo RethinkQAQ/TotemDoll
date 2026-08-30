@@ -22,8 +22,8 @@ package com.rethinkqaq.totemdoll.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 //? >= 1.21.6 {
-/*import com.rethinkqaq.totemdoll.client.gui.DollGuiPreviewAccess;
-import com.rethinkqaq.totemdoll.client.gui.DollGuiPreviewRenderState;
+/*import com.rethinkqaq.totemdoll.client.gui.preview.DollGuiPreviewAccess;
+import com.rethinkqaq.totemdoll.client.gui.preview.DollGuiPreviewRenderState;
 //? >= 26.1.2 {
 /^import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.state.gui.GuiRenderState;
@@ -34,7 +34,8 @@ import net.minecraft.client.gui.render.state.GuiRenderState;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Shadow;
 *///?} else if >= 1.21.4 {
-/*import com.mojang.blaze3d.vertex.PoseStack;
+/*import com.mojang.blaze3d.platform.Lighting;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.rethinkqaq.totemdoll.client.DollBoneRenderer;
 import com.rethinkqaq.totemdoll.client.DollPreviewContext;
 import com.rethinkqaq.totemdoll.config.TotemDollConfigRuntime;
@@ -86,6 +87,7 @@ public abstract class GuiGraphicsMixin
     *///?} else if >= 1.21.4 {
     /*@Shadow @Final private PoseStack pose;
     @Shadow @Final private MultiBufferSource.BufferSource bufferSource;
+    @Shadow public abstract void flush();
 
     @Inject(
             method = "renderItem(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;III)V",
@@ -107,16 +109,26 @@ public abstract class GuiGraphicsMixin
         }
 
         pose.pushPose();
-        pose.translate(x + 8, y + 8, 150);
-        pose.scale(16.0F, -16.0F, 16.0F);
-        float partialTicks = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
-        boolean rendered = DollBoneRenderer.render(style, ItemDisplayContext.GUI, false, pose, bufferSource,
-                15728880, OverlayTexture.NO_OVERLAY, partialTicks);
-        pose.popPose();
-        if (rendered) {
-            bufferSource.endBatch();
-            callback.cancel();
+        // Match GuiGraphics#renderItem's 1.21.4 state boundary exactly. Cancelling
+        // the method at its head previously skipped its pre/post flushes and
+        // Lighting restoration, leaving RCUI's following SDF/text draws on the
+        // item shader path. The model itself belongs at the vanilla item depth.
+        boolean rendered;
+        flush();
+        Lighting.setupForFlatItems();
+        try {
+            pose.translate(x + 8, y + 8, 150);
+            pose.scale(16.0F, -16.0F, 16.0F);
+            float partialTicks = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
+            rendered = DollBoneRenderer.render(style, ItemDisplayContext.GUI, false, pose, bufferSource,
+                    15728880, OverlayTexture.NO_OVERLAY, partialTicks,
+                    DollPreviewContext.current() != null);
+            flush();
+        } finally {
+            Lighting.setupFor3DItems();
+            pose.popPose();
         }
+        if (rendered) callback.cancel();
     }
     *///?}
 }

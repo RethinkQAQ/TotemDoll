@@ -26,6 +26,7 @@ public final class DollPreviewContext {
 
     private static final ThreadLocal<DollStyle> PREVIEW_STYLE = new ThreadLocal<>();
     private static final ThreadLocal<Boolean> NATIVE_RENDER = ThreadLocal.withInitial(() -> false);
+    private static final ThreadLocal<Boolean> PREVIEW_LIGHTING = ThreadLocal.withInitial(() -> false);
 
     public static DollStyle current() {
         return PREVIEW_STYLE.get();
@@ -60,6 +61,21 @@ public final class DollPreviewContext {
             } else {
                 NATIVE_RENDER.remove();
             }
+        }
+    }
+
+    public static boolean isPreviewLighting() {
+        return PREVIEW_LIGHTING.get();
+    }
+
+    public static void renderWithPreviewLighting(Runnable renderCall) {
+        boolean previous = PREVIEW_LIGHTING.get();
+        PREVIEW_LIGHTING.set(true);
+        try {
+            renderCall.run();
+        } finally {
+            if (previous) PREVIEW_LIGHTING.set(true);
+            else PREVIEW_LIGHTING.remove();
         }
     }
 

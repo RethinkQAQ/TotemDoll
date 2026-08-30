@@ -5,7 +5,7 @@
  * This file is part of Totem Doll.
  */
 
-package com.rethinkqaq.totemdoll.client.gui;
+package com.rethinkqaq.totemdoll.client.gui.dialog;
 
 import com.rethinkqaq.configui.core.Ui;
 import com.rethinkqaq.configui.core.UiBounds;
@@ -20,14 +20,14 @@ import com.rethinkqaq.configui.core.component.UiButton;
 import java.util.List;
 
 /** Small confirmation surface used by destructive style operations. */
-final class DollConfirmDialog extends Ui.Node implements Ui.ChildProvider {
+public final class DollConfirmDialog extends Ui.Node implements Ui.ChildProvider {
     private final UiDialogHost dialogs;
     private final UiText title;
     private final UiText message;
     private final UiButton confirm;
     private final UiButton keep;
 
-    DollConfirmDialog(UiDialogHost dialogs, UiText title, UiText message, Runnable confirmAction) {
+    public DollConfirmDialog(UiDialogHost dialogs, UiText title, UiText message, Runnable confirmAction) {
         this.dialogs = dialogs;
         this.title = title;
         this.message = message;

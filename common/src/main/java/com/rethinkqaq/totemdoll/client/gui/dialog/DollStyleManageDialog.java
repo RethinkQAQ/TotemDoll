@@ -5,7 +5,9 @@
  * This file is part of Totem Doll.
  */
 
-package com.rethinkqaq.totemdoll.client.gui;
+package com.rethinkqaq.totemdoll.client.gui.dialog;
+
+import com.rethinkqaq.totemdoll.client.gui.DollSelectionScreen;
 
 import com.rethinkqaq.configui.core.Ui;
 import com.rethinkqaq.configui.core.UiBinding;
@@ -31,7 +33,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 /** RCUI management dialog for a user-created style. File and style operations remain host-owned. */
-final class DollStyleManageDialog extends Ui.Node implements Ui.ChildProvider {
+public final class DollStyleManageDialog extends Ui.Node implements Ui.ChildProvider {
     private final UiDialogHost dialogs;
     private final DollSelectionScreen owner;
     private final DollStyle style;
@@ -44,7 +46,7 @@ final class DollStyleManageDialog extends Ui.Node implements Ui.ChildProvider {
     private final UiButton done;
     private UiText status;
 
-    DollStyleManageDialog(UiDialogHost dialogs, DollSelectionScreen owner, DollStyle style) {
+    public DollStyleManageDialog(UiDialogHost dialogs, DollSelectionScreen owner, DollStyle style) {
         this.dialogs = dialogs;
         this.owner = owner;
         this.style = style;

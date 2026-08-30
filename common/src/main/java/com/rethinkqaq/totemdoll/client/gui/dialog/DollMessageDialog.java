@@ -5,7 +5,7 @@
  * This file is part of Totem Doll.
  */
 
-package com.rethinkqaq.totemdoll.client.gui;
+package com.rethinkqaq.totemdoll.client.gui.dialog;
 
 import com.rethinkqaq.configui.core.Ui;
 import com.rethinkqaq.configui.core.UiBounds;
@@ -23,13 +23,13 @@ import com.rethinkqaq.configui.core.component.feedback.UiFeedbackType;
 import java.util.List;
 
 /** Informational dialog for operations that fail before a page refresh. */
-final class DollMessageDialog extends Ui.Node implements Ui.ChildProvider {
+public final class DollMessageDialog extends Ui.Node implements Ui.ChildProvider {
     private final UiDialogHost dialogs;
     private final UiText title;
     private final UiAlert alert;
     private final UiButton done;
 
-    DollMessageDialog(UiDialogHost dialogs, UiText title, UiText message) {
+    public DollMessageDialog(UiDialogHost dialogs, UiText title, UiText message) {
         this.dialogs = dialogs;
         this.title = title;
         this.alert = Ui.alert(UiFeedbackType.ERROR, message);

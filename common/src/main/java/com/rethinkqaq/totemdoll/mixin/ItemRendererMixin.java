@@ -96,7 +96,14 @@ public abstract class ItemRendererMixin {
         *///?} else {
         float partialTick = Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(false);
         //?}
-        if (DollBoneRenderer.render(style, context, leftHand, poseStack, buffers, light, overlay, partialTick)) {
+        if (DollBoneRenderer.render(style, context, leftHand, poseStack, buffers, light, overlay, partialTick, false)) {
+            // 1.21.1 renders GUI items into the shared BufferSource. A card
+            // preview must be committed before RCUI submits its tooltip; leaving
+            // it queued makes the model draw at the end of the Screen and cover
+            // the tooltip. Never flush gameplay item rendering.
+            if (DollPreviewContext.current() != null && buffers instanceof MultiBufferSource.BufferSource bufferSource) {
+                bufferSource.endBatch();
+            }
             ci.cancel();
         }
     }

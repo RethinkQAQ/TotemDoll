@@ -18,7 +18,7 @@
  * with Totem Doll. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.rethinkqaq.totemdoll.client.gui;
+package com.rethinkqaq.totemdoll.client.gui.preview;
 
 import com.rethinkqaq.totemdoll.doll.DollStyle;
 import com.rethinkqaq.totemdoll.utils.DollResourceId;

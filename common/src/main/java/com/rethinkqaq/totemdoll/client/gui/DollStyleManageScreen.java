@@ -20,6 +20,12 @@
 
 package com.rethinkqaq.totemdoll.client.gui;
 
+import com.rethinkqaq.totemdoll.client.gui.screen.DollScreenAdapter;
+
+import com.rethinkqaq.totemdoll.client.gui.screen.DollScreenParent;
+
+import com.rethinkqaq.totemdoll.client.gui.preview.DollGuiPreview;
+
 import com.rethinkqaq.totemdoll.utils.DollGuiGraphics;
 import com.rethinkqaq.totemdoll.client.TotemDollClient;
 import com.rethinkqaq.totemdoll.config.TotemDollConfigRuntime;

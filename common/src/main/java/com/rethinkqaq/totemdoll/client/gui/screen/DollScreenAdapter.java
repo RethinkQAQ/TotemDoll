@@ -18,7 +18,7 @@
  * with Totem Doll. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.rethinkqaq.totemdoll.client.gui;
+package com.rethinkqaq.totemdoll.client.gui.screen;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;

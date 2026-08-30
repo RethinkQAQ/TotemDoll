@@ -10,7 +10,9 @@
  * later version.
  */
 
-package com.rethinkqaq.totemdoll.client.gui;
+package com.rethinkqaq.totemdoll.client.gui.dialog;
+
+import com.rethinkqaq.totemdoll.client.gui.DollSelectionScreen;
 
 import com.rethinkqaq.configui.core.Ui;
 import com.rethinkqaq.configui.core.UiBinding;
@@ -36,7 +38,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 /** RCUI form for creating a local style; file selection remains a host operation. */
-final class DollCreateDialog extends Ui.Node implements Ui.ChildProvider {
+public final class DollCreateDialog extends Ui.Node implements Ui.ChildProvider {
     private final UiDialogHost dialogs;
     private final DollSelectionScreen owner;
     private final DollStyle template;
@@ -48,7 +50,7 @@ final class DollCreateDialog extends Ui.Node implements Ui.ChildProvider {
     private Path skinPath;
     private UiText status;
 
-    DollCreateDialog(UiDialogHost dialogs, DollSelectionScreen owner, DollStyle template) {
+    public DollCreateDialog(UiDialogHost dialogs, DollSelectionScreen owner, DollStyle template) {
         this.dialogs = dialogs;
         this.owner = owner;
         this.template = template;

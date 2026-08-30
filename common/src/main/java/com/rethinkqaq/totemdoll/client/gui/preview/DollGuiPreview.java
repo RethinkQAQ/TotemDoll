@@ -18,7 +18,7 @@
  * with Totem Doll. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.rethinkqaq.totemdoll.client.gui;
+package com.rethinkqaq.totemdoll.client.gui.preview;
 
 import com.rethinkqaq.totemdoll.client.DollPreviewContext;
 import com.rethinkqaq.totemdoll.doll.DollStyle;
@@ -64,8 +64,8 @@ public final class DollGuiPreview {
         );
         *///?} else {
         renderItemPreview(graphics, x, y, width, height, modelScale,
-                () -> DollPreviewContext.renderAs(style,
-                        () -> graphics.renderItem(DollNativeItemUtil.createTotemStack(), 0, 0)));
+                () -> DollPreviewContext.renderWithPreviewLighting(() -> DollPreviewContext.renderAs(style,
+                        () -> graphics.renderItem(DollNativeItemUtil.createTotemStack(), 0, 0))));
         //?}
     }
 

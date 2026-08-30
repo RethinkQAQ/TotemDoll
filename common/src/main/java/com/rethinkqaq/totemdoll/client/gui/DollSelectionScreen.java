@@ -19,11 +19,21 @@
 
 package com.rethinkqaq.totemdoll.client.gui;
 
+import com.rethinkqaq.totemdoll.client.gui.screen.DollScreenAdapter;
+
+import com.rethinkqaq.totemdoll.client.gui.screen.DollScreenParent;
+
+import com.rethinkqaq.totemdoll.client.gui.preview.DollGuiPreview;
+import com.rethinkqaq.totemdoll.client.gui.dialog.DollCreateDialog;
+import com.rethinkqaq.totemdoll.client.gui.dialog.DollMessageDialog;
+import com.rethinkqaq.totemdoll.client.gui.dialog.DollStyleManageDialog;
+
 import com.rethinkqaq.configui.core.Ui;
 import com.rethinkqaq.configui.core.UiBackground;
 import com.rethinkqaq.configui.core.UiBinding;
 import com.rethinkqaq.configui.core.UiDialogHost;
 import com.rethinkqaq.configui.core.UiGrid;
+import com.rethinkqaq.configui.core.UiMainAxisAlignment;
 import com.rethinkqaq.configui.core.UiPageHost;
 import com.rethinkqaq.configui.core.UiText;
 import com.rethinkqaq.configui.core.UiTheme;
@@ -96,7 +106,7 @@ public final class DollSelectionScreen extends UiScreen implements DollScreenPar
                             if (current instanceof DollSelectionScreen selection) DollPackScreen.chooseZipAndImport(selection);
                         }).variant(Ui.ButtonVariant.OUTLINE))
                         .add(Ui.button(UiText.translatable("gui.done"), () -> closeToParent(parent)).variant(Ui.ButtonVariant.PRIMARY)))
-                .footerAlignment(UiTemplate.FooterAlignment.END)
+                .footerAlignment(UiMainAxisAlignment.END)
                 .background(UiBackground.translucent(0xE0FFFFFF))
                 .maxContentWidth(1200)
                 .regionGap(12)
@@ -119,7 +129,8 @@ public final class DollSelectionScreen extends UiScreen implements DollScreenPar
             return column.add(Ui.section(UiText.translatable(local ? "screen.totemdoll.my_styles" : "screen.totemdoll.templates"))
                     .add(Ui.label(UiText.translatable(local ? "screen.totemdoll.empty_title" : "screen.totemdoll.empty_hint"))));
         }
-        UiGrid grid = Ui.grid().minimumColumnWidth(156).maximumColumnWidth(188).gap(10);
+        UiGrid grid = Ui.grid().minimumColumnWidth(156).maximumColumnWidth(188).gap(10)
+                .mainAxisAlignment(UiMainAxisAlignment.START);
         for (DollStyle style : styles) grid.add(styleCard(style, local));
         return column.add(Ui.section(UiText.translatable(local ? "screen.totemdoll.my_styles" : "screen.totemdoll.templates")).add(grid));
     }
@@ -141,7 +152,7 @@ public final class DollSelectionScreen extends UiScreen implements DollScreenPar
         };
         UiButton select = Ui.button(UiText.translatable("screen.totemdoll.select"), selectStyle)
                 .preferredWidth(84)
-                .variant(() -> isSelected(style) ? Ui.ButtonVariant.PRIMARY : Ui.ButtonVariant.OUTLINE);
+                .variant(() -> isSelected(style) ? Ui.ButtonVariant.PRIMARY : Ui.ButtonVariant.SECONDARY);
         select.enabled(style.isAvailable());
         Ui.Row actions = Ui.row().gap(8).equalChildWidths(true).add(select);
         if (local) {
@@ -184,12 +195,13 @@ public final class DollSelectionScreen extends UiScreen implements DollScreenPar
         UiSection section = Ui.section(UiText.translatable("screen.totemdoll.settings"))
                         .titleScale(1.25f);
 
-        UiToggle enabled = Ui.toggle(UiText.translatable("screen.totemdoll.skin_layer_3d.enabled"),
+        UiText skinLayerLabel = UiText.translatable("screen.totemdoll.skin_layer_3d.label");
+        UiToggle enabled = Ui.toggle(skinLayerLabel,
                 UiBinding.of(TotemDollConfigRuntime::skinLayer3dEnabled, value -> {
                     TotemDollConfigRuntime.setSkinLayer3dEnabled(value);
                     DollBoneRenderer.clearSkinLayerCache();
                 }));
-        section.add(Ui.formField(UiText.translatable("screen.totemdoll.skin_layer_3d.enabled"), enabled)
+        section.add(Ui.formField(skinLayerLabel, enabled)
                 .description(UiText.translatable("screen.totemdoll.skin_layer_3d.description")));
 
         UiSetting<Float> thicknessSetting = UiSetting.of(
@@ -268,7 +280,7 @@ public final class DollSelectionScreen extends UiScreen implements DollScreenPar
                 UiText.translatable("screen.totemdoll.import_error_title"), UiText.literal(message.getString())));
     }
 
-    void reloadStyles(Tab tab) {
+    public void reloadStyles(Tab tab) {
         TotemDollClient.reloadGeneratedStyles().thenRun(() -> Minecraft.getInstance().execute(() ->
                 DollScreenAdapter.setScreen(Minecraft.getInstance(), new DollSelectionScreen(rootParent(), tab))));
     }

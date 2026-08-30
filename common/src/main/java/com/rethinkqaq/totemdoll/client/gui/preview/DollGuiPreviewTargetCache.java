@@ -18,10 +18,10 @@
  * with Totem Doll. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.rethinkqaq.totemdoll.client.gui;
+package com.rethinkqaq.totemdoll.client.gui.preview;
 
 //? >= 1.21.6 {
-/*import com.rethinkqaq.totemdoll.client.gui.DollGuiPreviewRenderState.PreviewKey;
+/*import com.rethinkqaq.totemdoll.client.gui.preview.DollGuiPreviewRenderState.PreviewKey;
 
 import java.util.HashMap;
 import java.util.Map;

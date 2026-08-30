@@ -40,4 +40,18 @@ public final class DollRenderUtil {
         return RenderType.entityTranslucent(DollMinecraftResourceUtil.nativeId(texture));
     }
     //?}
+
+    // Use the regular entity pipeline for every preview version. Emissive
+    // RenderTypes bypass directional entity lighting, making all faces equally
+    // bright and defeating the preview's intended depth cues.
+    //? >= 1.21.11 {
+    /*public static RenderType previewTranslucent(DollResourceId texture) {
+        return RenderTypes.entityTranslucent(DollMinecraftResourceUtil.nativeId(texture));
+    }
+    *///?} else {
+    public static RenderType previewTranslucent(DollResourceId texture) {
+        return RenderType.entityTranslucent(DollMinecraftResourceUtil.nativeId(texture));
+    }
+    //?}
+
 }

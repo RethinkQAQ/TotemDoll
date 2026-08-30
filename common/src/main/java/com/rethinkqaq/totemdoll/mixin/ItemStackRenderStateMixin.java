@@ -77,7 +77,7 @@ public abstract class ItemStackRenderStateMixin {
         boolean isLeftHand = displayContext == ItemDisplayContext.THIRD_PERSON_LEFT_HAND
                 || displayContext == ItemDisplayContext.FIRST_PERSON_LEFT_HAND;
         if (DollBoneRenderer.submit(style, displayContext, isLeftHand, poseStack, nodeCollector,
-                light, overlay, outlineColor)) {
+                light, overlay, outlineColor, false)) {
             callback.cancel();
         }
     }
@@ -99,7 +99,7 @@ public abstract class ItemStackRenderStateMixin {
                 || displayContext == ItemDisplayContext.FIRST_PERSON_LEFT_HAND;
         float partialTick = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
         if (DollBoneRenderer.render(style, displayContext, isLeftHand, poseStack, buffers,
-                light, overlay, partialTick)) {
+                light, overlay, partialTick, false)) {
             callback.cancel();
         }
     }

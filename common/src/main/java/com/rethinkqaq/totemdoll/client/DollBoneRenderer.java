@@ -74,7 +74,7 @@ public final class DollBoneRenderer {
     //? < 26.2 {
     public static boolean render(DollStyle style, ItemDisplayContext context, boolean leftHand,
                                  PoseStack poseStack, MultiBufferSource buffers, int light, int overlay,
-                                 float partialTick) {
+                                 float partialTick, boolean previewLighting) {
         DollBoneModel model = DollBoneModels.get(style.id());
         RenderData data = resolve(style, model);
         if (data == null) return false;
@@ -108,9 +108,11 @@ public final class DollBoneRenderer {
         //?}
         DollResourceId texture = resolveTexture(style, model);
         DollSkinLayerRenderer.SkinLayerPlan skinLayers = DollSkinLayerRenderer.resolve(style, model, texture);
-        var consumer = buffers.getBuffer(DollRenderUtil.entityTranslucent(texture));
+        var consumer = buffers.getBuffer(previewLighting
+                ? DollRenderUtil.previewTranslucent(texture)
+                : DollRenderUtil.entityTranslucent(texture));
         for (RuntimePart root : runtime.roots)
-            renderPart(root, poseStack, consumer, light, overlay, skinLayers);
+            renderPart(root, poseStack, consumer, light, overlay, skinLayers, previewLighting);
         poseStack.popPose();
         return true;
     }
@@ -119,7 +121,7 @@ public final class DollBoneRenderer {
 //? >= 1.21.10 {
     /*public static boolean submit(DollStyle style, ItemDisplayContext context, boolean leftHand,
                                  PoseStack poseStack, SubmitNodeCollector nodeCollector, int light,
-                                 int overlay, int outlineColor) {
+                                 int overlay, int outlineColor, boolean previewLighting) {
         RenderData data = resolve(style, DollBoneModels.get(style.id()));
         if (data == null) return false;
         DollBoneModel model = data.model();
@@ -146,13 +148,15 @@ public final class DollBoneRenderer {
         DollResourceId finalTexture = texture;
         nodeCollector.submitCustomGeometry(
                 poseStack,
-                DollRenderUtil.entityTranslucent(finalTexture),
+                previewLighting
+                        ? DollRenderUtil.previewTranslucent(finalTexture)
+                        : DollRenderUtil.entityTranslucent(finalTexture),
                 (capturedPose, consumer) -> {
                     PoseStack capturedStack = new PoseStack();
                     capturedStack.last().pose().set(capturedPose.pose());
                     capturedStack.last().normal().set(capturedPose.normal());
                     for (RuntimePart root : runtime.roots) {
-                        renderPart(root, capturedStack, consumer, light, overlay, skinLayers);
+                        renderPart(root, capturedStack, consumer, light, overlay, skinLayers, previewLighting);
                     }
                 }
         );
@@ -248,22 +252,23 @@ public final class DollBoneRenderer {
     }
 
     private static void renderPart(RuntimePart runtime, PoseStack poseStack, VertexConsumer consumer,
-                                   int light, int overlay, DollSkinLayerRenderer.SkinLayerPlan skinLayers) {
+                                   int light, int overlay, DollSkinLayerRenderer.SkinLayerPlan skinLayers,
+                                   boolean previewLighting) {
         poseStack.pushPose();
         runtime.transform.translateAndRotate(poseStack);
         for (ModelPart.Cube cube : runtime.legacyCubes)
             cube.compile(poseStack.last(), consumer, light, overlay, -1);
         for (DollCube cube : runtime.faceCubes)
             if (!DollSkinLayerRenderer.isOverlayCube(skinLayers, runtime.bone.name(), cube))
-                renderCube(cube, runtime.bone, poseStack, consumer, light, overlay);
-        DollSkinLayerRenderer.render(skinLayers, runtime.bone.name(), poseStack, consumer, light, overlay);
+                renderCube(cube, runtime.bone, poseStack, consumer, light, overlay, previewLighting);
+        DollSkinLayerRenderer.render(skinLayers, runtime.bone.name(), poseStack, consumer, light, overlay, previewLighting);
         for (RuntimePart child : runtime.children)
-            renderPart(child, poseStack, consumer, light, overlay, skinLayers);
+            renderPart(child, poseStack, consumer, light, overlay, skinLayers, previewLighting);
         poseStack.popPose();
     }
 
     private static void renderCube(DollCube cube, DollBone bone, PoseStack poseStack,
-                                   VertexConsumer consumer, int light, int overlay) {
+                                   VertexConsumer consumer, int light, int overlay, boolean previewLighting) {
         float minX = cube.x() - bone.pivotX();
         float minY = cube.y() - bone.pivotY();
         float minZ = cube.z() - bone.pivotZ();
@@ -283,6 +288,20 @@ public final class DollBoneRenderer {
             if (direction == null) continue;
             DollFace face = entry.getValue();
             FaceInfo info = FaceInfo.fromFacing(direction);
+            // PIP renderers in newer Minecraft versions use a different camera
+            // basis from item rendering. Preserve a stable, front-lit preview
+            // normal there so the model face does not become the unlit side of
+            // the entity. Legacy 1.21.1/1.21.4 retain native face normals.
+            float normalX = direction.getStepX();
+            float normalY = direction.getStepY();
+            float normalZ = direction.getStepZ();
+            //? >= 1.21.5 {
+            /*if (previewLighting) {
+                normalX = 0.0F;
+                normalY = 1.0F;
+                normalZ = 0.0F;
+            }
+            *///?}
             for (int vertex = 0; vertex < 4; vertex++) {
                 FaceInfo.VertexInfo position = info.getVertexInfo(vertex);
                 float[] uv = UvUtil.vertexUv(face, vertex);
@@ -293,7 +312,7 @@ public final class DollBoneRenderer {
                         .setUv(uv[0] / 16F, uv[1] / 16F)
                         .setOverlay(overlay)
                         .setLight(light)
-                        .setNormal(poseStack.last(), direction.getStepX(), direction.getStepY(), direction.getStepZ());
+                        .setNormal(poseStack.last(), normalX, normalY, normalZ);
             }
         }
     }

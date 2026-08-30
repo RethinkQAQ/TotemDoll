@@ -18,7 +18,7 @@
  * with Totem Doll. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.rethinkqaq.totemdoll.client.gui;
+package com.rethinkqaq.totemdoll.client.gui.preview;
 
 //? >= 1.21.6 {
 /*import com.mojang.blaze3d.systems.RenderSystem;
