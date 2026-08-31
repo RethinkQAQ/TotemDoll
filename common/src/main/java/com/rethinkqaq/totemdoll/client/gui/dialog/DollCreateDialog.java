@@ -79,7 +79,7 @@ public final class DollCreateDialog extends Ui.Node implements Ui.ChildProvider 
         create = Ui.button(UiText.translatable("screen.totemdoll.create"), this::create)
                 .variant(Ui.ButtonVariant.PRIMARY);
         done = Ui.button(UiText.translatable("gui.done"), dialogs::close)
-                .variant(Ui.ButtonVariant.OUTLINE);
+                .variant(Ui.ButtonVariant.SECONDARY);
     }
 
     @Override protected void measureSelf(UiRenderer renderer, float maxWidth, float maxHeight, UiTheme theme) {

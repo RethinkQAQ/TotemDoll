@@ -96,7 +96,7 @@ public final class DollSelectionScreen extends UiScreen implements DollScreenPar
                         .add(Ui.button(UiText.translatable("screen.totemdoll.import_pack"), () -> {
                             Screen current = DollScreenAdapter.currentScreen(Minecraft.getInstance());
                             if (current instanceof DollSelectionScreen selection) DollPackScreen.chooseZipAndImport(selection);
-                        }).variant(Ui.ButtonVariant.OUTLINE))
+                        }).variant(Ui.ButtonVariant.SECONDARY))
                         .add(Ui.button(UiText.translatable("gui.done"), () -> closeToParent(parent)).variant(Ui.ButtonVariant.PRIMARY)))
                 .footerAlignment(UiMainAxisAlignment.END)
                 .background(UiBackground.translucent(0xFFFFFF, 0.78f))
