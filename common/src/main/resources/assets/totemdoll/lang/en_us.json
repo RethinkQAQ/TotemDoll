@@ -61,6 +61,7 @@
   "screen.totemdoll.name_required": "Please enter a style name",
   "screen.totemdoll.rename": "Rename",
   "screen.totemdoll.create_from_style": "Create from this style",
+  "screen.totemdoll.create_from_style_unavailable": "This style does not support custom skins",
   "screen.totemdoll.import_pack": "Import Style Pack",
   "screen.totemdoll.pack_title": "Import Style Pack",
   "screen.totemdoll.import_zip": "Import ZIP",

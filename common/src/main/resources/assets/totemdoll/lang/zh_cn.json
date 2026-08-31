@@ -61,6 +61,7 @@
   "screen.totemdoll.name_required": "请输入样式名称",
   "screen.totemdoll.rename": "重命名",
   "screen.totemdoll.create_from_style": "从此样式创建",
+  "screen.totemdoll.create_from_style_unavailable": "此样式不支持自定义皮肤",
   "screen.totemdoll.import_pack": "导入样式包",
   "screen.totemdoll.pack_title": "导入样式包",
   "screen.totemdoll.import_zip": "导入 ZIP",

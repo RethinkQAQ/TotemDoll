@@ -24,7 +24,7 @@ import org.spongepowered.asm.mixin.Mixin;
 //? >= 1.21.6 {
 /*import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.rethinkqaq.totemdoll.client.gui.DollGuiPreviewRenderer;
+import com.rethinkqaq.totemdoll.client.gui.preview.DollGuiPreviewRenderer;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.gui.render.GuiRenderer;

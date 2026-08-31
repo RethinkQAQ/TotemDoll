@@ -19,6 +19,7 @@
 
 package com.rethinkqaq.totemdoll.client.gui;
 
+import com.rethinkqaq.configui.core.*;
 import com.rethinkqaq.totemdoll.client.gui.screen.DollScreenAdapter;
 
 import com.rethinkqaq.totemdoll.client.gui.screen.DollScreenParent;
@@ -28,15 +29,6 @@ import com.rethinkqaq.totemdoll.client.gui.dialog.DollCreateDialog;
 import com.rethinkqaq.totemdoll.client.gui.dialog.DollMessageDialog;
 import com.rethinkqaq.totemdoll.client.gui.dialog.DollStyleManageDialog;
 
-import com.rethinkqaq.configui.core.Ui;
-import com.rethinkqaq.configui.core.UiBackground;
-import com.rethinkqaq.configui.core.UiBinding;
-import com.rethinkqaq.configui.core.UiDialogHost;
-import com.rethinkqaq.configui.core.UiGrid;
-import com.rethinkqaq.configui.core.UiMainAxisAlignment;
-import com.rethinkqaq.configui.core.UiPageHost;
-import com.rethinkqaq.configui.core.UiText;
-import com.rethinkqaq.configui.core.UiTheme;
 import com.rethinkqaq.configui.core.component.UiButton;
 import com.rethinkqaq.configui.core.component.feedback.UiFeedbackType;
 import com.rethinkqaq.configui.core.component.UiToggle;
@@ -78,7 +70,7 @@ public final class DollSelectionScreen extends UiScreen implements DollScreenPar
     public DollSelectionScreen(Screen parent, Tab tab) {
         super(parent, buildRoot(parent, tab), UiTheme.roseLight(), UiHost.LayoutMode.FULLSCREEN);
         this.parent = parent;
-        host().background(UiBackground.translucent(0xE0FFFFFF));
+        host().background(UiBackground.translucent(0xFFFFFF, 0.78f));
         this.dialogs = (UiDialogHost) host().root();
         DollStyles.all().forEach(style -> DollAnimationManager.trigger(style, "on_screen_open"));
     }
@@ -107,7 +99,7 @@ public final class DollSelectionScreen extends UiScreen implements DollScreenPar
                         }).variant(Ui.ButtonVariant.OUTLINE))
                         .add(Ui.button(UiText.translatable("gui.done"), () -> closeToParent(parent)).variant(Ui.ButtonVariant.PRIMARY)))
                 .footerAlignment(UiMainAxisAlignment.END)
-                .background(UiBackground.translucent(0xE0FFFFFF))
+                .background(UiBackground.translucent(0xFFFFFF, 0.78f))
                 .maxContentWidth(1200)
                 .regionGap(12)
                 .build();
@@ -126,13 +118,12 @@ public final class DollSelectionScreen extends UiScreen implements DollScreenPar
                 .sorted(styleComparator())
                 .toList();
         if (styles.isEmpty()) {
-            return column.add(Ui.section(UiText.translatable(local ? "screen.totemdoll.my_styles" : "screen.totemdoll.templates"))
-                    .add(Ui.label(UiText.translatable(local ? "screen.totemdoll.empty_title" : "screen.totemdoll.empty_hint"))));
+            return column.add(Ui.label(UiText.translatable(local ? "screen.totemdoll.empty_title" : "screen.totemdoll.empty_hint")));
         }
         UiGrid grid = Ui.grid().minimumColumnWidth(156).maximumColumnWidth(188).gap(10)
-                .mainAxisAlignment(UiMainAxisAlignment.START);
+                .rowAlignment(UiMainAxisAlignment.START);
         for (DollStyle style : styles) grid.add(styleCard(style, local));
-        return column.add(Ui.section(UiText.translatable(local ? "screen.totemdoll.my_styles" : "screen.totemdoll.templates")).add(grid));
+        return column.add(grid).crossAxisAlignment(UiCrossAxisAlignment.CENTER);
     }
 
     private static Ui.Node styleCard(DollStyle style, boolean local) {
