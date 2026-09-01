@@ -23,12 +23,10 @@ dependencies {
         })
     }
     // Common is compiled with Fabric mappings; use the matching RCUI adapter.
-    val rcui = "${commonMod.prop("rcui.group")}:${commonMod.prop("rcui.artifact_base")}-fabric:${commonMod.mc}-${commonMod.prop("rcui.version")}"
+    val rcui = "${commonMod.prop("rcui.group")}:${commonMod.prop("rcui.artifact_base")}-${commonMod.mc}-fabric:${commonMod.prop("rcui.version")}"
     // Common only consumes RCUI API and the annotation processor; loader projects
     // provide and embed the runtime platform artifact.
     modImplementation(rcui) { isTransitive = false }
-    val rcuiConfig = "${commonMod.prop("rcui.group")}:rethink-config-ui-lib-config:${commonMod.prop("rcui.version")}"
-    annotationProcessor(rcuiConfig) { isTransitive = false }
 }
 
 configureTotemDollMixinSupport(TotemDollMixinTarget.COMMON)

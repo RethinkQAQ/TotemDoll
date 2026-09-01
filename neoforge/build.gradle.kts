@@ -28,7 +28,7 @@ neoForge {
         }
     }
     dependencies {
-        val rcui = "${commonMod.prop("rcui.group")}:${commonMod.prop("rcui.artifact_base")}-neoforge:${commonMod.mc}-${commonMod.prop("rcui.version")}"
+        val rcui = "${commonMod.prop("rcui.group")}:${commonMod.prop("rcui.artifact_base")}-${commonMod.mc}-neoforge:${commonMod.prop("rcui.version")}"
         implementation(rcui) { isTransitive = false }
         jarJar(rcui) { isTransitive = false }
     }
