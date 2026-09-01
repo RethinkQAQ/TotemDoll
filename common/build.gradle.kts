@@ -22,11 +22,9 @@ dependencies {
             parchment("org.parchmentmc.data:parchment-${commonMod.mc}:${commonMod.dep("parchment")}@zip")
         })
     }
-    // Common is compiled with Fabric mappings; use the matching RCUI adapter.
-    val rcui = "${commonMod.prop("rcui.group")}:${commonMod.prop("rcui.artifact_base")}-${commonMod.mc}-fabric:${commonMod.prop("rcui.version")}"
-    // Common only consumes RCUI API and the annotation processor; loader projects
-    // provide and embed the runtime platform artifact.
-    modImplementation(rcui) { isTransitive = false }
+    val rcui = "com.github.RethinkQAQ.RethinkConfigUiLib:rethink-config-ui-lib-${commonMod.mc}-fabric:${commonMod.prop("mod.rcui")}"
+    modCompileOnly(rcui) { isTransitive = false }
+    annotationProcessor(rcui) { isTransitive = false }
 }
 
 configureTotemDollMixinSupport(TotemDollMixinTarget.COMMON)

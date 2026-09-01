@@ -18,7 +18,7 @@ dependencies {
     modImplementation("net.fabricmc.fabric-api:fabric-api:${commonMod.dep("fabric-api")}+${commonMod.mc}")
     modImplementation("com.terraformersmc:modmenu:${commonMod.dep("modmenu")}")
 
-    val rcui = "${commonMod.prop("rcui.group")}:${commonMod.prop("rcui.artifact_base")}-${commonMod.mc}-fabric:${commonMod.prop("rcui.version")}"
+    val rcui = "com.github.RethinkQAQ.RethinkConfigUiLib:rethink-config-ui-lib-${commonMod.mc}-fabric:${commonMod.prop("mod.rcui")}"
     modImplementation(rcui) { isTransitive = false }
     include(rcui)
 }
