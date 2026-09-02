@@ -16,9 +16,6 @@ on:
 permissions:
   contents: read
 
-env:
-  BASE_VERSION: 0.1.1-alpha
-
 jobs:
   build:
     name: Build Minecraft targets
@@ -49,8 +46,13 @@ jobs:
             artifact_version="$GITHUB_REF_NAME"
             build_suffix=""
           else
-            version="$BASE_VERSION"
-            artifact_version="${BASE_VERSION}.build.${GITHUB_RUN_NUMBER}"
+            base_version="$(sed -n 's/^mod\.version[[:space:]]*=[[:space:]]*//p' gradle.properties | head -n 1)"
+            if [[ -z "$base_version" ]]; then
+              echo "Missing mod.version in gradle.properties" >&2
+              exit 1
+            fi
+            version="$base_version"
+            artifact_version="${base_version}-build.${GITHUB_RUN_NUMBER}"
             build_suffix="build.${GITHUB_RUN_NUMBER}"
           fi
 
