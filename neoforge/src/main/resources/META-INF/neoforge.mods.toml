@@ -29,3 +29,10 @@ type="required"
 versionRange="${minecraftVersionRangeNeoForge}"
 ordering="NONE"
 side="CLIENT"
+
+[[dependencies.${modId}]]
+modId="rethink_config_ui_lib"
+type="required"
+versionRange="[0.7.4,)"
+ordering="NONE"
+side="CLIENT"

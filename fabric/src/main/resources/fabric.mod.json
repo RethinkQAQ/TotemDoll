@@ -23,7 +23,8 @@
     "fabric-api": "*",
     "mixinextras": ">=0.5.4",
     "minecraft": "${minecraft_version_range_fabric}",
-    "java": ">=${java_version}"
+    "java": ">=${java_version}",
+    "rethink_config_ui_lib": ">=0.7.4"
   },
   "custom": {
     "modmenu": {
