@@ -18,10 +18,10 @@
  * with Totem Doll. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.rethinkqaq.totemdoll.client.gui;
+package com.rethinkqaq.totemdoll.client.gui.screen;
 
 import net.minecraft.client.gui.screens.Screen;
 
-interface DollScreenParent {
+public interface DollScreenParent {
     Screen rootParent();
 }

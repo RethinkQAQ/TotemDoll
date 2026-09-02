@@ -22,7 +22,7 @@ package com.rethinkqaq.totemdoll;
 
 import com.rethinkqaq.totemdoll.client.TotemDollClient;
 import com.rethinkqaq.totemdoll.client.gui.DollSelectionScreen;
-import com.rethinkqaq.totemdoll.client.gui.DollScreenAdapter;
+import com.rethinkqaq.totemdoll.client.gui.screen.DollScreenAdapter;
 import com.rethinkqaq.totemdoll.doll.DollStyleLoader;
 import com.rethinkqaq.totemdoll.doll.DollAnimationManager;
 import com.mojang.blaze3d.platform.InputConstants;

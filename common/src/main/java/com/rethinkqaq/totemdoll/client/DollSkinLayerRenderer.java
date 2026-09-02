@@ -15,7 +15,7 @@ package com.rethinkqaq.totemdoll.client;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.rethinkqaq.totemdoll.config.TotemDollConfig;
+import com.rethinkqaq.totemdoll.config.TotemDollConfigRuntime;
 import com.rethinkqaq.totemdoll.doll.DollStyle;
 import com.rethinkqaq.totemdoll.doll.bone.DollBone;
 import com.rethinkqaq.totemdoll.doll.bone.DollBoneModel;
@@ -50,19 +50,19 @@ public final class DollSkinLayerRenderer {
     );
 
     public static SkinLayerPlan resolve(DollStyle style, DollBoneModel model, DollResourceId texture) {
-        if (!TotemDollConfig.skinLayer3dEnabled() || model == null || texture == null) return null;
-        CacheKey key = new CacheKey(style.id(), texture, TotemDollConfig.skinLayer3dThickness());
+        if (!TotemDollConfigRuntime.skinLayer3dEnabled() || model == null || texture == null) return null;
+        CacheKey key = new CacheKey(style.id(), texture, TotemDollConfigRuntime.skinLayer3dThickness());
         return CACHE.computeIfAbsent(key, ignored -> build(model, texture));
     }
 
     public static void clear() { CACHE.clear(); }
 
     public static void render(SkinLayerPlan plan, String boneName, PoseStack stack,
-                              VertexConsumer consumer, int light, int overlay) {
+                              VertexConsumer consumer, int light, int overlay, boolean previewLighting) {
         if (plan == null) return;
         List<PixelQuad> quads = plan.quads.get(boneName);
         if (quads == null) return;
-        for (PixelQuad quad : quads) renderQuad(quad, stack.last(), consumer, light, overlay);
+        for (PixelQuad quad : quads) renderQuad(quad, stack.last(), consumer, light, overlay, previewLighting);
     }
 
     public static boolean isOverlayCube(SkinLayerPlan plan, String boneName, DollCube cube) {
@@ -111,7 +111,7 @@ public final class DollSkinLayerRenderer {
 
     /** Builds exposed shell edges from one shared six-face surface grid. */
     private static List<PixelQuad> buildPart(NativeImage image, DollBone renderBone, DollBone outerBone, DollCube outer) {
-        float thickness = TotemDollConfig.skinLayer3dThickness();
+        float thickness = TotemDollConfigRuntime.skinLayer3dThickness();
         List<SurfaceCell> cells = new ArrayList<>();
         for (Map.Entry<String, DollFace> entry : outer.faces().entrySet()) {
             Direction direction = Direction.byName(entry.getKey());
@@ -157,7 +157,21 @@ public final class DollSkinLayerRenderer {
         return mergeWalls(walls);
     }
 
-    private static void renderQuad(PixelQuad quad, Pose pose, VertexConsumer consumer, int light, int overlay) {
+    private static void renderQuad(PixelQuad quad, Pose pose, VertexConsumer consumer, int light, int overlay,
+                                   boolean previewLighting) {
+        float normalX = quad.normalX;
+        float normalY = quad.normalY;
+        float normalZ = quad.normalZ;
+        // Keep the generated skin shell in the same preview-lighting space as
+        // the base model. Otherwise its exposed side walls retain world-facing
+        // normals and become dark seams in the PIP preview.
+        //? >= 1.21.5 {
+        /*if (previewLighting) {
+            normalX = 0.0F;
+            normalY = 1.0F;
+            normalZ = 0.0F;
+        }
+        *///?}
         for (int vertex = 0; vertex < 4; vertex++) {
             float[] point = quad.points[vertex];
             consumer.addVertex(pose, point[0] / 16F, point[1] / 16F, point[2] / 16F)
@@ -167,7 +181,7 @@ public final class DollSkinLayerRenderer {
                     .setUv(quad.uvs[vertex * 2] / 16F, quad.uvs[vertex * 2 + 1] / 16F)
                     .setOverlay(overlay)
                     .setLight(light)
-                    .setNormal(pose, quad.normalX, quad.normalY, quad.normalZ);
+                    .setNormal(pose, normalX, normalY, normalZ);
         }
     }
 

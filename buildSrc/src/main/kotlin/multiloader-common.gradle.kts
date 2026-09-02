@@ -30,6 +30,7 @@ java {
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
     maven("https://maven.fabricmc.net/") {
         name = "FabricMC"
@@ -50,6 +51,7 @@ repositories {
         name = "TerraformersMC"
         content { includeGroup("com.terraformersmc") }
     }
+    maven("https://jitpack.io/") { name = "JitPack" }
 }
 
 tasks {

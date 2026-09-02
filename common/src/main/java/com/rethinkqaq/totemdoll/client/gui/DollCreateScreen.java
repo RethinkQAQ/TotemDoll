@@ -20,8 +20,14 @@
 
 package com.rethinkqaq.totemdoll.client.gui;
 
+import com.rethinkqaq.totemdoll.client.gui.screen.DollScreenParent;
+
+import com.rethinkqaq.totemdoll.client.gui.screen.DollScreenAdapter;
+
+import com.rethinkqaq.totemdoll.client.gui.preview.DollGuiPreview;
+
 import com.rethinkqaq.totemdoll.client.TotemDollClient;
-import com.rethinkqaq.totemdoll.config.TotemDollConfig;
+import com.rethinkqaq.totemdoll.config.TotemDollConfigRuntime;
 import com.rethinkqaq.totemdoll.doll.DollLocalStyleStore;
 import com.rethinkqaq.totemdoll.doll.DollStyle;
 import com.rethinkqaq.totemdoll.utils.DollMinecraftResourceUtil;
@@ -157,7 +163,7 @@ public final class DollCreateScreen extends DollScreen {
                     ? dollParent.rootParent()
                     : parent;
             TotemDollClient.reloadGeneratedStyles().thenRun(() -> this.minecraft.execute(() -> {
-                TotemDollConfig.select(createdId);
+                TotemDollConfigRuntime.select(createdId);
                 DollScreenAdapter.setScreen(this.minecraft, new DollSelectionScreen(rootParent, DollSelectionScreen.Tab.MY_STYLES));
             }));
         } catch (IOException exception) {

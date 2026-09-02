@@ -18,7 +18,7 @@
  * with Totem Doll. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.rethinkqaq.totemdoll.client.gui;
+package com.rethinkqaq.totemdoll.client.gui.preview;
 
 import com.rethinkqaq.totemdoll.client.DollPreviewContext;
 import com.rethinkqaq.totemdoll.doll.DollStyle;
@@ -44,6 +44,11 @@ public final class DollGuiPreview {
     }
 
     public static void render(DollGuiGraphics graphics, DollStyle style, int x, int y, int width, int height, float modelScale) {
+        render(graphics, style, x, y, width, height, modelScale, x, y, width, height);
+    }
+
+    public static void render(DollGuiGraphics graphics, DollStyle style, int x, int y, int width, int height,
+                              float modelScale, int clipX, int clipY, int clipWidth, int clipHeight) {
         if (!DollBoneModels.contains(style.id())) {
             ItemStack totem = DollNativeItemUtil.createTotemStack();
             renderItemPreview(graphics, x, y, width, height, modelScale,
@@ -54,12 +59,13 @@ public final class DollGuiPreview {
 
         //? >= 1.21.6 {
         /*graphics.submitPreview(
-                new DollGuiPreviewRenderState(style, x, y, width, height, modelScale)
+                new DollGuiPreviewRenderState(style, x, y, width, height, modelScale,
+                        clipX, clipY, clipWidth, clipHeight)
         );
         *///?} else {
         renderItemPreview(graphics, x, y, width, height, modelScale,
-                () -> DollPreviewContext.renderAs(style,
-                        () -> graphics.renderItem(DollNativeItemUtil.createTotemStack(), 0, 0)));
+                () -> DollPreviewContext.renderWithPreviewLighting(() -> DollPreviewContext.renderAs(style,
+                        () -> graphics.renderItem(DollNativeItemUtil.createTotemStack(), 0, 0))));
         //?}
     }
 

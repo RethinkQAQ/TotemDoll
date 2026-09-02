@@ -21,6 +21,7 @@
 package com.rethinkqaq.totemdoll.client.gui;
 
 import com.rethinkqaq.totemdoll.utils.DollGuiGraphics;
+import com.rethinkqaq.totemdoll.client.gui.screen.DollScreenRender;
 //? >= 26.1.2 {
 /*import net.minecraft.client.gui.GuiGraphicsExtractor;
 *///?} else {

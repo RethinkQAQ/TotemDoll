@@ -18,7 +18,7 @@
  * with Totem Doll. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.rethinkqaq.totemdoll.client.gui;
+package com.rethinkqaq.totemdoll.client.gui.screen;
 
 //? >= 26.1.2 {
 /*import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -31,9 +31,9 @@ import net.minecraft.client.gui.screens.Screen;
 
 import java.util.function.Predicate;
 
-final class DollScreenRender {
+public final class DollScreenRender {
 
-    static void renderChildren(
+    public static void renderChildren(
             Screen screen,
             //? >= 26.1.2 {
             /*GuiGraphicsExtractor graphics,
@@ -47,7 +47,7 @@ final class DollScreenRender {
         renderChildren(screen, graphics, mouseX, mouseY, partialTick, child -> true);
     }
 
-    static void renderChildren(
+    public static void renderChildren(
             Screen screen,
             //? >= 26.1.2 {
             /*GuiGraphicsExtractor graphics,

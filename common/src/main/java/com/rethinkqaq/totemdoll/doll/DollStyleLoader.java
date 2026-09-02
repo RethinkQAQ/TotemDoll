@@ -34,7 +34,7 @@ import com.rethinkqaq.totemdoll.doll.bone.DollBoneModels;
 import com.rethinkqaq.totemdoll.doll.bone.DollBoneActionManager;
 import com.rethinkqaq.totemdoll.doll.bone.DollDisplayOverrideResolver;
 import com.rethinkqaq.totemdoll.client.DollBoneRenderer;
-import com.rethinkqaq.totemdoll.client.gui.DollGuiPreviewRenderer;
+import com.rethinkqaq.totemdoll.client.gui.preview.DollGuiPreviewRenderer;
 
 import java.io.Reader;
 import java.io.IOException;
@@ -100,8 +100,11 @@ public final class DollStyleLoader {
             DollSkinDefinition skin = readSkin(root);
             Map<String, DollResourceId> textures = readTextures(source, root);
             List<DollAnimationDefinition> animations = readTextureAnimations(root, textures);
+            boolean userCreated = root.has("user_created")
+                    ? root.get("user_created").getAsBoolean()
+                    : origin == DollStyleOrigin.LOCAL;
             output.add(new DollStyle(id, name, nameKey, modelId, false, template,
-                    origin == DollStyleOrigin.LOCAL, skin, origin, textures, animations,
+                    userCreated, skin, origin, textures, animations,
                     modelType, source, packMetadata, null));
         } catch (Exception exception) {
             Constants.LOG.error("Could not load style {}", source, exception);

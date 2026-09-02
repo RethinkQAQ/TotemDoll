@@ -18,7 +18,7 @@
  * with Totem Doll. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.rethinkqaq.totemdoll.client.gui;
+package com.rethinkqaq.totemdoll.client.gui.preview;
 
 /** Internal bridge implemented by the 1.21.6+ GuiGraphics mixin. */
 public interface DollGuiPreviewAccess {

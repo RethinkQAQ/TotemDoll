@@ -295,7 +295,9 @@ public final class StylePackStore {
 
 
     public static void exportLocal(DollStyle style, Path zip) throws IOException {
-        if (!style.userCreated()) throw new IOException("Only user-created styles can be exported");
+        if (!style.isLocal() || style.origin() == DollStyleOrigin.BUILTIN) {
+            throw new IOException("Only local styles can be exported");
+        }
         Path source = stylesDirectory.resolve(style.id().path()).normalize();
         if (!source.startsWith(stylesDirectory) || !Files.isDirectory(source)) throw new IOException("Local style not found");
         try (OutputStream output = Files.newOutputStream(zip); ZipOutputStream archive = new ZipOutputStream(output)) {

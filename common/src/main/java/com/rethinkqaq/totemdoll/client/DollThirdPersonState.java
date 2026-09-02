@@ -21,7 +21,7 @@
 package com.rethinkqaq.totemdoll.client;
 
 //? >= 1.21.4 {
-/*import com.rethinkqaq.totemdoll.config.TotemDollConfig;
+/*import com.rethinkqaq.totemdoll.config.TotemDollConfigRuntime;
 import com.rethinkqaq.totemdoll.doll.DollStyle;
 import com.rethinkqaq.totemdoll.doll.bone.DollBoneModels;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
@@ -63,7 +63,7 @@ public final class DollThirdPersonState {
         }
 
         DollStyle style = DollPreviewContext.current();
-        if (style == null) style = TotemDollConfig.selectedStyle();
+        if (style == null) style = TotemDollConfigRuntime.selectedStyle();
         if (style != null && DollBoneModels.contains(style.id())) {
             STYLES.put(renderState, style);
             //? >= 1.21.6 {

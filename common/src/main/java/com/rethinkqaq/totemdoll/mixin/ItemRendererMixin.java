@@ -29,7 +29,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.rethinkqaq.totemdoll.client.DollBoneRenderer;
 import com.rethinkqaq.totemdoll.client.DollPreviewContext;
-import com.rethinkqaq.totemdoll.config.TotemDollConfig;
+import com.rethinkqaq.totemdoll.config.TotemDollConfigRuntime;
 import com.rethinkqaq.totemdoll.doll.DollStyle;
 import com.rethinkqaq.totemdoll.doll.bone.DollBoneModels;
 import net.minecraft.client.Minecraft;
@@ -83,7 +83,7 @@ public abstract class ItemRendererMixin {
         if (!stack.is(Items.TOTEM_OF_UNDYING)) return;
         if (DollPreviewContext.isNativeRender()) return;
         DollStyle style = DollPreviewContext.current();
-        if (style == null) style = TotemDollConfig.selectedStyle();
+        if (style == null) style = TotemDollConfigRuntime.selectedStyle();
         if (style == null || !DollBoneModels.contains(style.id())) return;
 
         //? >= 1.21.5 {
@@ -96,7 +96,14 @@ public abstract class ItemRendererMixin {
         *///?} else {
         float partialTick = Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(false);
         //?}
-        if (DollBoneRenderer.render(style, context, leftHand, poseStack, buffers, light, overlay, partialTick)) {
+        if (DollBoneRenderer.render(style, context, leftHand, poseStack, buffers, light, overlay, partialTick, false)) {
+            // 1.21.1 renders GUI items into the shared BufferSource. A card
+            // preview must be committed before RCUI submits its tooltip; leaving
+            // it queued makes the model draw at the end of the Screen and cover
+            // the tooltip. Never flush gameplay item rendering.
+            if (DollPreviewContext.current() != null && buffers instanceof MultiBufferSource.BufferSource bufferSource) {
+                bufferSource.endBatch();
+            }
             ci.cancel();
         }
     }

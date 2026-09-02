@@ -18,7 +18,7 @@
  * with Totem Doll. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.rethinkqaq.totemdoll.client.gui;
+package com.rethinkqaq.totemdoll.client.gui.preview;
 
 import com.rethinkqaq.totemdoll.doll.DollStyle;
 import com.rethinkqaq.totemdoll.utils.DollResourceId;
@@ -36,10 +36,15 @@ public record DollGuiPreviewRenderState(
         ScreenRectangle scissorArea, ScreenRectangle bounds
 ) implements PictureInPictureRenderState {
     public DollGuiPreviewRenderState(DollStyle style, int x, int y, int width, int height, float scale) {
+        this(style, x, y, width, height, scale, x, y, width, height);
+    }
+
+    public DollGuiPreviewRenderState(DollStyle style, int x, int y, int width, int height, float scale,
+                                     int clipX, int clipY, int clipWidth, int clipHeight) {
         this(style, x, y, x + width, y + height, scale,
-                new ScreenRectangle(x, y, width, height),
+                new ScreenRectangle(clipX, clipY, Math.max(0, clipWidth), Math.max(0, clipHeight)),
                 PictureInPictureRenderState.getBounds(x, y, x + width, y + height,
-                        new ScreenRectangle(x, y, width, height)));
+                        new ScreenRectangle(clipX, clipY, Math.max(0, clipWidth), Math.max(0, clipHeight))));
     }
 
     public PreviewKey key(int guiScale) {
@@ -56,6 +61,10 @@ public record DollGuiPreviewRenderState(
 *///?} else {
 public final class DollGuiPreviewRenderState {
     public DollGuiPreviewRenderState(DollStyle style, int x, int y, int width, int height, float scale) {
+    }
+    public DollGuiPreviewRenderState(DollStyle style, int x, int y, int width, int height, float scale,
+                                     int clipX, int clipY, int clipWidth, int clipHeight) {
+        this(style, x, y, width, height, scale);
     }
 }
 //?}
