@@ -21,6 +21,9 @@
 package com.rethinkqaq.totemdoll.utils;
 
 import net.minecraft.world.item.ItemStack;
+//? if 26.1.2 {
+/*import net.minecraft.client.Minecraft;
+*///?}
 //? >= 26.2 {
 /*import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.Registries;
@@ -39,6 +42,11 @@ public final class DollNativeItemUtil {
     *///?}
 
     public static ItemStack createTotemStack() {
+        //? if 26.1.2 {
+        /*if (Minecraft.getInstance().level == null) {
+            return ItemStack.EMPTY;
+        }
+        *///?}
         //? >= 26.2 {
         /*var connection = Minecraft.getInstance().getConnection();
         if (connection == null) {

@@ -6,7 +6,9 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [],
   "client": [
-    "fabric.GameRendererPreviewMixin"
+    "fabric.GameRendererPreviewMixin",
+    "fabric.OptionsResourcePackMixin",
+    "fabric.PackRepositoryMixin"
   ],
   "server": [],
   "injectors": {

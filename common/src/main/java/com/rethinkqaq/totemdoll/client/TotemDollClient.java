@@ -53,7 +53,7 @@ public final class TotemDollClient {
             return false;
         }
         initialStylesReloaded = true;
-        reloadGeneratedStyles();
+        TotemDollConfigRuntime.reconcileSelectedStyle();
         return true;
     }
 

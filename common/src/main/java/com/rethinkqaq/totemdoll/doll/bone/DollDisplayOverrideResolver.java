@@ -112,7 +112,7 @@ public final class DollDisplayOverrideResolver {
         Set<String> loadedMods = new HashSet<>();
         for (DollDisplayOverride override : overrides) {
             for (String mod : override.mods()) {
-                if (loadedModCache.computeIfAbsent(mod, id -> Services.PLATFORM.isModLoaded(id))) {
+                if (loadedModCache.computeIfAbsent(mod, id -> Services.platform().isModLoaded(id))) {
                     loadedMods.add(mod);
                 }
             }

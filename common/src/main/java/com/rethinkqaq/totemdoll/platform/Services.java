@@ -28,12 +28,28 @@ import java.util.ServiceLoader;
 // Service loaders are a built-in Java feature that allow us to locate implementations of an interface that vary from one
 // environment to another. In the context of MultiLoader we use this feature to access a mock API in the common code that
 // is swapped out for the platform specific implementation at runtime.
-public class Services {
+public final class Services {
 
     // In this example we provide a platform helper which provides information about what platform the mod is running on.
     // For example this can be used to check if the code is running on Forge vs Fabric, or to ask the modloader if another
     // mod is loaded.
-    public static final IPlatformHelper PLATFORM = load(IPlatformHelper.class);
+    private static volatile IPlatformHelper platform;
+
+    public static void initialize() {
+        if (platform != null) {
+            return;
+        }
+        synchronized (Services.class) {
+            if (platform == null) {
+                platform = load(IPlatformHelper.class);
+            }
+        }
+    }
+
+    public static IPlatformHelper platform() {
+        initialize();
+        return platform;
+    }
 
     // This code is used to load a service for the current environment. Your implementation of the service must be defined
     // manually by including a text file in META-INF/services named with the fully qualified class name of the service.
@@ -41,10 +57,13 @@ public class Services {
     // example our file on Forge points to ForgePlatformHelper while Fabric points to FabricPlatformHelper.
     public static <T> T load(Class<T> clazz) {
 
-        final T loadedService = ServiceLoader.load(clazz)
+        final T loadedService = ServiceLoader.load(clazz, Services.class.getClassLoader())
                 .findFirst()
                 .orElseThrow(() -> new NullPointerException("Failed to load service for " + clazz.getName()));
         Constants.LOG.debug("Loaded {} for service {}", loadedService, clazz);
         return loadedService;
+    }
+
+    private Services() {
     }
 }
