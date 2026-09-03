@@ -29,7 +29,7 @@ neoForge {
     }
     dependencies {
         val rcui = "com.github.RethinkQAQ.RethinkConfigUiLib:rethink-config-ui-lib-${commonMod.mc}-neoforge:${commonMod.prop("mod.rcui")}"
-        implementation(rcui) { isTransitive = false }
-        jarJar(rcui) { isTransitive = false }
+
+        jarJar(implementation(rcui) { isTransitive = false })
     }
 }

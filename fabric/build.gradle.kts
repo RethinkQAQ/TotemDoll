@@ -19,8 +19,8 @@ dependencies {
     modImplementation("com.terraformersmc:modmenu:${commonMod.dep("modmenu")}")
 
     val rcui = "com.github.RethinkQAQ.RethinkConfigUiLib:rethink-config-ui-lib-${commonMod.mc}-fabric:${commonMod.prop("mod.rcui")}"
-    modImplementation(rcui) { isTransitive = false }
-    include(rcui)
+
+    include(modImplementation(rcui) { isTransitive = false })
 }
 
 configureTotemDollMixinSupport(TotemDollMixinTarget.FABRIC)
