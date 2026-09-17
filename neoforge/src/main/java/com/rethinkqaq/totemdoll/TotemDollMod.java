@@ -47,15 +47,25 @@ import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 /*import net.neoforged.neoforge.client.event.RegisterPictureInPictureRenderersEvent;
 *///?}
 import net.neoforged.neoforge.common.NeoForge;
+//? < 26.3 {
 import org.lwjgl.glfw.GLFW;
+//?}
 
 @Mod(Constants.MOD_ID)
 public class TotemDollMod {
 
     private static final KeyMapping OPEN_CONFIG = new KeyMapping(
             "key.totemdoll.open_config",
+            //? >= 26.3 {
+            /*InputConstants.Type.KEYBOARD,
+            *///?} else {
             InputConstants.Type.KEYSYM,
+            //?}
+            //? >= 26.3 {
+            /*InputConstants.KEY_F9,
+            *///?} else {
             GLFW.GLFW_KEY_F9,
+            //?}
             //? >= 1.21.10 {
             /*KeyMapping.Category.register(DollMinecraftResourceUtil.nativeId(
                     DollResourceId.ofVanilla("totemdoll")))

@@ -29,6 +29,9 @@ import net.minecraft.client.renderer.FaceInfo;
 import net.minecraft.core.Direction;
 import net.minecraft.server.packs.resources.Resource;
 import com.mojang.blaze3d.vertex.PoseStack.Pose;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -49,8 +52,55 @@ public final class DollSkinLayerRenderer {
             "head", "body", "left_arm", "right_arm", "left_leg", "right_leg"
     );
 
+    public static boolean allows3dLayer(ItemDisplayContext context, Entity owner) {
+        return allows3dLayer(context, owner == null ? null : owner.position());
+    }
+
+    public static boolean allows3dLayer(ItemDisplayContext context, Vec3 ownerPosition) {
+        if (keeps3dLayer(context) || ownerPosition == null) return true;
+        float distance = TotemDollConfigRuntime.skinLayer3dDistance();
+        //? >= 26.2 {
+        /*return ownerPosition.distanceToSqr(Minecraft.getInstance().gameRenderer.mainCamera().position())
+                <= distance * distance;
+        *///?} else if >= 1.21.11 {
+        /*return ownerPosition.distanceToSqr(Minecraft.getInstance().gameRenderer.getMainCamera().position())
+                <= distance * distance;
+        *///?} else {
+        return ownerPosition.distanceToSqr(Minecraft.getInstance().gameRenderer.getMainCamera().getPosition())
+                <= distance * distance;
+        //?}
+    }
+
+    /**
+     * Legacy item renderers do not pass their non-living owner to ItemRenderer.
+     * Their pose is already camera-relative, so its translation is the only
+     * available world-distance source for dropped items and item frames.
+     */
+    public static boolean allows3dLayer(ItemDisplayContext context, PoseStack poseStack) {
+        if (keeps3dLayer(context)) return true;
+        float distance = TotemDollConfigRuntime.skinLayer3dDistance();
+        var pose = poseStack.last().pose();
+        float x = pose.m30();
+        float y = pose.m31();
+        float z = pose.m32();
+        return x * x + y * y + z * z <= distance * distance;
+    }
+
+    private static boolean keeps3dLayer(ItemDisplayContext context) {
+        return context == ItemDisplayContext.GUI
+                || context == ItemDisplayContext.FIRST_PERSON_LEFT_HAND
+                || context == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND;
+    }
+
     public static SkinLayerPlan resolve(DollStyle style, DollBoneModel model, DollResourceId texture) {
-        if (!TotemDollConfigRuntime.skinLayer3dEnabled() || model == null || texture == null) return null;
+        return resolve(style, model, texture, true);
+    }
+
+    public static SkinLayerPlan resolve(DollStyle style, DollBoneModel model, DollResourceId texture,
+                                        boolean allow3dLayer) {
+        if (!allow3dLayer || !TotemDollConfigRuntime.skinLayer3dEnabled() || model == null || texture == null) {
+            return null;
+        }
         CacheKey key = new CacheKey(style.id(), texture, TotemDollConfigRuntime.skinLayer3dThickness());
         return CACHE.computeIfAbsent(key, ignored -> build(model, texture));
     }

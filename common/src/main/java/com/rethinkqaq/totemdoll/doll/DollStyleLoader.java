@@ -32,9 +32,10 @@ import com.rethinkqaq.totemdoll.doll.bone.DollBoneModel;
 import com.rethinkqaq.totemdoll.doll.bone.DollBoneModelLoader;
 import com.rethinkqaq.totemdoll.doll.bone.DollBoneModels;
 import com.rethinkqaq.totemdoll.doll.bone.DollBoneActionManager;
-import com.rethinkqaq.totemdoll.doll.bone.DollDisplayOverrideResolver;
 import com.rethinkqaq.totemdoll.client.DollBoneRenderer;
-import com.rethinkqaq.totemdoll.client.gui.preview.DollGuiPreviewRenderer;
+//? >= 1.21.6 {
+/*import com.rethinkqaq.totemdoll.client.gui.preview.DollGuiPreviewRenderer;
+*///?}
 
 import java.io.Reader;
 import java.io.IOException;
@@ -50,7 +51,9 @@ public final class DollStyleLoader {
 
     public static List<DollStyle> reload(ResourceManager manager) {
         DollBoneRenderer.clear();
-        DollGuiPreviewRenderer.invalidateAll();
+        //? >= 1.21.6 {
+        /*DollGuiPreviewRenderer.invalidateAll();
+        *///?}
         DollBoneActionManager.clear();
         DollBoneModels.clear();
         List<DollStyle> styles = new ArrayList<>();

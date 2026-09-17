@@ -16,6 +16,9 @@ tasks.named("licenseMain") {
 
 dependencies {
     minecraft("com.mojang:minecraft:${commonMod.mc}")
+    if (stonecutter.eval(commonMod.mc, ">=26.3")) {
+        compileOnly("org.lwjgl:lwjgl-tinyfd:${commonMod.dep("lwjgl-tinyfd")}")
+    }
     if (stonecutter.eval(commonMod.mc, "<=1.21.11")) {
         mappings(loom.layered {
             officialMojangMappings()

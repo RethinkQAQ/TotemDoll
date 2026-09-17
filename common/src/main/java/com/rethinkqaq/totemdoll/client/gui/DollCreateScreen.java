@@ -33,6 +33,7 @@ import com.rethinkqaq.totemdoll.doll.DollStyle;
 import com.rethinkqaq.totemdoll.utils.DollMinecraftResourceUtil;
 import com.rethinkqaq.totemdoll.utils.DollResourceId;
 import com.rethinkqaq.totemdoll.utils.DollGuiGraphics;
+import com.rethinkqaq.totemdoll.utils.DollFileDialog;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
@@ -44,8 +45,6 @@ import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.ResourceLocation;
 //?}
 import net.minecraft.network.chat.Component;
-import org.lwjgl.util.tinyfd.TinyFileDialogs;
-
 import java.io.IOException;
 import java.nio.file.Path;
 
@@ -96,17 +95,14 @@ public final class DollCreateScreen extends DollScreen {
     }
 
     private void chooseSkin() {
-        String chosen = TinyFileDialogs.tinyfd_openFileDialog(
+        Path selected = DollFileDialog.open(
                 "Select a 64x64 Minecraft skin",
-                "",
-                null,
                 "PNG image",
-                false
+                "png"
         );
-        if (chosen == null) {
+        if (selected == null) {
             return;
         }
-        Path selected = Path.of(chosen);
         try {
             DollLocalStyleStore.validateSkinFile(selected);
             skinPath = selected;

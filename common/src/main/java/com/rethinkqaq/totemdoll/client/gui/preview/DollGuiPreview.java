@@ -30,8 +30,13 @@ import com.rethinkqaq.totemdoll.utils.DollResourceId;
 import net.minecraft.world.item.ItemStack;
 //? >= 1.21.6 {
 /*import com.mojang.blaze3d.systems.RenderSystem;
+//? >= 26.3 {
+/^import com.mojang.renderpearl.api.textures.FilterMode;
+import com.mojang.renderpearl.api.textures.GpuTextureView;
+^///?} else {
 import com.mojang.blaze3d.textures.FilterMode;
 import com.mojang.blaze3d.textures.GpuTextureView;
+//?}
 import net.minecraft.client.gui.render.TextureSetup;
 *///?}
 
@@ -78,7 +83,12 @@ public final class DollGuiPreview {
         }
     }
 
-    //? >= 1.21.11 {
+    //? >= 26.3 {
+        /*public static TextureSetup singleTexture(GpuTextureView view) {
+        return TextureSetup.singleTexture(view,
+                RenderSystem.getSamplerCache().getRepeat(FilterMode.NEAREST));
+    }
+    *///?} else if >= 1.21.11 {
     /*public static TextureSetup singleTexture(GpuTextureView view) {
         return TextureSetup.singleTexture(view,
                 RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST));

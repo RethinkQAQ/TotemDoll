@@ -18,6 +18,14 @@ dependencies {
     modImplementation("net.fabricmc.fabric-api:fabric-api:${commonMod.dep("fabric-api")}+${commonMod.mc}")
     modImplementation("com.terraformersmc:modmenu:${commonMod.dep("modmenu")}")
 
+    if (stonecutter.eval(commonMod.mc, ">=26.3")) {
+        val tinyfd = "org.lwjgl:lwjgl-tinyfd:${commonMod.dep("lwjgl-tinyfd")}"
+        include(implementation(tinyfd)!!)
+        listOf("windows", "windows-arm64", "linux", "linux-arm64", "macos", "macos-arm64").forEach { platform ->
+            include(runtimeOnly("$tinyfd:natives-$platform")!!)
+        }
+    }
+
     val rcui = "com.github.RethinkQAQ.RethinkConfigUiLib:rethink-config-ui-lib-${commonMod.mc}-fabric:${commonMod.prop("mod.rcui")}"
 
     include(modImplementation(rcui) { isTransitive = false })

@@ -63,7 +63,7 @@ public abstract class ItemModelResolverMixin {
             LivingEntity entity,
             CallbackInfo callback
     ) {
-        DollThirdPersonState.mark(renderState, stack, context);
+        DollThirdPersonState.mark(renderState, stack, context, entity);
     }
 
     @Inject(method = "updateForNonLiving", at = @At("HEAD"))
@@ -74,7 +74,7 @@ public abstract class ItemModelResolverMixin {
             Entity entity,
             CallbackInfo callback
     ) {
-        DollThirdPersonState.mark(renderState, stack, context);
+        DollThirdPersonState.mark(renderState, stack, context, entity);
     }
 
     //? >= 1.21.6 {
@@ -92,7 +92,12 @@ public abstract class ItemModelResolverMixin {
             int seed,
             CallbackInfo callback
     ) {
-        DollThirdPersonState.mark(renderState, stack, context);
+        // updateForNonLiving() on 1.21.6-1.21.9 calls this method with a null
+        // owner after marking the actual entity. Preserve that earlier result;
+        // a standalone GUI update still needs to create the native GUI state.
+        if (entity != null || context == ItemDisplayContext.GUI) {
+            DollThirdPersonState.mark(renderState, stack, context, entity);
+        }
     }
     ^///?}
     *///?}

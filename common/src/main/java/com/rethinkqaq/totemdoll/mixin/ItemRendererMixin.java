@@ -29,6 +29,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.rethinkqaq.totemdoll.client.DollBoneRenderer;
 import com.rethinkqaq.totemdoll.client.DollPreviewContext;
+import com.rethinkqaq.totemdoll.client.DollSkinLayerRenderer;
 import com.rethinkqaq.totemdoll.config.TotemDollConfigRuntime;
 import com.rethinkqaq.totemdoll.doll.DollStyle;
 import com.rethinkqaq.totemdoll.doll.bone.DollBoneModels;
@@ -42,12 +43,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //?}
-//? < 1.21.4 {
-import net.minecraft.client.resources.model.BakedModel;
-//?}
 //? < 1.21.10 {
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
+//?}
+//? < 1.21.4 {
+import net.minecraft.client.resources.model.BakedModel;
 //?}
 
 @Mixin(
@@ -60,13 +61,27 @@ import net.minecraft.world.level.Level;
 public abstract class ItemRendererMixin {
 
     //? < 1.21.10 {
+    //? < 1.21.4 {
+    @Inject(
+            method = "render",
+            at = @At("HEAD"),
+            cancellable = true
+    )
+    private void totemdoll$renderGuiItem(
+            ItemStack stack, ItemDisplayContext context, boolean leftHand,
+            PoseStack poseStack, MultiBufferSource buffers, int light, int overlay,
+            BakedModel referenceModel, CallbackInfo ci
+    ) {
+        totemdoll$renderBoneModel(stack, context, leftHand, poseStack, buffers,
+                light, overlay, DollSkinLayerRenderer.allows3dLayer(context, poseStack), ci);
+    }
+    //?}
+
     @Inject(
             //? >= 1.21.5 {
             /*method = "renderStatic(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemDisplayContext;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/world/level/Level;III)V",
-            *///?} else if >= 1.21.4 {
-            /*method = "renderStatic(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemDisplayContext;ZLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/world/level/Level;III)V",
             *///?} else {
-            method = "render",
+            method = "renderStatic(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemDisplayContext;ZLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/world/level/Level;III)V",
             //?}
             at = @At("HEAD"),
             cancellable = true
@@ -74,11 +89,24 @@ public abstract class ItemRendererMixin {
     private void totemdoll$renderBoneModel(
             //? >= 1.21.5 {
             /*LivingEntity entity, ItemStack stack, ItemDisplayContext context, PoseStack poseStack, MultiBufferSource buffers, Level level, int light, int overlay, int seed, CallbackInfo ci
-            *///?} else if >= 1.21.4 {
-            /*LivingEntity entity, ItemStack stack, ItemDisplayContext context, boolean leftHand, PoseStack poseStack, MultiBufferSource buffers, Level level, int light, int overlay, int seed, CallbackInfo ci
             *///?} else {
-            ItemStack stack, ItemDisplayContext context, boolean leftHand, PoseStack poseStack, MultiBufferSource buffers, int light, int overlay, BakedModel referenceModel, CallbackInfo ci
+            LivingEntity entity, ItemStack stack, ItemDisplayContext context, boolean leftHand, PoseStack poseStack, MultiBufferSource buffers, Level level, int light, int overlay, int seed, CallbackInfo ci
              //?}
+    ) {
+        //? >= 1.21.5 {
+        /*boolean leftHand = context == ItemDisplayContext.THIRD_PERSON_LEFT_HAND
+                || context == ItemDisplayContext.FIRST_PERSON_LEFT_HAND;
+        *///?}
+        totemdoll$renderBoneModel(stack, context, leftHand, poseStack, buffers,
+                light, overlay, entity == null
+                        ? DollSkinLayerRenderer.allows3dLayer(context, poseStack)
+                        : DollSkinLayerRenderer.allows3dLayer(context, entity), ci);
+    }
+
+    private void totemdoll$renderBoneModel(
+            ItemStack stack, ItemDisplayContext context, boolean leftHand,
+            PoseStack poseStack, MultiBufferSource buffers, int light, int overlay,
+            boolean allow3dSkinLayer, CallbackInfo ci
     ) {
         if (!stack.is(Items.TOTEM_OF_UNDYING)) return;
         if (DollPreviewContext.isNativeRender()) return;
@@ -86,17 +114,13 @@ public abstract class ItemRendererMixin {
         if (style == null) style = TotemDollConfigRuntime.selectedStyle();
         if (style == null || !DollBoneModels.contains(style.id())) return;
 
-        //? >= 1.21.5 {
-        /*boolean leftHand = context == ItemDisplayContext.THIRD_PERSON_LEFT_HAND
-                || context == ItemDisplayContext.FIRST_PERSON_LEFT_HAND;
-        *///?}
-
         //? >= 1.21.3 {
         /*float partialTick = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
         *///?} else {
         float partialTick = Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(false);
         //?}
-        if (DollBoneRenderer.render(style, context, leftHand, poseStack, buffers, light, overlay, partialTick, false)) {
+        if (DollBoneRenderer.render(style, context, leftHand, poseStack, buffers, light, overlay,
+                partialTick, false, allow3dSkinLayer)) {
             // 1.21.1 renders GUI items into the shared BufferSource. A card
             // preview must be committed before RCUI submits its tooltip; leaving
             // it queued makes the model draw at the end of the Screen and cover

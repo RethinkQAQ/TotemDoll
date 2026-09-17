@@ -28,8 +28,13 @@ import java.util.Map;
 
 final class DollGuiPreviewTargetCache implements AutoCloseable {
     private final Map<PreviewKey, DollGuiPreviewTarget> targets = new HashMap<>();
+    private int guiScale = -1;
 
     public DollGuiPreviewTarget getOrCreate(PreviewKey key) {
+        if (guiScale != key.guiScale()) {
+            clear();
+            guiScale = key.guiScale();
+        }
         return targets.computeIfAbsent(key,
                 ignored -> new DollGuiPreviewTarget(key.width(), key.height()));
     }
@@ -44,9 +49,4 @@ final class DollGuiPreviewTargetCache implements AutoCloseable {
         clear();
     }
 }
-*///?} else {
-final class DollGuiPreviewTargetCache {
-    public void clear() {
-    }
-}
-//?}
+*///?}

@@ -42,20 +42,6 @@ public final class DollScreenRender {
             //?}
             int mouseX,
             int mouseY,
-            float partialTick
-    ) {
-        renderChildren(screen, graphics, mouseX, mouseY, partialTick, child -> true);
-    }
-
-    public static void renderChildren(
-            Screen screen,
-            //? >= 26.1.2 {
-            /*GuiGraphicsExtractor graphics,
-            *///?} else {
-            GuiGraphics graphics,
-            //?}
-            int mouseX,
-            int mouseY,
             float partialTick,
             Predicate<GuiEventListener> filter
     ) {

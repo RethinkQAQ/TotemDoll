@@ -22,12 +22,18 @@ package com.rethinkqaq.totemdoll.client.gui.preview;
 
 //? >= 1.21.6 {
 /*import com.mojang.blaze3d.systems.RenderSystem;
+//? >= 26.3 {
+/^import com.mojang.renderpearl.api.GpuFormat;
+import com.mojang.renderpearl.api.textures.GpuTexture;
+import com.mojang.renderpearl.api.textures.GpuTextureView;
+^///?} else {
 import com.mojang.blaze3d.textures.GpuTexture;
 import com.mojang.blaze3d.textures.GpuTextureView;
 //? >= 26.2 {
 /^import com.mojang.blaze3d.GpuFormat;
 ^///?} else {
 import com.mojang.blaze3d.textures.TextureFormat;
+//?}
 //?}
 
 final class DollGuiPreviewTarget implements AutoCloseable {
@@ -82,7 +88,4 @@ final class DollGuiPreviewTarget implements AutoCloseable {
         depth.close();
     }
 }
-*///?} else {
-final class DollGuiPreviewTarget {
-}
-//?}
+*///?}

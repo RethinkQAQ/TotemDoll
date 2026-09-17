@@ -23,12 +23,11 @@ import com.rethinkqaq.configui.minecraft.MinecraftPreview;
 import com.rethinkqaq.configui.core.component.UiButton;
 import com.rethinkqaq.configui.core.component.input.UiTextField;
 import com.rethinkqaq.totemdoll.Constants;
-import com.rethinkqaq.totemdoll.client.TotemDollClient;
 import com.rethinkqaq.totemdoll.config.TotemDollConfigRuntime;
 import com.rethinkqaq.totemdoll.doll.DollLocalStyleStore;
 import com.rethinkqaq.totemdoll.doll.DollStyle;
 import com.rethinkqaq.totemdoll.doll.DollStyles;
-import org.lwjgl.util.tinyfd.TinyFileDialogs;
+import com.rethinkqaq.totemdoll.utils.DollFileDialog;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -195,11 +194,11 @@ public final class DollStyleManageDialog extends Ui.Node implements Ui.ChildProv
             invalidateLayout();
             return;
         }
-        String path = TinyFileDialogs.tinyfd_saveFileDialog("Export style", style.id().path() + ".zip", null,
-                "Totem Doll style pack (*.zip)");
+        Path path = DollFileDialog.save("Export style", style.id().path() + ".zip",
+                "Totem Doll style pack (*.zip)", "zip");
         if (path == null) return;
         try {
-            DollLocalStyleStore.exportStyle(style, Path.of(path));
+            DollLocalStyleStore.exportStyle(style, path);
             status = UiText.translatable("screen.totemdoll.status.exported");
         } catch (Exception exception) {
             Constants.LOG.warn("Could not export Totem Doll style {}", style.id(), exception);

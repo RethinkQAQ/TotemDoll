@@ -23,20 +23,25 @@ package com.rethinkqaq.totemdoll.client.gui.preview;
 //? >= 1.21.6 {
 /*import com.mojang.blaze3d.ProjectionType;
 import com.mojang.blaze3d.systems.RenderSystem;
+//? >= 26.3 {
+/^import com.mojang.renderpearl.api.commands.RenderPass;
+import com.mojang.renderpearl.api.textures.FilterMode;
+^///?} else {
 import com.mojang.blaze3d.textures.FilterMode;
+//?}
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.rethinkqaq.totemdoll.client.DollBoneRenderer;
 import com.rethinkqaq.totemdoll.client.DollPreviewContext;
 import com.rethinkqaq.totemdoll.client.gui.preview.DollGuiPreviewRenderState.PreviewKey;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
-//? >= 1.21.6 && < 26.1.2 {
+//? < 26.1.2 {
 /^import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.gui.render.state.BlitRenderState;
 import net.minecraft.client.gui.render.state.GuiRenderState;
 import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer;
 import net.minecraft.client.renderer.RenderPipelines;
 ^///?}
-//? >= 26.1.2 && < 26.2 {
+//? 26.1.2 {
 /^import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.renderer.Projection;
 import net.minecraft.client.renderer.ProjectionMatrixBuffer;
@@ -61,6 +66,10 @@ import com.rethinkqaq.totemdoll.utils.Dummy;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.client.Minecraft;
+//? >= 26.3 {
+/^import java.util.Optional;
+import java.util.OptionalDouble;
+^///?}
 //? >= 26.2 {
 //?} else {
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -71,12 +80,12 @@ public final class DollGuiPreviewRenderer extends PictureInPictureRenderer<DollG
     /^private static DollGuiPreviewRenderer instance;
     private final DollGuiPreviewTargetCache targetCache = new DollGuiPreviewTargetCache();
     ^///?}
-    //? >= 1.21.6 && < 26.1.2 {
+    //? < 26.1.2 {
 /^private final CachedOrthoProjectionMatrixBuffer legacyProjectionBuffer = new CachedOrthoProjectionMatrixBuffer(
             "TotemDoll GUI preview", -1000.0F, 1000.0F, true
     );
     ^///?}
-    //? >= 26.1.2 && < 26.2 {
+    //? 26.1.2 {
 /^private final Projection projection = new Projection();
     private final ProjectionMatrixBuffer projectionBuffer = new ProjectionMatrixBuffer("TotemDoll GUI preview");
     ^///?}
@@ -92,9 +101,7 @@ public final class DollGuiPreviewRenderer extends PictureInPictureRenderer<DollG
     ^///?} else {
     public DollGuiPreviewRenderer(MultiBufferSource.BufferSource bufferSource) {
         super(bufferSource);
-        //? >= 1.21.6 && < 26.2 {
-        /^instance = this;
-        ^///?}
+        instance = this;
     }
     //?}
 
@@ -112,7 +119,7 @@ public final class DollGuiPreviewRenderer extends PictureInPictureRenderer<DollG
         ^///?}
     }
 
-    //? >= 1.21.6 && < 26.1.2 {
+    //? < 26.1.2 {
     /^@Override
     public void prepare(DollGuiPreviewRenderState state, GuiRenderState guiRenderState, int guiScale) {
         // Let Minecraft own the PIP target and GUI-layer composition. The former
@@ -158,7 +165,7 @@ public final class DollGuiPreviewRenderer extends PictureInPictureRenderer<DollG
     }
     ^///?}
 
-    //? >= 26.2 {
+    //? >= 26.3 {
     /^@Override
     public void prepare(
             DollGuiPreviewRenderState state,
@@ -169,26 +176,81 @@ public final class DollGuiPreviewRenderer extends PictureInPictureRenderer<DollG
         PreviewKey key = state.key(guiScale);
         DollGuiPreviewTarget target = targetCache.getOrCreate(key);
 
-        RenderSystem.outputColorTextureOverride = target.colorView;
-        RenderSystem.outputDepthTextureOverride = target.depthView;
-        RenderSystem.backupProjectionMatrix();
-        try {
-            RenderSystem.getDevice().createCommandEncoder()
-                    .clearColorAndDepthTextures(target.color, GuiRenderer.CLEAR_COLOR, target.depth, 0.0);
-            projection.setupOrtho(-1000.0F, 1000.0F, key.width(), key.height(), true);
-            RenderSystem.setProjectionMatrix(projectionBuffer.getBuffer(projection), ProjectionType.ORTHOGRAPHIC);
+        if (target.needsRender(state.dynamic())) {
+            RenderSystem.backupProjectionMatrix();
+            var modelViewStack = RenderSystem.getModelViewStack();
+            modelViewStack.pushMatrix();
+            try {
+                RenderSystem.getDevice().createCommandEncoder()
+                        .clearColorAndDepthTextures(target.color, GuiRenderer.CLEAR_COLOR, target.depth, 0.0);
+                projection.setupOrtho(-1000.0F, 1000.0F, key.width(), key.height(), true);
+                RenderSystem.setProjectionMatrix(projectionBuffer.getBuffer(projection), ProjectionType.ORTHOGRAPHIC);
 
-            PoseStack poseStack = new PoseStack();
-            poseStack.translate(key.width() / 2.0F, key.height() / 2.0F, 0.0F);
-            poseStack.scale(guiScale * state.scale(), -guiScale * state.scale(), guiScale * state.scale());
-            SubmitNodeStorage storage = new SubmitNodeStorage();
-            DollBoneRenderer.submit(state.style(), ItemDisplayContext.GUI, false, poseStack, storage,
-                    15728880, OverlayTexture.NO_OVERLAY, 0, true);
-            featureRenderDispatcher.renderAllFeatures(storage);
-        } finally {
-            RenderSystem.restoreProjectionMatrix();
-            RenderSystem.outputColorTextureOverride = null;
-            RenderSystem.outputDepthTextureOverride = null;
+                PoseStack poseStack = new PoseStack();
+                poseStack.translate(key.width() / 2.0F, key.height() / 2.0F, 0.0F);
+                poseStack.scale(guiScale * state.scale(), -guiScale * state.scale(), guiScale * state.scale());
+                SubmitNodeStorage storage = new SubmitNodeStorage();
+                DollBoneRenderer.submit(state.style(), ItemDisplayContext.GUI, false, poseStack, storage,
+                        15728880, OverlayTexture.NO_OVERLAY, 0, true);
+
+                try (
+                        FeatureRenderDispatcher.PreparedFrame frame = featureRenderDispatcher.prepareFrame(storage);
+                        RenderPass renderPass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
+                                () -> "TotemDoll GUI preview", target.colorView, Optional.empty(),
+                                target.depthView, OptionalDouble.empty())
+                ) {
+                    RenderSystem.bindDefaultUniforms(renderPass);
+                    FeatureRenderDispatcher.renderAllFeatures(renderPass, frame);
+                }
+                target.markRendered();
+            } finally {
+                modelViewStack.popMatrix();
+                RenderSystem.restoreProjectionMatrix();
+            }
+        }
+
+        guiRenderState.addBlitToCurrentLayer(new BlitRenderState(
+                RenderPipelines.GUI_TEXTURED_PREMULTIPLIED_ALPHA,
+                DollGuiPreview.singleTexture(target.colorView), state.pose(),
+                state.x0(), state.y0(), state.x1(), state.y1(),
+                0.0F, 1.0F, 1.0F, 0.0F, -1, state.scissorArea(), null));
+    }
+    ^///?}
+
+    //? 26.2 {
+    /^@Override
+    public void prepare(
+            DollGuiPreviewRenderState state,
+            GuiRenderState guiRenderState,
+            FeatureRenderDispatcher featureRenderDispatcher,
+            int guiScale
+    ) {
+        PreviewKey key = state.key(guiScale);
+        DollGuiPreviewTarget target = targetCache.getOrCreate(key);
+
+        if (target.needsRender(state.dynamic())) {
+            RenderSystem.outputColorTextureOverride = target.colorView;
+            RenderSystem.outputDepthTextureOverride = target.depthView;
+            RenderSystem.backupProjectionMatrix();
+            try {
+                RenderSystem.getDevice().createCommandEncoder()
+                        .clearColorAndDepthTextures(target.color, GuiRenderer.CLEAR_COLOR, target.depth, 0.0);
+                projection.setupOrtho(-1000.0F, 1000.0F, key.width(), key.height(), true);
+                RenderSystem.setProjectionMatrix(projectionBuffer.getBuffer(projection), ProjectionType.ORTHOGRAPHIC);
+
+                PoseStack poseStack = new PoseStack();
+                poseStack.translate(key.width() / 2.0F, key.height() / 2.0F, 0.0F);
+                poseStack.scale(guiScale * state.scale(), -guiScale * state.scale(), guiScale * state.scale());
+                SubmitNodeStorage storage = new SubmitNodeStorage();
+                DollBoneRenderer.submit(state.style(), ItemDisplayContext.GUI, false, poseStack, storage,
+                        15728880, OverlayTexture.NO_OVERLAY, 0, true);
+                featureRenderDispatcher.renderAllFeatures(storage);
+                target.markRendered();
+            } finally {
+                RenderSystem.restoreProjectionMatrix();
+                RenderSystem.outputColorTextureOverride = null;
+                RenderSystem.outputDepthTextureOverride = null;
+            }
         }
 
         guiRenderState.addBlitToCurrentLayer(new BlitRenderState(
@@ -200,7 +262,7 @@ public final class DollGuiPreviewRenderer extends PictureInPictureRenderer<DollG
     }
     ^///?}
 
-    //? >= 26.1.2 && < 26.2 {
+    //? 26.1.2 {
 /^@Override
     public void prepare(DollGuiPreviewRenderState state, GuiRenderState guiRenderState, int guiScale) {
         // TotemDoll supplies only renderToTexture; native PIP owns composition.
@@ -284,7 +346,7 @@ public final class DollGuiPreviewRenderer extends PictureInPictureRenderer<DollG
         return "TotemDoll preview";
     }
 
-    //? >= 1.21.6 && < 26.1.2 {
+    //? < 26.1.2 {
     /^@Override
     public void close() {
         targetCache.close();
@@ -309,7 +371,7 @@ public final class DollGuiPreviewRenderer extends PictureInPictureRenderer<DollG
     }
     ^///?}
 
-    //? >= 26.1.2 && < 26.2 {
+    //? 26.1.2 {
 /^@Override
     public void close() {
         targetCache.close();
@@ -321,12 +383,4 @@ public final class DollGuiPreviewRenderer extends PictureInPictureRenderer<DollG
     }
     ^///?}
 }
-*///?} else {
-public final class DollGuiPreviewRenderer {
-    private DollGuiPreviewRenderer() {
-    }
-
-    public static void invalidateAll() {
-    }
-}
-//?}
+*///?}

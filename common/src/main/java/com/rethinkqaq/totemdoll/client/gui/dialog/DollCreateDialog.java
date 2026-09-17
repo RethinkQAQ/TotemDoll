@@ -42,7 +42,7 @@ import net.minecraft.resources.ResourceLocation;
 //?}
 import com.rethinkqaq.totemdoll.utils.DollMinecraftResourceUtil;
 import com.rethinkqaq.totemdoll.utils.DollResourceId;
-import org.lwjgl.util.tinyfd.TinyFileDialogs;
+import com.rethinkqaq.totemdoll.utils.DollFileDialog;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -139,10 +139,8 @@ public final class DollCreateDialog extends Ui.Node implements Ui.ChildProvider 
     }
 
     private void chooseSkin() {
-        String chosen = TinyFileDialogs.tinyfd_openFileDialog("Select a 64x64 Minecraft skin", "", null,
-                "PNG image", false);
-        if (chosen == null) return;
-        Path selected = Path.of(chosen);
+        Path selected = DollFileDialog.open("Select a 64x64 Minecraft skin", "PNG image", "png");
+        if (selected == null) return;
         try {
             DollLocalStyleStore.validateSkinFile(selected);
             skinPath = selected;

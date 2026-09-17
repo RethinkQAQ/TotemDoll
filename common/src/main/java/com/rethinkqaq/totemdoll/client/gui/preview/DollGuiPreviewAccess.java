@@ -20,8 +20,9 @@
 
 package com.rethinkqaq.totemdoll.client.gui.preview;
 
-/** Internal bridge implemented by the 1.21.6+ GuiGraphics mixin. */
-public interface DollGuiPreviewAccess {
+//? >= 1.21.6 {
+/*public interface DollGuiPreviewAccess {
     default void totemdoll$submitPreview(DollGuiPreviewRenderState state) {
     }
 }
+*///?}

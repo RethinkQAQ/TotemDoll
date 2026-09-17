@@ -218,14 +218,19 @@ public final class StylePackStore {
         }
         Path license = findDocument(pack, "license", "copying", "notice");
         Path readme = findDocument(pack, "readme");
+        String licenseName = license == null ? stringOrDefault(object, "license_name", null)
+                : license.getFileName().toString();
+        String licenseSummary = license == null ? stringOrDefault(object, "license_summary", null)
+                : safeSummary(license);
+        String readmeName = readme == null ? stringOrDefault(object, "readme_name", null)
+                : readme.getFileName().toString();
+        String readmeSummary = readme == null ? stringOrDefault(object, "readme_summary", null)
+                : safeSummary(readme);
         return new DollStylePackMetadata(
                 stringOrDefault(object, "id", null),
                 stringOrDefault(object, "name", storageKey),
                 stringOrDefault(object, "author", "Unknown"),
-                license == null ? null : license.getFileName().toString(),
-                license == null ? null : safeSummary(license),
-                readme == null ? null : readme.getFileName().toString(),
-                readme == null ? null : safeSummary(readme),
+                licenseName, licenseSummary, readmeName, readmeSummary,
                 storageKey);
     }
 
@@ -298,8 +303,7 @@ public final class StylePackStore {
         if (!style.isLocal() || style.origin() == DollStyleOrigin.BUILTIN) {
             throw new IOException("Only local styles can be exported");
         }
-        Path source = stylesDirectory.resolve(style.id().path()).normalize();
-        if (!source.startsWith(stylesDirectory) || !Files.isDirectory(source)) throw new IOException("Local style not found");
+        Path source = sourceDirectory(style);
         try (OutputStream output = Files.newOutputStream(zip); ZipOutputStream archive = new ZipOutputStream(output)) {
             JsonObject exportedStyle = read(source.resolve("style.json"));
             JsonObject model = exportedStyle.getAsJsonObject("model");
@@ -309,23 +313,106 @@ public final class StylePackStore {
             if (model.has("animations")) model.addProperty("animations", "models/animations.json");
             JsonObject textures = exportedStyle.getAsJsonObject("textures");
             if (textures == null) { textures = new JsonObject(); exportedStyle.add("textures", textures); }
+            JsonObject exportedTextures = new JsonObject();
+            for (var entry : textures.entrySet()) {
+                String relative = safeRelativeResource(entry.getValue().getAsString());
+                Path texture = resolveStyleResource(source, relative);
+                if (texture == null) {
+                    throw new IOException("Missing texture " + relative);
+                }
+                String fileName = "base".equals(entry.getKey()) ? "skin.png" : safeName(entry.getKey()) + ".png";
+                exportedTextures.addProperty(entry.getKey(), "textures/" + fileName);
+                addEntry(archive, "styles/" + style.id().path() + "/textures/" + fileName,
+                        Files.readAllBytes(texture));
+            }
             textures.entrySet().clear();
-            textures.addProperty("base", "textures/skin.png");
+            for (var entry : exportedTextures.entrySet()) textures.add(entry.getKey(), entry.getValue());
             JsonObject pack = new JsonObject();
             pack.addProperty("format", 1);
             pack.addProperty("id", style.id().toString() + "_pack");
-            pack.addProperty("name", style.displayName());
-            pack.addProperty("author", "Totem Doll");
+            DollStylePackMetadata metadata = style.packMetadata();
+            pack.addProperty("name", metadata == null ? style.displayName() : metadata.displayName());
+            pack.addProperty("author", metadata == null || metadata.author() == null
+                    ? "Totem Doll" : metadata.author());
+            if (metadata != null) {
+                addNullable(pack, "license_name", metadata.licenseName());
+                addNullable(pack, "license_summary", metadata.licenseSummary());
+                addNullable(pack, "readme_name", metadata.readmeName());
+                addNullable(pack, "readme_summary", metadata.readmeSummary());
+            }
             JsonArray styles = new JsonArray();
             styles.add("styles/" + style.id().path() + "/style.json");
             pack.add("styles", styles);
             addEntry(archive, "pack.json", GSON.toJson(pack).getBytes(StandardCharsets.UTF_8));
             String base = "styles/" + style.id().path() + "/";
             addEntry(archive, base + "style.json", GSON.toJson(exportedStyle).getBytes(StandardCharsets.UTF_8));
-            addEntry(archive, base + "models/geometry.json", Files.readAllBytes(source.resolve("geometry.json")));
-            if (model.has("animations")) addEntry(archive, base + "models/animations.json", Files.readAllBytes(source.resolve("animations.json")));
-            addEntry(archive, base + "textures/skin.png", Files.readAllBytes(source.resolve("skin.png")));
+            addEntry(archive, base + "models/geometry.json", Files.readAllBytes(resolveModelFile(source, model, "geometry")));
+            if (model.has("animations")) {
+                addEntry(archive, base + "models/animations.json",
+                        Files.readAllBytes(resolveModelFile(source, model, "animations")));
+            }
         }
+    }
+
+    private static Path sourceDirectory(DollStyle style) throws IOException {
+        if (style.origin() == DollStyleOrigin.IMPORTED) {
+            String storageKey = style.packMetadata() == null ? null : style.packMetadata().storageKey();
+            if (storageKey == null || storageKey.isBlank()) storageKey = storageKeyFromSource(style.definitionSource());
+            if (storageKey == null || storageKey.isBlank()) throw new IOException("Imported style has no storage key");
+            Path imported = stylesDirectory.resolve("imported").normalize();
+            Path pack = imported.resolve(storageKey).normalize();
+            if (!pack.startsWith(imported) || !Files.isDirectory(pack)) throw new IOException("Imported style pack not found");
+            Path source = sourceFromDefinition(pack, style.definitionSource(), storageKey);
+            if (source != null) return source;
+            try (var files = Files.walk(pack)) {
+                for (Path file : files.filter(path -> path.getFileName().toString().equals("style.json")).toList()) {
+                    JsonObject value = read(file);
+                    if (value.has("id") && style.id().equals(DollResourceId.tryParse(value.get("id").getAsString()))) {
+                        return file.getParent();
+                    }
+                }
+            }
+            throw new IOException("Imported style source not found");
+        }
+        Path source = stylesDirectory.resolve(style.id().path()).normalize();
+        if (!source.startsWith(stylesDirectory) || !Files.isDirectory(source)) throw new IOException("Local style not found");
+        return source;
+    }
+
+    private static Path sourceFromDefinition(Path pack, DollResourceId definition, String storageKey) {
+        if (definition == null) return null;
+        String marker = "styles/imported/";
+        int markerStart = definition.path().indexOf(marker);
+        if (markerStart < 0) return null;
+        String relative = definition.path().substring(markerStart + marker.length());
+        String prefix = storageKey + "/";
+        if (!relative.startsWith(prefix)) return null;
+        Path source = pack.resolve(relative.substring(prefix.length())).normalize().getParent();
+        return source != null && source.startsWith(pack) && Files.isDirectory(source) ? source : null;
+    }
+
+    private static Path resolveModelFile(Path source, JsonObject model, String key) throws IOException {
+        String relative = safeRelativeResource(safePath(model, key));
+        Path file = source.resolve(relative).normalize();
+        if (file.startsWith(source) && Files.isRegularFile(file)) return file;
+        Path fallback = source.resolve(key + ".json").normalize();
+        if (Files.isRegularFile(fallback)) return fallback;
+        throw new IOException("Missing model " + relative);
+    }
+
+    private static Path resolveStyleResource(Path source, String relative) {
+        Path direct = source.resolve(relative).normalize();
+        if (direct.startsWith(source) && Files.isRegularFile(direct)) return direct;
+        Path fallback = source.resolve(Path.of(relative).getFileName().toString()).normalize();
+        return fallback.startsWith(source) && Files.isRegularFile(fallback) ? fallback : null;
+    }
+
+    private static String safeRelativeResource(String value) throws IOException {
+        String path = value.replace('\\', '/');
+        if (path.isBlank() || path.startsWith("/") || path.contains("..") || path.contains(":")) {
+            throw new IOException("Invalid relative resource path");
+        }
+        return path;
     }
 
     private static void copyModelFile(Path root, JsonObject model, String key, Path target) throws IOException {

@@ -37,7 +37,9 @@ import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+//? < 26.3 {
 import org.lwjgl.glfw.GLFW;
+//?}
 
 //? >= 1.21.10 {
 /*import com.rethinkqaq.totemdoll.utils.DollMinecraftResourceUtil;
@@ -62,8 +64,16 @@ public final class TotemDollFabricClient implements ClientModInitializer {
                 //?}
                         new KeyMapping(
                                 "key.totemdoll.open_config",
+                                //? >= 26.3 {
+                                /*InputConstants.Type.KEYBOARD,
+                                *///?} else {
                                 InputConstants.Type.KEYSYM,
+                                //?}
+                                //? >= 26.3 {
+                                /*InputConstants.KEY_F9,
+                                *///?} else {
                                 GLFW.GLFW_KEY_F9,
+                                //?}
                                 //? >= 1.21.10 {
                                 /*KeyMapping.Category.register(DollMinecraftResourceUtil.nativeId(
                                         DollResourceId.ofVanilla("totemdoll")))

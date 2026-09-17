@@ -74,10 +74,11 @@ public abstract class ItemStackRenderStateMixin {
     ) {
         DollStyle style = totemdoll$style();
         if (style == null) return;
+        boolean allow3dSkinLayer = DollThirdPersonState.allow3dSkinLayer((ItemStackRenderState) (Object) this);
         boolean isLeftHand = displayContext == ItemDisplayContext.THIRD_PERSON_LEFT_HAND
                 || displayContext == ItemDisplayContext.FIRST_PERSON_LEFT_HAND;
         if (DollBoneRenderer.submit(style, displayContext, isLeftHand, poseStack, nodeCollector,
-                light, overlay, outlineColor, false)) {
+                light, overlay, outlineColor, false, allow3dSkinLayer)) {
             callback.cancel();
         }
     }
@@ -95,11 +96,12 @@ public abstract class ItemStackRenderStateMixin {
     ) {
         DollStyle style = totemdoll$style();
         if (style == null) return;
+        boolean allow3dSkinLayer = DollThirdPersonState.allow3dSkinLayer((ItemStackRenderState) (Object) this);
         boolean isLeftHand = displayContext == ItemDisplayContext.THIRD_PERSON_LEFT_HAND
                 || displayContext == ItemDisplayContext.FIRST_PERSON_LEFT_HAND;
         float partialTick = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
         if (DollBoneRenderer.render(style, displayContext, isLeftHand, poseStack, buffers,
-                light, overlay, partialTick, false)) {
+                light, overlay, partialTick, false, allow3dSkinLayer)) {
             callback.cancel();
         }
     }

@@ -25,6 +25,7 @@ import com.rethinkqaq.totemdoll.client.gui.screen.DollScreenAdapter;
 import com.rethinkqaq.totemdoll.client.gui.screen.DollScreenParent;
 
 import com.rethinkqaq.totemdoll.utils.DollGuiGraphics;
+import com.rethinkqaq.totemdoll.utils.DollFileDialog;
 import com.rethinkqaq.totemdoll.client.TotemDollClient;
 import com.rethinkqaq.totemdoll.doll.DollLocalStyleStore;
 import com.rethinkqaq.totemdoll.Constants;
@@ -32,7 +33,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import org.lwjgl.util.tinyfd.TinyFileDialogs;
 import java.nio.file.Path;
 
 public final class DollPackScreen extends DollScreen implements DollScreenParent {
@@ -41,12 +41,12 @@ public final class DollPackScreen extends DollScreen implements DollScreenParent
     public DollPackScreen(Screen parent) { super(Component.translatable("screen.totemdoll.pack_title")); this.parent = parent; }
 
     public static void chooseZipAndImport(Screen parent) {
-        String file = TinyFileDialogs.tinyfd_openFileDialog(
-                Component.translatable("screen.totemdoll.import_zip").getString(), "", null,
-                "Totem Doll style pack (*.zip)", false);
+        Path file = DollFileDialog.open(
+                Component.translatable("screen.totemdoll.import_zip").getString(),
+                "Totem Doll style pack (*.zip)", "zip");
         if (file == null) return;
         try {
-            DollLocalStyleStore.importZip(Path.of(file));
+            DollLocalStyleStore.importZip(file);
             TotemDollClient.reloadGeneratedStyles().thenRun(() -> Minecraft.getInstance().execute(() ->
                     DollScreenAdapter.setScreen(Minecraft.getInstance(), new DollSelectionScreen(parent, DollSelectionScreen.Tab.TEMPLATES))));
         } catch (Exception exception) {
@@ -85,7 +85,7 @@ public final class DollPackScreen extends DollScreen implements DollScreenParent
         addRenderableWidget(Button.builder(Component.translatable("screen.totemdoll.import_zip"), b -> chooseZip()).bounds(center - 100, 52, 200, 20).build());
         addRenderableWidget(Button.builder(Component.translatable("gui.done"), b -> onClose()).bounds(center - 100, height - 32, 200, 20).build());
     }
-    private void chooseZip() { String file = TinyFileDialogs.tinyfd_openFileDialog(title.getString(), "", null, "ZIP style pack", false); if (file != null) importPack(Path.of(file), true); }
+    private void chooseZip() { Path file = DollFileDialog.open(title.getString(), "ZIP style pack", "zip"); if (file != null) importPack(file, true); }
     private void importPack(Path path, boolean zip) {
         try { DollLocalStyleStore.importZip(path); status = Component.translatable("screen.totemdoll.import_success"); TotemDollClient.reloadGeneratedStyles().thenRun(() -> minecraft.execute(() -> DollScreenAdapter.setScreen(minecraft, new DollSelectionScreen(parent, DollSelectionScreen.Tab.TEMPLATES)))); }
         catch (Exception exception) { status = importErrorMessage(exception); }

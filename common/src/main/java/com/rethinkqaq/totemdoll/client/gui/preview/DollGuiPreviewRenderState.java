@@ -48,23 +48,14 @@ public record DollGuiPreviewRenderState(
     }
 
     public PreviewKey key(int guiScale) {
-        return new PreviewKey(style.id(), (x1 - x0) * guiScale, (y1 - y0) * guiScale, scale);
+        return new PreviewKey(style.id(), (x1 - x0) * guiScale, (y1 - y0) * guiScale, scale, guiScale);
     }
 
     public boolean dynamic() {
-        return style.hasDynamicModel() || style.hasDynamicTextures() || style.supportsSkin();
+        return style.hasDynamicModel() || style.hasDynamicTextures();
     }
 
-    public record PreviewKey(DollResourceId styleId, int width, int height, float scale) {
+    public record PreviewKey(DollResourceId styleId, int width, int height, float scale, int guiScale) {
     }
 }
-*///?} else {
-public final class DollGuiPreviewRenderState {
-    public DollGuiPreviewRenderState(DollStyle style, int x, int y, int width, int height, float scale) {
-    }
-    public DollGuiPreviewRenderState(DollStyle style, int x, int y, int width, int height, float scale,
-                                     int clipX, int clipY, int clipWidth, int clipHeight) {
-        this(style, x, y, width, height, scale);
-    }
-}
-//?}
+*///?}

@@ -20,8 +20,10 @@
 
 package com.rethinkqaq.totemdoll.utils;
 
-import com.rethinkqaq.totemdoll.client.gui.preview.DollGuiPreviewAccess;
+//? >= 1.21.6 {
+/*import com.rethinkqaq.totemdoll.client.gui.preview.DollGuiPreviewAccess;
 import com.rethinkqaq.totemdoll.client.gui.preview.DollGuiPreviewRenderState;
+*///?}
 import net.minecraft.client.gui.Font;
 //? >= 26.1.2 {
 /*import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -156,9 +158,9 @@ public final class DollGuiGraphics {
         //?}
     }
 
-    public void submitPreview(DollGuiPreviewRenderState state) {
-        //? >= 1.21.6 {
-        /*((DollGuiPreviewAccess) graphics).totemdoll$submitPreview(state);
-        *///?}
+    //? >= 1.21.6 {
+    /*public void submitPreview(DollGuiPreviewRenderState state) {
+        ((DollGuiPreviewAccess) graphics).totemdoll$submitPreview(state);
     }
+    *///?}
 }

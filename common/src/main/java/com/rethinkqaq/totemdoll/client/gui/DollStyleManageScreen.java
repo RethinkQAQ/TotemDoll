@@ -27,6 +27,7 @@ import com.rethinkqaq.totemdoll.client.gui.screen.DollScreenParent;
 import com.rethinkqaq.totemdoll.client.gui.preview.DollGuiPreview;
 
 import com.rethinkqaq.totemdoll.utils.DollGuiGraphics;
+import com.rethinkqaq.totemdoll.utils.DollFileDialog;
 import com.rethinkqaq.totemdoll.client.TotemDollClient;
 import com.rethinkqaq.totemdoll.config.TotemDollConfigRuntime;
 import com.rethinkqaq.totemdoll.doll.DollLocalStyleStore;
@@ -37,8 +38,6 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import org.lwjgl.util.tinyfd.TinyFileDialogs;
-
 public final class DollStyleManageScreen extends DollScreen implements DollScreenParent {
 
     private final Screen parent;
@@ -124,9 +123,9 @@ public final class DollStyleManageScreen extends DollScreen implements DollScree
     }
 
     private void exportStyle() {
-        String path = TinyFileDialogs.tinyfd_saveFileDialog(Component.translatable("screen.totemdoll.export").getString(), style.id().path() + ".zip", null, "Totem Doll style pack (*.zip)");
+        java.nio.file.Path path = DollFileDialog.save(Component.translatable("screen.totemdoll.export").getString(), style.id().path() + ".zip", "Totem Doll style pack (*.zip)", "zip");
         if (path == null) return;
-        try { DollLocalStyleStore.exportStyle(style, java.nio.file.Path.of(path)); status = Component.translatable("screen.totemdoll.export_success"); }
+        try { DollLocalStyleStore.exportStyle(style, path); status = Component.translatable("screen.totemdoll.export_success"); }
         catch (Exception exception) { status = Component.translatable("screen.totemdoll.pack_import_failed", exception.getMessage()); }
     }
 

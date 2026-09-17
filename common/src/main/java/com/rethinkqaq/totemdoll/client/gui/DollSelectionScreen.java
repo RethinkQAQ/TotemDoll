@@ -99,7 +99,6 @@ public final class DollSelectionScreen extends UiScreen implements DollScreenPar
                         }).variant(Ui.ButtonVariant.SECONDARY))
                         .add(Ui.button(UiText.translatable("gui.done"), () -> closeToParent(parent)).variant(Ui.ButtonVariant.PRIMARY)))
                 .footerAlignment(UiMainAxisAlignment.END)
-                .background(UiBackground.translucent(0xFFFFFF, 0.78f))
                 .maxContentWidth(1200)
                 .regionGap(12)
                 .build();
@@ -127,13 +126,17 @@ public final class DollSelectionScreen extends UiScreen implements DollScreenPar
     }
 
     private static Ui.Node styleCard(DollStyle style, boolean local) {
-        Ui.Node preview = new MinecraftPreview((graphics, bounds, clip) ->
-                DollGuiPreview.render(
-                        DollGuiGraphics.wrap(graphics), style,
-                        Math.round(bounds.x()), Math.round(bounds.y()),
-                        Math.round(bounds.width()), Math.round(bounds.height()), 37.6F,
-                        Math.round(clip.x()), Math.round(clip.y()),
-                        Math.round(clip.width()), Math.round(clip.height())))
+        Ui.Node preview = new MinecraftPreview((graphics, bounds, clip) -> {
+            int previewX = Math.round(bounds.x());
+            int previewY = Math.round(bounds.y());
+            int previewWidth = Math.round(bounds.width());
+            int previewHeight = Math.round(bounds.height());
+            DollGuiPreview.render(
+                    DollGuiGraphics.wrap(graphics), style,
+                    previewX, previewY, previewWidth, previewHeight, 37.6F,
+                    Math.round(clip.x()), Math.round(clip.y()),
+                    Math.round(clip.width()), Math.round(clip.height()));
+        })
                 .preferredHeight(58);
 
         Runnable selectStyle = () -> {
@@ -168,17 +171,22 @@ public final class DollSelectionScreen extends UiScreen implements DollScreenPar
                 : localized("screen.totemdoll.unavailable_reason", style.invalidReason());
         String capabilities = capabilities(style);
         String sourceStatus = localized("screen.totemdoll.source_status", origin, availability);
+        String metadata = metadataDetails(style);
+        String description = metadata.isBlank()
+                ? sourceStatus + "\n" + capabilities
+                : sourceStatus + "\n" + capabilities + "\n" + metadata;
         return Ui.tooltip(
-                Ui.previewCard(UiText.literal(style.label().getString()), preview)
-                        .description(UiText.literal(sourceStatus + "\n" + capabilities))
+                Ui.previewCard(UiText.literal(style.displayName()), preview)
+                        .description(UiText.literal(description))
                         .previewHeight(58)
                         .selected(() -> isSelected(style))
                         .onClick(selectStyle)
                         .action(actions),
                 UiText.literal(localized("screen.totemdoll.resource_id", style.id().toString()) + "\n"
-                        + sourceStatus + "\n" + capabilities))
-                .maxWidth(220)
-                .maxLines(5);
+                        + sourceStatus + "\n" + capabilities
+                        + (metadata.isBlank() ? "" : "\n" + metadata)))
+                .maxWidth(320)
+                .maxLines(12);
     }
 
     private static Ui.Node settingsPage() {
@@ -235,6 +243,32 @@ public final class DollSelectionScreen extends UiScreen implements DollScreenPar
         if (style.hasAnimations()) values.add(localized("screen.totemdoll.animations"));
         if (style.supportsSkin()) values.add(localized("screen.totemdoll.skin_supported"));
         return values.isEmpty() ? localized("screen.totemdoll.capability_static") : String.join(" · ", values);
+    }
+
+    private static String metadataDetails(DollStyle style) {
+        var metadata = style.packMetadata();
+        if (metadata == null) return "";
+        java.util.ArrayList<String> values = new java.util.ArrayList<>();
+        if (metadata.displayName() != null && !metadata.displayName().isBlank()) {
+            values.add(localized("screen.totemdoll.pack_metadata.pack", metadata.displayName()));
+        }
+        if (metadata.author() != null && !metadata.author().isBlank()) {
+            values.add(localized("screen.totemdoll.pack_metadata.author", metadata.author()));
+        }
+        if (metadata.licenseName() != null && !metadata.licenseName().isBlank()) {
+            values.add(localized("screen.totemdoll.pack_metadata.license", metadata.licenseName(),
+                    summaryLine(metadata.licenseSummary())));
+        }
+        if (metadata.readmeName() != null && !metadata.readmeName().isBlank()) {
+            values.add(localized("screen.totemdoll.pack_metadata.readme", metadata.readmeName(),
+                    summaryLine(metadata.readmeSummary())));
+        }
+        return String.join("\n", values);
+    }
+
+    private static String summaryLine(String value) {
+        if (value == null || value.isBlank()) return "-";
+        return value.replace('\n', ' ').replace('\r', ' ').trim();
     }
 
     private static String localizedOrigin(DollStyle style) {

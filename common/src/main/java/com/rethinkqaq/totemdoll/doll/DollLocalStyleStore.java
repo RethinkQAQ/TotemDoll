@@ -23,7 +23,6 @@ package com.rethinkqaq.totemdoll.doll;
 import com.rethinkqaq.totemdoll.Constants;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.rethinkqaq.totemdoll.utils.DollResourceId;
 import com.rethinkqaq.totemdoll.utils.DollMinecraftResourceUtil;

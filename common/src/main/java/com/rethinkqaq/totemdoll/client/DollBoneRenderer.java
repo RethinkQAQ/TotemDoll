@@ -76,43 +76,20 @@ public final class DollBoneRenderer {
     public static boolean render(DollStyle style, ItemDisplayContext context, boolean leftHand,
                                  PoseStack poseStack, MultiBufferSource buffers, int light, int overlay,
                                  float partialTick, boolean previewLighting) {
-        DollBoneModel model = DollBoneModels.get(style.id());
-        RenderData data = resolve(style, model);
-        if (data == null) return false;
-        model = data.model();
-        RuntimeModel runtime = data.runtime();
-        applyPoses(style, runtime, partialTick);
+        return render(style, context, leftHand, poseStack, buffers, light, overlay, partialTick,
+                previewLighting, true);
+    }
 
-        poseStack.pushPose();
-        DollDisplayTransform display = displayTransform(model, context);
-        if (display != null) {
-            new ItemTransform(
-                    new Vector3f(display.rotationX(), display.rotationY(), display.rotationZ()),
-                    new Vector3f(display.translationX(), display.translationY(), display.translationZ()),
-                    new Vector3f(display.scaleX(), display.scaleY(), display.scaleZ())
-            ).apply(
-                    leftHand,
-                    //? >= 1.21.5 {
-                    /*poseStack.last()
-                    *///?} else {
-                    poseStack
-                    //?}
-            );
-        }
-        //? >= 1.21.5 {
-        /*if (display == null) {
-            poseStack.translate(-0.5F, -0.5F, -0.5F);
-        }
-        *///?} else {
-        poseStack.translate(-0.5F, -0.5F, -0.5F);
-        //?}
-        DollResourceId texture = resolveTexture(style, model);
-        DollSkinLayerRenderer.SkinLayerPlan skinLayers = DollSkinLayerRenderer.resolve(style, model, texture);
+    public static boolean render(DollStyle style, ItemDisplayContext context, boolean leftHand,
+                                 PoseStack poseStack, MultiBufferSource buffers, int light, int overlay,
+                                 float partialTick, boolean previewLighting, boolean allow3dSkinLayer) {
+        PreparedModel prepared = prepare(style, context, leftHand, poseStack, partialTick, allow3dSkinLayer);
+        if (prepared == null) return false;
         var consumer = buffers.getBuffer(previewLighting
-                ? DollRenderUtil.previewTranslucent(texture)
-                : DollRenderUtil.entityTranslucent(texture));
-        for (RuntimePart root : runtime.roots)
-            renderPart(root, poseStack, consumer, light, overlay, skinLayers, previewLighting);
+                ? DollRenderUtil.previewTranslucent(prepared.texture())
+                : DollRenderUtil.entityTranslucent(prepared.texture()));
+        for (RuntimePart root : prepared.runtime().roots())
+            renderPart(root, poseStack, consumer, light, overlay, prepared.skinLayers(), previewLighting);
         poseStack.popPose();
         return true;
     }
@@ -122,40 +99,29 @@ public final class DollBoneRenderer {
     /*public static boolean submit(DollStyle style, ItemDisplayContext context, boolean leftHand,
                                  PoseStack poseStack, SubmitNodeCollector nodeCollector, int light,
                                  int overlay, int outlineColor, boolean previewLighting) {
-        RenderData data = resolve(style, DollBoneModels.get(style.id()));
-        if (data == null) return false;
-        DollBoneModel model = data.model();
-        RuntimeModel runtime = data.runtime();
+        return submit(style, context, leftHand, poseStack, nodeCollector, light, overlay, outlineColor,
+                previewLighting, true);
+    }
+
+    public static boolean submit(DollStyle style, ItemDisplayContext context, boolean leftHand,
+                                 PoseStack poseStack, SubmitNodeCollector nodeCollector, int light,
+                                 int overlay, int outlineColor, boolean previewLighting, boolean allow3dSkinLayer) {
         float partialTick = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
-        applyPoses(style, runtime, partialTick);
+        PreparedModel prepared = prepare(style, context, leftHand, poseStack, partialTick, allow3dSkinLayer);
+        if (prepared == null) return false;
 
-        poseStack.pushPose();
-        DollDisplayTransform display = displayTransform(model, context);
-        if (display != null) {
-            new ItemTransform(
-                    new Vector3f(display.rotationX(), display.rotationY(), display.rotationZ()),
-                    new Vector3f(display.translationX(), display.translationY(), display.translationZ()),
-                    new Vector3f(display.scaleX(), display.scaleY(), display.scaleZ())
-            ).apply(leftHand, poseStack.last());
-        } else {
-            poseStack.translate(-0.5F, -0.5F, -0.5F);
-        }
-
-        DollResourceId texture = resolveTexture(style, model);
-        DollSkinLayerRenderer.SkinLayerPlan skinLayers = DollSkinLayerRenderer.resolve(style, model, texture);
-
-        DollResourceId finalTexture = texture;
         nodeCollector.submitCustomGeometry(
                 poseStack,
                 previewLighting
-                        ? DollRenderUtil.previewTranslucent(finalTexture)
-                        : DollRenderUtil.entityTranslucent(finalTexture),
+                        ? DollRenderUtil.previewTranslucent(prepared.texture())
+                        : DollRenderUtil.entityTranslucent(prepared.texture()),
                 (capturedPose, consumer) -> {
                     PoseStack capturedStack = new PoseStack();
                     capturedStack.last().pose().set(capturedPose.pose());
                     capturedStack.last().normal().set(capturedPose.normal());
-                    for (RuntimePart root : runtime.roots) {
-                        renderPart(root, capturedStack, consumer, light, overlay, skinLayers, previewLighting);
+                    for (RuntimePart root : prepared.runtime().roots()) {
+                        renderPart(root, capturedStack, consumer, light, overlay,
+                                prepared.skinLayers(), previewLighting);
                     }
                 }
         );
@@ -182,11 +148,6 @@ public final class DollBoneRenderer {
         };
     }
 
-    private static DollDisplayTransform displayTransform(DollBoneModel model, ItemDisplayContext context) {
-        Map<String, DollDisplayTransform> displays = model.displays().forFirstPerson(firstPersonPerspective(context));
-        return DollDisplayContext.resolve(displays, displayContext(context));
-    }
-
     private static boolean firstPersonPerspective(ItemDisplayContext context) {
         return switch (context) {
             case FIRST_PERSON_LEFT_HAND, FIRST_PERSON_RIGHT_HAND,
@@ -194,6 +155,40 @@ public final class DollBoneRenderer {
                     Minecraft.getInstance().options.getCameraType().isFirstPerson();
             default -> false;
         };
+    }
+
+    private static PreparedModel prepare(DollStyle style, ItemDisplayContext context, boolean leftHand,
+                                         PoseStack poseStack, float partialTick, boolean allow3dSkinLayer) {
+        RenderData data = resolve(style, DollBoneModels.get(style.id()));
+        if (data == null) return null;
+        DollBoneModel model = data.model();
+        RuntimeModel runtime = data.runtime();
+        if (runtime.animated()) applyPoses(style, runtime, partialTick);
+
+        poseStack.pushPose();
+        ItemTransform display = displayTransform(runtime, context);
+        if (display != null) {
+            applyDisplayTransform(display, leftHand, poseStack);
+        }
+        // The legacy item renderer applies the model-space origin offset even
+        // when an ItemTransform is present. Keep that ordering for the old
+        // item and GUI paths; the newer render-state path only needs the
+        // fallback when no display transform exists.
+        //? < 1.21.5 {
+        poseStack.translate(-0.5F, -0.5F, -0.5F);
+        //?} else {
+        /*if (display == null) {
+            poseStack.translate(-0.5F, -0.5F, -0.5F);
+        }
+        *///?}
+        DollResourceId texture = resolveTexture(style, model);
+        DollSkinLayerRenderer.SkinLayerPlan skinLayers = DollSkinLayerRenderer.resolve(
+                style, model, texture, allow3dSkinLayer);
+        return new PreparedModel(runtime, texture, skinLayers);
+    }
+
+    private static ItemTransform displayTransform(RuntimeModel runtime, ItemDisplayContext context) {
+        return runtime.displayTransforms().get(new DisplayKey(context, firstPersonPerspective(context)));
     }
 
     public static void clear() {
@@ -234,13 +229,31 @@ public final class DollBoneRenderer {
         for (DollBone bone : model.roots()) {
             roots.add(buildPart(bone, null, model, named, bases));
         }
-        return new RuntimeModel(List.copyOf(roots), named, bases);
+        return new RuntimeModel(List.copyOf(roots), named, bases, !model.animations().isEmpty(),
+                buildDisplayTransforms(model));
+    }
+
+    private static Map<DisplayKey, ItemTransform> buildDisplayTransforms(DollBoneModel model) {
+        Map<DisplayKey, ItemTransform> result = new HashMap<>();
+        for (boolean firstPerson : new boolean[]{false, true}) {
+            Map<String, DollDisplayTransform> displays = model.displays().forFirstPerson(firstPerson);
+            for (ItemDisplayContext context : ItemDisplayContext.values()) {
+                DollDisplayTransform display = DollDisplayContext.resolve(displays, displayContext(context));
+                if (display == null) continue;
+                result.put(new DisplayKey(context, firstPerson), new ItemTransform(
+                        new Vector3f(display.rotationX(), display.rotationY(), display.rotationZ()),
+                        new Vector3f(display.translationX(), display.translationY(), display.translationZ()),
+                        new Vector3f(display.scaleX(), display.scaleY(), display.scaleZ())
+                ));
+            }
+        }
+        return Map.copyOf(result);
     }
 
     private static RuntimePart buildPart(DollBone bone, DollBone parent, DollBoneModel model,
                                          Map<String, ModelPart> named, Map<String, BasePose> bases) {
         List<ModelPart.Cube> legacyCubes = new ArrayList<>();
-        List<DollCube> faceCubes = new ArrayList<>();
+        List<RuntimeFace> faces = new ArrayList<>();
         for (var cube : bone.cubes()) {
             if (cube.faces().isEmpty()) {
                 legacyCubes.add(new ModelPart.Cube(cube.u(), cube.v(),
@@ -248,7 +261,7 @@ public final class DollBoneRenderer {
                         cube.width(), cube.height(), cube.depth(), 0, 0, 0, cube.mirror(),
                         model.textureWidth(), model.textureHeight(), EnumSet.allOf(Direction.class)));
             } else {
-                faceCubes.add(cube);
+                faces.add(buildFace(cube, bone));
             }
         }
         ModelPart part = new ModelPart(List.of(), Map.of());
@@ -262,28 +275,11 @@ public final class DollBoneRenderer {
         List<RuntimePart> children = new ArrayList<>();
         for (DollBone child : bone.children())
             children.add(buildPart(child, bone, model, named, bases));
-        return new RuntimePart(part, bone, List.copyOf(legacyCubes), List.copyOf(faceCubes),
+        return new RuntimePart(part, bone, List.copyOf(legacyCubes), List.copyOf(faces),
                 List.copyOf(children));
     }
 
-    private static void renderPart(RuntimePart runtime, PoseStack poseStack, VertexConsumer consumer,
-                                   int light, int overlay, DollSkinLayerRenderer.SkinLayerPlan skinLayers,
-                                   boolean previewLighting) {
-        poseStack.pushPose();
-        runtime.transform.translateAndRotate(poseStack);
-        for (ModelPart.Cube cube : runtime.legacyCubes)
-            cube.compile(poseStack.last(), consumer, light, overlay, -1);
-        for (DollCube cube : runtime.faceCubes)
-            if (!DollSkinLayerRenderer.isOverlayCube(skinLayers, runtime.bone.name(), cube))
-                renderCube(cube, runtime.bone, poseStack, consumer, light, overlay, previewLighting);
-        DollSkinLayerRenderer.render(skinLayers, runtime.bone.name(), poseStack, consumer, light, overlay, previewLighting);
-        for (RuntimePart child : runtime.children)
-            renderPart(child, poseStack, consumer, light, overlay, skinLayers, previewLighting);
-        poseStack.popPose();
-    }
-
-    private static void renderCube(DollCube cube, DollBone bone, PoseStack poseStack,
-                                   VertexConsumer consumer, int light, int overlay, boolean previewLighting) {
+    private static RuntimeFace buildFace(DollCube cube, DollBone bone) {
         float minX = cube.x() - bone.pivotX();
         float minY = cube.y() - bone.pivotY();
         float minZ = cube.z() - bone.pivotZ();
@@ -298,18 +294,49 @@ public final class DollBoneRenderer {
         shape[Direction.UP.get3DDataValue()] = maxY;
         shape[Direction.SOUTH.get3DDataValue()] = maxZ;
 
+        List<FaceVertex> vertices = new ArrayList<>(cube.faces().size() * 4);
         for (Map.Entry<String, DollFace> entry : cube.faces().entrySet()) {
             Direction direction = Direction.byName(entry.getKey());
             if (direction == null) continue;
-            DollFace face = entry.getValue();
             FaceInfo info = FaceInfo.fromFacing(direction);
-            // PIP renderers in newer Minecraft versions use a different camera
-            // basis from item rendering. Preserve a stable, front-lit preview
-            // normal there so the model face does not become the unlit side of
-            // the entity. Legacy 1.21.1/1.21.4 retain native face normals.
-            float normalX = direction.getStepX();
-            float normalY = direction.getStepY();
-            float normalZ = direction.getStepZ();
+            DollFace face = entry.getValue();
+            for (int vertex = 0; vertex < 4; vertex++) {
+                FaceInfo.VertexInfo position = info.getVertexInfo(vertex);
+                float[] uv = UvUtil.vertexUv(face, vertex);
+                vertices.add(new FaceVertex(
+                        DollFaceUtil.x(position, shape, minX, minY, minZ, maxX, maxY, maxZ) / 16F,
+                        DollFaceUtil.y(position, shape, minX, minY, minZ, maxX, maxY, maxZ) / 16F,
+                        DollFaceUtil.z(position, shape, minX, minY, minZ, maxX, maxY, maxZ) / 16F,
+                        uv[0] / 16F, uv[1] / 16F,
+                        direction.getStepX(), direction.getStepY(), direction.getStepZ()
+                ));
+            }
+        }
+        return new RuntimeFace(cube, List.copyOf(vertices));
+    }
+
+    private static void renderPart(RuntimePart runtime, PoseStack poseStack, VertexConsumer consumer,
+                                   int light, int overlay, DollSkinLayerRenderer.SkinLayerPlan skinLayers,
+                                   boolean previewLighting) {
+        poseStack.pushPose();
+        runtime.transform.translateAndRotate(poseStack);
+        for (ModelPart.Cube cube : runtime.legacyCubes)
+            cube.compile(poseStack.last(), consumer, light, overlay, -1);
+        for (RuntimeFace face : runtime.faces)
+            if (!DollSkinLayerRenderer.isOverlayCube(skinLayers, runtime.bone.name(), face.cube()))
+                renderFace(face, poseStack, consumer, light, overlay, previewLighting);
+        DollSkinLayerRenderer.render(skinLayers, runtime.bone.name(), poseStack, consumer, light, overlay, previewLighting);
+        for (RuntimePart child : runtime.children)
+            renderPart(child, poseStack, consumer, light, overlay, skinLayers, previewLighting);
+        poseStack.popPose();
+    }
+
+    private static void renderFace(RuntimeFace face, PoseStack poseStack, VertexConsumer consumer,
+                                   int light, int overlay, boolean previewLighting) {
+        for (FaceVertex vertex : face.vertices()) {
+            float normalX = vertex.normalX();
+            float normalY = vertex.normalY();
+            float normalZ = vertex.normalZ();
             //? >= 1.21.5 {
             /*if (previewLighting) {
                 normalX = 0.0F;
@@ -317,19 +344,24 @@ public final class DollBoneRenderer {
                 normalZ = 0.0F;
             }
             *///?}
-            for (int vertex = 0; vertex < 4; vertex++) {
-                FaceInfo.VertexInfo position = info.getVertexInfo(vertex);
-                float[] uv = UvUtil.vertexUv(face, vertex);
-                consumer.addVertex(poseStack.last(), DollFaceUtil.x(position, shape, minX, minY, minZ, maxX, maxY, maxZ) / 16F,
-                                DollFaceUtil.y(position, shape, minX, minY, minZ, maxX, maxY, maxZ) / 16F,
-                                DollFaceUtil.z(position, shape, minX, minY, minZ, maxX, maxY, maxZ) / 16F)
+            consumer.addVertex(poseStack.last(), vertex.x(), vertex.y(), vertex.z())
                         .setColor(-1)
-                        .setUv(uv[0] / 16F, uv[1] / 16F)
+                        .setUv(vertex.u(), vertex.v())
                         .setOverlay(overlay)
                         .setLight(light)
                         .setNormal(poseStack.last(), normalX, normalY, normalZ);
-            }
         }
+    }
+
+    private static void applyDisplayTransform(ItemTransform transform, boolean leftHand, PoseStack poseStack) {
+        transform.apply(
+                leftHand,
+                //? >= 1.21.5 {
+                /*poseStack.last()
+                *///?} else {
+                poseStack
+                //?}
+        );
     }
 
     private static void applyPoses(DollStyle style, RuntimeModel runtime, float partialTick) {
@@ -348,10 +380,17 @@ public final class DollBoneRenderer {
 
     private static float radians(float degrees) { return degrees * ((float) Math.PI / 180F); }
     private record RuntimeModel(List<RuntimePart> roots, Map<String, ModelPart> named,
-                                Map<String, BasePose> bases) {}
+                                Map<String, BasePose> bases, boolean animated,
+                                Map<DisplayKey, ItemTransform> displayTransforms) {}
     private record RenderData(DollBoneModel model, RuntimeModel runtime) {}
+    private record PreparedModel(RuntimeModel runtime, DollResourceId texture,
+                                 DollSkinLayerRenderer.SkinLayerPlan skinLayers) {}
     private record RuntimePart(ModelPart transform, DollBone bone, List<ModelPart.Cube> legacyCubes,
-                               List<DollCube> faceCubes, List<RuntimePart> children) {}
+                               List<RuntimeFace> faces, List<RuntimePart> children) {}
+    private record RuntimeFace(DollCube cube, List<FaceVertex> vertices) {}
+    private record FaceVertex(float x, float y, float z, float u, float v,
+                              float normalX, float normalY, float normalZ) {}
+    private record DisplayKey(ItemDisplayContext context, boolean firstPerson) {}
     private record BasePose(float x, float y, float z, float xRot, float yRot, float zRot) {}
     private DollBoneRenderer() {}
 }
