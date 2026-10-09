@@ -127,6 +127,8 @@ public final class DollLocalStyleStore {
             style.add("features", templateStyle.get("features").deepCopy());
         if (templateStyle.has("animations"))
             style.add("animations", templateStyle.get("animations").deepCopy());
+        if (templateStyle.has("compatibility"))
+            style.add("compatibility", templateStyle.get("compatibility").deepCopy());
 
         Path styleDirectory = stylesDirectory.resolve(key);
         Files.createDirectories(styleDirectory);
