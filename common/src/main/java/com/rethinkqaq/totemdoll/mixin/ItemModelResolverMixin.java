@@ -92,10 +92,11 @@ public abstract class ItemModelResolverMixin {
             int seed,
             CallbackInfo callback
     ) {
-        // updateForNonLiving() on 1.21.6-1.21.9 calls this method with a null
-        // owner after marking the actual entity. Preserve that earlier result;
-        // a standalone GUI update still needs to create the native GUI state.
+        //? >= 1.21.11 {
+        if (entity != null || context == ItemDisplayContext.GUI || context == ItemDisplayContext.FIXED) {
+        //?} else {
         if (entity != null || context == ItemDisplayContext.GUI) {
+        //?}
             DollThirdPersonState.mark(renderState, stack, context, entity);
         }
     }
