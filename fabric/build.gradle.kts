@@ -1,10 +1,7 @@
 plugins {
     id("multiloader-loader")
     id("fabric-loom-compat")
-    id("com.github.hierynomus.license") version "0.16.1"
 }
-
-apply(from = rootProject.file("license.gradle"))
 
 dependencies {
     minecraft("com.mojang:minecraft:${commonMod.mc}")

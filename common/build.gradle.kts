@@ -1,17 +1,6 @@
 plugins {
     id("multiloader-common")
     id("fabric-loom-compat")
-    id("com.github.hierynomus.license") version "0.16.1"
-}
-
-apply(from = rootProject.file("license.gradle"))
-
-tasks.named("compileJava") {
-    dependsOn("licenseFormat")
-}
-
-tasks.named("licenseMain") {
-    dependsOn("licenseFormat")
 }
 
 dependencies {

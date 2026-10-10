@@ -87,7 +87,7 @@ gradle.projectsEvaluated {
     rootProject.tasks.register("licenseCheck") {
         group = "verification"
         description = "Checks LGPL-3.0 headers in Java source files."
-        dependsOn(licenseProjects.map { it.tasks.named("license") })
+        dependsOn(licenseProjects.map { it.tasks.named("licenseCheck") })
     }
 
     rootProject.tasks.named("build") {

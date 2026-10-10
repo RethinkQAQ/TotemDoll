@@ -1,10 +1,7 @@
 plugins {
     id("multiloader-loader")
     id("net.neoforged.moddev") version "2.0.147"
-    id("com.github.hierynomus.license") version "0.16.1"
 }
-
-apply(from = rootProject.file("license.gradle"))
 
 configureTotemDollMixinSupport(TotemDollMixinTarget.NEOFORGE)
 
