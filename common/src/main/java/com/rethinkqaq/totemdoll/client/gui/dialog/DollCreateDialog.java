@@ -338,12 +338,12 @@ public final class DollCreateDialog extends Ui.Node implements Ui.ChildProvider 
         try {
             var id = DollLocalStyleStore.importSkin(template, skinPath, displayName,
                     Minecraft.getInstance().getResourceManager());
-            TotemDollConfigRuntime.select(id);
             deleteDownloadedSkin();
             status = UiText.translatable("screen.totemdoll.status.creating");
             TotemDollClient.reloadGeneratedStyles().thenRun(() -> Minecraft.getInstance().execute(() -> {
+                TotemDollConfigRuntime.select(id);
                 dialogs.close();
-                owner.reloadStyles(DollSelectionScreen.Tab.MY_STYLES);
+                owner.showStyles(DollSelectionScreen.Tab.MY_STYLES);
             }));
         } catch (Exception exception) {
             status = UiText.translatable("screen.totemdoll.status.creation_failed", exception.getMessage());

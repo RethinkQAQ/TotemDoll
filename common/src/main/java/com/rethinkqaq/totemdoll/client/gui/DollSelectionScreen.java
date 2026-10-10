@@ -307,7 +307,11 @@ public final class DollSelectionScreen extends UiScreen implements DollScreenPar
 
     public void reloadStyles(Tab tab) {
         TotemDollClient.reloadGeneratedStyles().thenRun(() -> Minecraft.getInstance().execute(() ->
-                DollScreenAdapter.setScreen(Minecraft.getInstance(), new DollSelectionScreen(rootParent(), tab))));
+                showStyles(tab)));
+    }
+
+    public void showStyles(Tab tab) {
+        DollScreenAdapter.setScreen(Minecraft.getInstance(), new DollSelectionScreen(rootParent(), tab));
     }
 
     @Override public void onClose() {
