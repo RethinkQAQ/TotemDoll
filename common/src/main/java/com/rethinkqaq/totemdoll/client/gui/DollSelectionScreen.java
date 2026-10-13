@@ -26,7 +26,7 @@ import com.rethinkqaq.totemdoll.client.gui.screen.DollScreenParent;
 
 import com.rethinkqaq.totemdoll.client.gui.preview.DollGuiPreview;
 import com.rethinkqaq.totemdoll.client.gui.dialog.DollCreateDialog;
-import com.rethinkqaq.totemdoll.client.gui.dialog.DollMessageDialog;
+import com.rethinkqaq.configui.core.component.feedback.UiToast;
 import com.rethinkqaq.totemdoll.client.gui.dialog.DollStyleManageDialog;
 
 import com.rethinkqaq.configui.core.component.UiButton;
@@ -301,8 +301,7 @@ public final class DollSelectionScreen extends UiScreen implements DollScreenPar
 
     void showImportError(Component message) {
         Constants.LOG.warn("Totem Doll style import failed: {}", message.getString());
-        dialogs.show(new DollMessageDialog(dialogs,
-                UiText.translatable("screen.totemdoll.import_error_title"), UiText.literal(message.getString())));
+        host().showToast(UiToast.error(UiText.literal(message.getString())));
     }
 
     public void reloadStyles(Tab tab) {
