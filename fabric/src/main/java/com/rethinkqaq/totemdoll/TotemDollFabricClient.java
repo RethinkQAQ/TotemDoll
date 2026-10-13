@@ -84,7 +84,7 @@ public final class TotemDollFabricClient implements ClientModInitializer {
                 );
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             DollAnimationManager.tick();
-            TotemDollClient.reloadInitialStylesIfReady();
+            TotemDollClient.reconcileInitialStylesIfReady();
             while (openConfig.consumeClick()) {
                 DollScreenAdapter.setScreen(client, new DollSelectionScreen(DollScreenAdapter.currentScreen(client)));
             }

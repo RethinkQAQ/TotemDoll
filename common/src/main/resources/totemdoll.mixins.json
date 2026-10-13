@@ -8,6 +8,7 @@
   "client": [
     "GameRendererMixin",
     "GuiGraphicsMixin",
+    "OptionsResourcePackMixin",
     "ItemRendererMixin",
     "ItemModelResolverMixin",
     "ItemStackRenderStateMixin"

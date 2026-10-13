@@ -31,28 +31,25 @@ import java.util.concurrent.CompletableFuture;
 
 public final class TotemDollClient {
 
-    private static boolean initialStylesReloaded;
+    private static boolean initialStylesReconciled;
 
     public static void init(Path configDirectory, Path gameDirectory) {
         DollStyles.init();
         TotemDollConfigRuntime.initialize(configDirectory);
         DollLocalStyleStore.initialize(configDirectory, gameDirectory);
-        // The client instance is not available during NeoForge mod construction.
-        // The first client tick enables the generated pack after Minecraft and
-        // its resource manager have been initialized.
-        initialStylesReloaded = false;
+        initialStylesReconciled = false;
     }
 
-    /** Reloads the generated pack once the client resource manager is ready. */
-    public static boolean reloadInitialStylesIfReady() {
-        if (initialStylesReloaded) {
+    /** Reconciles the selected style once the client resource manager is ready. */
+    public static boolean reconcileInitialStylesIfReady() {
+        if (initialStylesReconciled) {
             return true;
         }
         Minecraft client = Minecraft.getInstance();
         if (client.getResourceManager() == null) {
             return false;
         }
-        initialStylesReloaded = true;
+        initialStylesReconciled = true;
         TotemDollConfigRuntime.reconcileSelectedStyle();
         return true;
     }

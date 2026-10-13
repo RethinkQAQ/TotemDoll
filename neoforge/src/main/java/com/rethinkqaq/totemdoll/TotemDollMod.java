@@ -116,7 +116,7 @@ public class TotemDollMod {
 
     private void onClientTick(ClientTickEvent.Post event) {
         DollAnimationManager.tick();
-        TotemDollClient.reloadInitialStylesIfReady();
+        TotemDollClient.reconcileInitialStylesIfReady();
         while (OPEN_CONFIG.consumeClick()) {
             Minecraft client = Minecraft.getInstance();
             DollScreenAdapter.setScreen(client, new DollSelectionScreen(DollScreenAdapter.currentScreen(client)));

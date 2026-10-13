@@ -18,10 +18,9 @@
  * with Totem Doll. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.rethinkqaq.totemdoll.mixin.fabric;
+package com.rethinkqaq.totemdoll.mixin;
 
 import com.rethinkqaq.totemdoll.doll.DollLocalStyleStore;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Options;
 import net.minecraft.server.packs.repository.PackRepository;
 import org.spongepowered.asm.mixin.Final;
@@ -31,7 +30,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.nio.file.Files;
 import java.util.List;
 
 @Mixin(Options.class)
@@ -42,17 +40,15 @@ public abstract class OptionsResourcePackMixin {
 
     @Inject(method = "loadSelectedResourcePacks", at = @At("HEAD"))
     private void totemdoll$selectGeneratedStyles(PackRepository repository, CallbackInfo callback) {
-        if (!Files.isDirectory(FabricLoader.getInstance().getGameDir()
-                .resolve("resourcepacks")
-                .resolve(DollLocalStyleStore.GENERATED_PACK_NAME))
-                || repository.getPack(DollLocalStyleStore.GENERATED_PACK_ID) == null) {
+        var generatedPack = repository.getPack(DollLocalStyleStore.GENERATED_PACK_ID);
+        if (generatedPack == null) {
             return;
         }
 
         if (!this.resourcePacks.contains(DollLocalStyleStore.GENERATED_PACK_ID)) {
             this.resourcePacks.add(DollLocalStyleStore.GENERATED_PACK_ID);
         }
-        if (!repository.getPack(DollLocalStyleStore.GENERATED_PACK_ID).getCompatibility().isCompatible()
+        if (!generatedPack.getCompatibility().isCompatible()
                 && !this.incompatibleResourcePacks.contains(DollLocalStyleStore.GENERATED_PACK_ID)) {
             this.incompatibleResourcePacks.add(DollLocalStyleStore.GENERATED_PACK_ID);
         }
@@ -61,10 +57,7 @@ public abstract class OptionsResourcePackMixin {
     //? if 1.21.1 {
     @Inject(method = "loadSelectedResourcePacks", at = @At("RETURN"))
     private void totemdoll$restoreGeneratedStylesSelection(PackRepository repository, CallbackInfo callback) {
-        if (Files.isDirectory(FabricLoader.getInstance().getGameDir()
-                .resolve("resourcepacks")
-                .resolve(DollLocalStyleStore.GENERATED_PACK_NAME))
-                && repository.getPack(DollLocalStyleStore.GENERATED_PACK_ID) != null) {
+        if (repository.getPack(DollLocalStyleStore.GENERATED_PACK_ID) != null) {
             repository.addPack(DollLocalStyleStore.GENERATED_PACK_ID);
         }
     }
