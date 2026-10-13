@@ -48,7 +48,7 @@ public final class DollPackScreen extends DollScreen implements DollScreenParent
         try {
             DollLocalStyleStore.importZip(file);
             TotemDollClient.reloadGeneratedStyles().thenRun(() -> Minecraft.getInstance().execute(() ->
-                    DollScreenAdapter.setScreen(Minecraft.getInstance(), new DollSelectionScreen(parent, DollSelectionScreen.Tab.TEMPLATES))));
+                    DollScreenAdapter.setScreen(Minecraft.getInstance(), new DollSelectionScreen(parent, DollSelectionScreen.Tab.MY_STYLES))));
         } catch (Exception exception) {
             Constants.LOG.warn("Could not import style pack {}", file, exception);
             if (parent instanceof DollSelectionScreen selection) {
@@ -87,7 +87,7 @@ public final class DollPackScreen extends DollScreen implements DollScreenParent
     }
     private void chooseZip() { Path file = DollFileDialog.open(title.getString(), "ZIP style pack", "zip"); if (file != null) importPack(file, true); }
     private void importPack(Path path, boolean zip) {
-        try { DollLocalStyleStore.importZip(path); status = Component.translatable("screen.totemdoll.import_success"); TotemDollClient.reloadGeneratedStyles().thenRun(() -> minecraft.execute(() -> DollScreenAdapter.setScreen(minecraft, new DollSelectionScreen(parent, DollSelectionScreen.Tab.TEMPLATES)))); }
+        try { DollLocalStyleStore.importZip(path); status = Component.translatable("screen.totemdoll.import_success"); TotemDollClient.reloadGeneratedStyles().thenRun(() -> minecraft.execute(() -> DollScreenAdapter.setScreen(minecraft, new DollSelectionScreen(parent, DollSelectionScreen.Tab.MY_STYLES)))); }
         catch (Exception exception) { status = importErrorMessage(exception); }
     }
     @Override public void onClose() { DollScreenAdapter.setScreen(minecraft, DollScreenAdapter.rootParent(parent)); }
