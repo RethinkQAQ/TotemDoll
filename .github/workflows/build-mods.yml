@@ -32,7 +32,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: '25'
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
@@ -62,6 +62,9 @@ jobs:
           echo "artifact_name=mod-jars-staging" >> "$GITHUB_OUTPUT"
           echo "artifact_version=$artifact_version" >> "$GITHUB_OUTPUT"
 
+      - name: Validate registered version metadata
+        run: ./gradlew validateVersionProperties --no-daemon --stacktrace
+
       - name: Build all targets
         run: |
           ./gradlew build \
@@ -75,169 +78,7 @@ jobs:
       - name: Collect jars and generate manifests
         id: manifest
         shell: bash
-        run: |
-          python3 - <<'PY'
-          import json
-          import os
-          import re
-          import zipfile
-          from collections import defaultdict
-          from pathlib import Path
-
-          artifacts = Path('artifacts')
-          artifacts.mkdir(exist_ok=True)
-          combined = Path('combined-artifacts')
-          combined.mkdir(exist_ok=True)
-          groups = defaultdict(list)
-          build_version = os.environ['BUILD_VERSION']
-          build_suffix = os.environ.get('BUILD_SUFFIX', '').strip()
-
-          def read_properties(path):
-              values = {}
-              for line in path.read_text().splitlines():
-                  line = line.strip()
-                  if not line or line.startswith('#') or '=' not in line:
-                      continue
-                  key, value = line.split('=', 1)
-                  values[key.strip()] = value.strip()
-              return values
-
-          for root_name in ('fabric', 'neoforge'):
-              root = Path(root_name) / 'versions'
-              if not root.exists():
-                  continue
-              for jar in sorted(root.glob('*/build/libs/*.jar')):
-                  if any(suffix in jar.name for suffix in ('-sources.jar', '-javadoc.jar', '-dev.jar')):
-                      continue
-
-                  loader = root_name
-                  minecraft_version = jar.parts[2]
-                  version_properties = Path('versions') / minecraft_version / 'gradle.properties'
-                  if not version_properties.exists():
-                      raise SystemExit(f'Missing version properties: {version_properties}')
-                  version_config = read_properties(version_properties)
-                  publish_versions = [item.strip() for item in version_config.get('publish_version', '').split(',') if item.strip()]
-                  if not publish_versions:
-                      raise SystemExit(f'Missing publish_version: {version_properties}')
-                  with zipfile.ZipFile(jar) as zf:
-                      names = set(zf.namelist())
-                      if loader == 'fabric':
-                          if 'fabric.mod.json' not in names:
-                              raise SystemExit(f'Missing fabric.mod.json: {jar}')
-                          metadata = json.loads(zf.read('fabric.mod.json'))
-                          mod_id = metadata.get('id', '')
-                          mod_version = metadata.get('version', '')
-                          version_range = metadata.get('depends', {}).get('minecraft', '')
-                      else:
-                          metadata_name = 'META-INF/neoforge.mods.toml'
-                          if metadata_name not in names:
-                              raise SystemExit(f'Missing {metadata_name}: {jar}')
-                          text = zf.read(metadata_name).decode()
-                          mod_block = re.search(r'\[\[mods\]\](.*?)(?=\n\[\[|\Z)', text, re.S)
-                          dependency = re.search(r'modId="minecraft".*?versionRange="([^"]+)"', text, re.S)
-                          mod_id = re.search(r'modId="([^"]+)"', mod_block.group(1)).group(1) if mod_block else ''
-                          mod_version = re.search(r'version="([^"]+)"', mod_block.group(1)).group(1) if mod_block else ''
-                          version_range = dependency.group(1) if dependency else ''
-
-                  if not all((mod_id, mod_version, version_range)):
-                      raise SystemExit(f'Incomplete mod metadata: {jar}')
-
-                  group_name = f'{loader}-{minecraft_version}'
-                  group_dir = artifacts / group_name
-                  group_dir.mkdir(parents=True, exist_ok=True)
-                  output_name = jar.name
-                  (group_dir / output_name).write_bytes(jar.read_bytes())
-
-                  combined_name = output_name
-                  if (combined / combined_name).exists():
-                      source_stem = Path(output_name).stem
-                      combined_name = f'{source_stem}-mc{minecraft_version}.jar'
-                      if (combined / combined_name).exists():
-                          raise SystemExit(f'Cannot flatten duplicate jar name: {jar}')
-                  (combined / combined_name).write_bytes(jar.read_bytes())
-                  groups[group_name].append({
-                      'loader': loader,
-                      'minecraft_version': minecraft_version,
-                      'publish_version': publish_versions,
-                      'game_versions': '\n'.join(publish_versions),
-                      'minecraft_version_range': version_range,
-                      'mod_id': mod_id,
-                      'mod_version': mod_version,
-                      'platform_version': f'{mod_version}-mc{minecraft_version}-{loader}',
-                      'jar': output_name,
-                      'combined_jar': combined_name,
-                  })
-
-          if not any(item['loader'] == 'fabric' for items in groups.values() for item in items):
-              raise SystemExit('No Fabric mod jars found')
-          if not any(item['loader'] == 'neoforge' for items in groups.values() for item in items):
-              raise SystemExit('No NeoForge mod jars found')
-
-          matrix_entries = []
-          for group_name in sorted(groups):
-              items = groups[group_name]
-              manifest = {
-                  'loader': items[0]['loader'],
-                  'minecraft_version': items[0]['minecraft_version'],
-                  'publish_version': items[0]['publish_version'],
-                  'game_versions': items[0]['game_versions'],
-                  'minecraft_version_range': items[0]['minecraft_version_range'],
-                  'mod_id': items[0]['mod_id'],
-                  'mod_version': items[0]['mod_version'],
-                  'platform_version': items[0]['platform_version'],
-                  'jars': [item['jar'] for item in items],
-              }
-              group_dir = artifacts / group_name
-              (group_dir / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
-              publish_versions_display = ', '.join(manifest['publish_version'])
-              summary = [
-                  f'# {group_name}', '',
-                  f'- Loader: `{manifest["loader"]}`',
-                  f'- Minecraft: `{manifest["minecraft_version"]}`',
-                  f'- Publish versions: `{publish_versions_display}`',
-                  f'- Minecraft range: `{manifest["minecraft_version_range"]}`',
-                  f'- Mod: `{manifest["mod_id"]}`',
-                  f'- Mod version: `{manifest["mod_version"]}`', '',
-                  f'- Platform version: `{manifest["platform_version"]}`',
-                  f'- Game versions sent to mc-publish: `{publish_versions_display}`',
-                  '- Game version filter: `none` (explicit compatibility list)', '',
-                  '## Files', '',
-              ]
-              summary.extend(f'- `{jar_name}`' for jar_name in manifest['jars'])
-              (group_dir / 'summary.md').write_text('\n'.join(summary) + '\n')
-              matrix_entries.append({
-                  'group': group_name,
-                  'loader': manifest['loader'],
-                  'minecraft_version': manifest['minecraft_version'],
-                  'publish_version': manifest['publish_version'],
-                  'game_versions': manifest['game_versions'],
-                  'minecraft_version_range': manifest['minecraft_version_range'],
-                  'mod_version': manifest['mod_version'],
-                  'platform_version': manifest['platform_version'],
-                  'path': group_name,
-              })
-
-          lines = [
-              '# Build Summary', '',
-              f'- Event: `{os.environ.get("GITHUB_EVENT_NAME", "unknown")}`',
-              f'- Commit: `{os.environ.get("GITHUB_SHA", "unknown")}`',
-              f'- Ref: `{os.environ.get("GITHUB_REF_NAME", "unknown")}`',
-              f'- Mod version: `{os.environ.get("BUILD_VERSION", "unknown")}`',
-              f'- Build suffix: `{os.environ.get("BUILD_SUFFIX") or "none"}`', '',
-              '## Build Artifacts Summary', '',
-              '| Loader | Minecraft | Publish versions | Mod version | Platform version | JAR | Artifact |',
-              '| --- | --- | --- | --- | --- | --- | --- |',
-          ]
-          for entry in matrix_entries:
-              for item in groups[entry['group']]:
-                  artifact_name = f'mod-jars-{entry["group"]}'
-                  publish_versions_display = ', '.join(entry['publish_version'])
-                  lines.append(f'| {item["loader"]} | {item["minecraft_version"]} | `{publish_versions_display}` | {item["mod_version"]} | `{entry["platform_version"]}` | `{item["jar"]}` | `{artifact_name}` |')
-          Path(os.environ['GITHUB_STEP_SUMMARY']).write_text('\n'.join(lines) + '\n')
-
-          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
-              output.write('publish_matrix=' + json.dumps({'include': matrix_entries}, separators=(',', ':')) + '\n')
-          PY
+        run: python3 .github/scripts/collect_artifacts.py
 
       - name: Upload combined build artifact
         if: github.event_name != 'release'

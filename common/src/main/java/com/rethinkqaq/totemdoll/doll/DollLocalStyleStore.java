@@ -32,6 +32,8 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -208,18 +210,8 @@ public final class DollLocalStyleStore {
             deleteTree(generatedPackDirectory);
         }
         Files.createDirectories(generatedPackDirectory);
-        Files.writeString(
-                generatedPackDirectory.resolve("pack.mcmeta"),
-                """
-                        {
-                          "pack": {
-                            "pack_format": 34,
-                            "description": "Totem Doll generated local styles"
-                          }
-                        }
-                        """,
-                StandardCharsets.UTF_8
-        );
+        Files.writeString(generatedPackDirectory.resolve("pack.mcmeta"), generatedPackMetadata(), StandardCharsets.UTF_8);
+        copyGeneratedPackIcon();
 
         try (var directories = Files.list(stylesDirectory)) {
             directories.filter(Files::isDirectory)
@@ -230,6 +222,30 @@ public final class DollLocalStyleStore {
                     .forEach(DollLocalStyleStore::copyStyleToGeneratedPack);
         }
         StylePackStore.compileImported();
+    }
+
+    private static String generatedPackMetadata() throws IOException {
+        try (InputStream stream = DollLocalStyleStore.class.getResourceAsStream("/pack.mcmeta")) {
+            if (stream == null) {
+                throw new IOException("Could not find the version-specific pack.mcmeta resource");
+            }
+            JsonObject metadata = GSON.fromJson(new InputStreamReader(stream, StandardCharsets.UTF_8), JsonObject.class);
+            JsonObject pack = metadata == null ? null : metadata.getAsJsonObject("pack");
+            if (pack == null) {
+                throw new IOException("The version-specific pack.mcmeta has no pack object");
+            }
+            pack.addProperty("description", "Totem Doll generated local styles");
+            return GSON.toJson(metadata);
+        }
+    }
+
+    private static void copyGeneratedPackIcon() throws IOException {
+        try (InputStream icon = DollLocalStyleStore.class.getResourceAsStream("/itemdoll.png")) {
+            if (icon == null) {
+                throw new IOException("Could not find the Totem Doll mod icon");
+            }
+            Files.copy(icon, generatedPackDirectory.resolve("pack.png"), StandardCopyOption.REPLACE_EXISTING);
+        }
     }
 
     public static void importZip(Path zip) throws IOException {

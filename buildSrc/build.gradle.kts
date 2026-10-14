@@ -10,6 +10,6 @@ repositories {
 }
 
 dependencies {
-    implementation("dev.kikugie:stonecutter:0.7.11")
+    implementation("dev.kikugie:stonecutter:0.9.8")
     implementation("com.github.hierynomus.license:com.github.hierynomus.license.gradle.plugin:0.16.1")
 }

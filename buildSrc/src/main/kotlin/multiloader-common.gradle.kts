@@ -1,3 +1,6 @@
+import org.gradle.api.tasks.JavaExec
+import org.gradle.api.tasks.SourceTask
+
 plugins {
     java
     idea
@@ -7,10 +10,11 @@ plugins {
 
 // Stonecutter creates version-specific Java sources during the build. Ensure
 // those generated sources receive the license header before compilation.
-val stonecutterGenerateTask = ":common:${commonMod.prop("minecraft_version")}:stonecutterGenerate"
-
-tasks.matching { it.name == "licenseFormatMain" }.configureEach {
-    dependsOn(stonecutterGenerateTask)
+listOf("licenseFormatMain", "licenseMain").forEach { taskName ->
+    tasks.named<SourceTask>(taskName) {
+        dependsOn(stonecutterGenerateTask)
+        source(stonecutterGeneratedMain.map { it.dir("java") })
+    }
 }
 
 val buildSuffix = commonMod.propOrNull("build.number")
@@ -21,39 +25,71 @@ version = listOfNotNull("${commonMod.version}-mc${commonMod.mc}", buildSuffix)
     .joinToString("-")
 
 base { archivesName = "${commonMod.id}-${loader}" }
+group = "${commonMod.group}.${loader ?: "common"}"
+
+val configuredJavaVersion = commonMod.prop("java.version").toInt()
+val mixinCompatibilityLevel = "JAVA_$configuredJavaVersion"
 
 java {
-    toolchain.languageVersion = JavaLanguageVersion.of(commonProject.prop("java.version")!!)
+    toolchain.languageVersion = JavaLanguageVersion.of(configuredJavaVersion)
+    sourceCompatibility = JavaVersion.toVersion(configuredJavaVersion)
+    targetCompatibility = JavaVersion.toVersion(configuredJavaVersion)
+}
+
+val runJavaLauncher = javaToolchains.launcherFor {
+    languageVersion.set(JavaLanguageVersion.of(configuredJavaVersion))
+}
+tasks.withType<JavaExec>().configureEach { javaLauncher.set(runJavaLauncher) }
+gradle.projectsEvaluated {
+    tasks.withType<JavaExec>().matching { it.name in setOf("runClient", "runServer") }.configureEach {
+        setExecutable(runJavaLauncher.get().executablePath.asFile.absolutePath)
+    }
+}
+tasks.register("printRunJava") {
+    group = "help"
+    doLast { println("Minecraft ${commonMod.mc}: ${runJavaLauncher.get().executablePath.asFile}") }
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
-    maven("https://maven.fabricmc.net/") {
+    if (loader != "neoforge") maven("https://maven.fabricmc.net/") {
         name = "FabricMC"
         content {
-            includeGroupByRegex("net\\.fabricmc(\\..*)?")
+            includeGroupByRegex("(?:remapped\\.)?net\\.fabricmc(\\..*)?")
         }
     }
-    maven("https://maven.neoforged.net/releases/") {
+    if (loader == "neoforge") maven("https://maven.neoforged.net/releases/") {
         name = "NeoForged"
         content {
-            includeGroupByRegex("net\\.neoforged(\\..*)?")
+            includeGroupByRegex("(?:remapped\\.)?net\\.neoforged(\\..*)?")
             includeGroup("codechicken")
         }
     }
     strictMaven("https://repo.spongepowered.org/repository/maven-public", "Sponge", "org.spongepowered")
     maven("https://maven.parchmentmc.org") { name = "ParchmentMC" }
-    maven("https://maven.terraformersmc.com/releases/") {
+    if (loader != "neoforge") maven("https://maven.terraformersmc.com/releases/") {
         name = "TerraformersMC"
         content { includeGroup("com.terraformersmc") }
     }
-    maven("https://jitpack.io/") { name = "JitPack" }
+    if (loader != "neoforge") maven("https://maven.nucleoid.xyz") { name = "Nucleoid" }
+    maven("https://jitpack.io/") {
+        name = "JitPack"
+        content { includeGroupByRegex("com\\.github\\..+") }
+    }
 }
 
 tasks {
     processResources {
+        val packFormat = commonMod.prop("resource_pack_format").split('.').map(String::toInt)
+        val resourcePackMetadata = if (commonMod.minecraftVersion.atLeast(1, 21, 9)) {
+            val format = "[${packFormat[0]}, ${packFormat.getOrElse(1) { 0 }}]"
+            "\"min_format\": $format,\n        \"max_format\": $format"
+        } else {
+            "\"pack_format\": ${packFormat[0]}"
+        }
         val expandProps = mapOf(
+        "resourcePackMetadata" to resourcePackMetadata,
+        "mixinCompatibilityLevel" to mixinCompatibilityLevel,
         "modId" to commonMod.id,
         "modName" to commonMod.name,
         "modVersion" to commonMod.version,
@@ -94,13 +130,14 @@ tasks {
         filesMatching(listOf("META-INF/neoforge.mods.toml")) {
             expand(expandProps)
         }
-        filesMatching(listOf("pack.mcmeta", "fabric.mod.json", "*.mixins.json")) {
+        filesMatching(listOf("fabric.mod.json", "*.mixins.json")) {
             expand(jsonExpandProps)
         }
+        filesMatching("pack.mcmeta") { expand(expandProps) }
         inputs.properties(expandProps)
     }
 }
 
 tasks.named("processResources") {
-    dependsOn(":common:${commonMod.prop("minecraft_version")}:stonecutterGenerate")
+    dependsOn(stonecutterGenerateTask)
 }

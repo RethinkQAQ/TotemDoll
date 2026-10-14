@@ -12,8 +12,12 @@ dependencies {
         })
     }
     modImplementation("net.fabricmc:fabric-loader:${commonMod.dep("fabric-loader")}")
-    modImplementation("net.fabricmc.fabric-api:fabric-api:${commonMod.dep("fabric-api")}+${commonMod.mc}")
-    modImplementation("com.terraformersmc:modmenu:${commonMod.dep("modmenu")}")
+    modImplementation("net.fabricmc.fabric-api:fabric-api:${commonMod.dep("fabric-api")}+${commonMod.mc}") {
+        exclude(group = "net.fabricmc", module = "fabric-loader")
+    }
+    modImplementation("com.terraformersmc:modmenu:${commonMod.dep("modmenu")}") {
+        exclude(group = "net.fabricmc", module = "fabric-loader")
+    }
 
     if (stonecutter.eval(commonMod.mc, ">=26.3")) {
         val tinyfd = "org.lwjgl:lwjgl-tinyfd:${commonMod.dep("lwjgl-tinyfd")}"
@@ -44,11 +48,16 @@ loom {
         named("client") {
             client()
             configName = "Fabric Client ${commonMod.mc}"
-            ideConfigGenerated(true)
+            ideConfigGenerated(false)
             runDir("runs/client")
         }
         named("server") { isIdeConfigGenerated = false }
     }
 }
 
-tasks.matching { it.name == "runServer" }.configureEach { enabled = false }
+tasks.matching { it.name == "runClient" }.configureEach {
+    enabled = providers.gradleProperty("run.client").map(String::toBoolean).orElse(true).get()
+}
+tasks.matching { it.name == "runServer" }.configureEach {
+    enabled = providers.gradleProperty("run.server").map(String::toBoolean).orElse(false).get()
+}

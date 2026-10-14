@@ -1,3 +1,5 @@
+import org.gradle.api.attributes.Attribute
+
 plugins {
     id("multiloader-common")
     id("fabric-loom-compat")
@@ -30,24 +32,23 @@ if (!commonMod.unobfuscated) {
     }
 }
 
-val commonJava: Configuration by configurations.creating {
-    isCanBeResolved = false
-    isCanBeConsumed = true
+val commonSourceKind = Attribute.of("com.rethinkqaq.totemdoll.source-kind", String::class.java)
+val commonJava = configurations.consumable("commonJava") {
+    attributes.attribute(commonSourceKind, "java")
 }
-val commonResources: Configuration by configurations.creating {
-    isCanBeResolved = false
-    isCanBeConsumed = true
+val commonResources = configurations.consumable("commonResources") {
+    attributes.attribute(commonSourceKind, "resources")
 }
 
 artifacts {
-    afterEvaluate {
-        val main = sourceSets.main.get()
-        main.java.sourceDirectories.files.forEach { add(commonJava.name, it) }
-        main.resources.sourceDirectories.files.forEach { add(commonResources.name, it) }
-
-        // Annotation processors write generated wrappers outside the regular
-        // source directories. Export that directory as common Java source so
-        // loader projects compile and package the generated configuration API.
-        add(commonJava.name, layout.buildDirectory.dir("generated/sources/annotationProcessor/java/main"))
+    add(commonJava.name, stonecutterGeneratedMain.map { it.dir("java") }) {
+        builtBy(stonecutterGenerateTask)
+    }
+    add(commonResources.name, stonecutterGeneratedMain.map { it.dir("resources") }) {
+        builtBy(stonecutterGenerateTask)
+    }
+    // RCUI's processor generates wrappers consumed by both loader compilers.
+    add(commonJava.name, tasks.compileJava.flatMap { it.options.generatedSourceOutputDirectory }) {
+        builtBy(tasks.compileJava)
     }
 }

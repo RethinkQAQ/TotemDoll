@@ -1,26 +1,36 @@
+import org.gradle.api.attributes.Attribute
+
 plugins {
     java
     idea
     id("multiloader-common")
 }
 
-val commonJava: Configuration by configurations.creating { isCanBeResolved = true }
-val commonResources: Configuration by configurations.creating { isCanBeResolved = true }
+val commonPath = ":common:${commonMod.mc}"
+val commonSourceKind = Attribute.of("com.rethinkqaq.totemdoll.source-kind", String::class.java)
+val commonJavaDependencies = configurations.dependencyScope("commonJavaDependencies")
+val commonResourcesDependencies = configurations.dependencyScope("commonResourcesDependencies")
+val commonJava = configurations.resolvable("commonJava") {
+    extendsFrom(commonJavaDependencies.get())
+    attributes.attribute(commonSourceKind, "java")
+}
+val commonResources = configurations.resolvable("commonResources") {
+    extendsFrom(commonResourcesDependencies.get())
+    attributes.attribute(commonSourceKind, "resources")
+}
 
 dependencies {
-    val commonPath = common.hierarchy.toString()
     compileOnly(project(path = commonPath))
-    commonJava(project(path = commonPath, configuration = "commonJava"))
-    commonResources(project(path = commonPath, configuration = "commonResources"))
+    add(commonJavaDependencies.name, project(commonPath))
+    add(commonResourcesDependencies.name, project(commonPath))
 }
 
 tasks {
     compileJava {
-        dependsOn(commonJava)
-        source(commonJava)
+        dependsOn(stonecutterGenerateTask)
+        setSource(files(stonecutterGeneratedMain.map { it.dir("java") }, commonJava))
     }
     processResources {
-        dependsOn(commonResources)
         from(commonResources)
     }
 }

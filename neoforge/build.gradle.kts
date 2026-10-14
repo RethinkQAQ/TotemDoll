@@ -17,6 +17,7 @@ neoForge {
         register("client") {
             client()
             ideName = "NeoForge Client ${commonMod.mc}"
+            disableIdeRun()
         }
     }
     mods {
@@ -37,4 +38,8 @@ neoForge {
             }
         }
     }
+}
+
+tasks.matching { it.name == "runClient" }.configureEach {
+    enabled = providers.gradleProperty("run.client").map(String::toBoolean).orElse(true).get()
 }
