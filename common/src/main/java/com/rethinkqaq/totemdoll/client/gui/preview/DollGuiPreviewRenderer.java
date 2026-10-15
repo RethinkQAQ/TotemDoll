@@ -322,17 +322,9 @@ public final class DollGuiPreviewRenderer extends PictureInPictureRenderer<DollG
                 15728880, OverlayTexture.NO_OVERLAY, 0, true
         ));
     }
-    
-    @Override
-    protected float getTranslateY(int height, int guiScale) {
-        return height / 2.0F;
-    }
-
     ^///?} else {
     protected void renderToTexture(DollGuiPreviewRenderState state, PoseStack poseStack) {
         poseStack.scale(1.0F, -1.0F, -1.0F);
-        float verticalOffset = 0.75F * 37.6F / state.scale();
-        poseStack.translate(0.0F, verticalOffset, 0.0F);
         DollPreviewContext.renderWithPreviewLighting(() -> DollBoneRenderer.render(
                 state.style(), ItemDisplayContext.GUI, false, poseStack, bufferSource,
                 15728880, OverlayTexture.NO_OVERLAY,
@@ -340,6 +332,12 @@ public final class DollGuiPreviewRenderer extends PictureInPictureRenderer<DollG
         ));
     }
     //?}
+
+    @Override
+    protected float getTranslateY(int height, int guiScale) {
+        // Center every preview size instead of compensating for a fixed card height.
+        return height / 2.0F;
+    }
 
     @Override
     protected String getTextureLabel() {
