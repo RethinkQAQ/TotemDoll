@@ -50,17 +50,27 @@ public final class DollLocalStyleStore {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static Path stylesDirectory;
     private static Path generatedPackDirectory;
+    private static boolean initialized;
 
-    public static void initialize(Path configDirectory, Path gameDirectory) {
-        stylesDirectory = configDirectory.resolve(Constants.MOD_ID).resolve("styles");
-        generatedPackDirectory = gameDirectory.resolve("resourcepacks").resolve(GENERATED_PACK_NAME);
-        try {
-            Files.createDirectories(stylesDirectory);
-            StylePackStore.initialize(stylesDirectory, generatedPackDirectory);
-            rebuildGeneratedPack();
-        } catch (IOException exception) {
-            Constants.LOG.error("Could not initialize local doll styles", exception);
+    public static synchronized Path initialize(Path configDirectory, Path gameDirectory) throws IOException {
+        if (initialized) {
+            return generatedPackDirectory;
         }
+        Path storageDirectory = configDirectory.toAbsolutePath().normalize().resolve(Constants.MOD_ID);
+        stylesDirectory = storageDirectory.resolve("styles");
+        generatedPackDirectory = storageDirectory.resolve("generated-pack");
+        Files.createDirectories(stylesDirectory);
+        StylePackStore.initialize(stylesDirectory, generatedPackDirectory);
+        rebuildGeneratedPack();
+
+        // The generated copy must have a single repository source. Keep original styles in place.
+        Path legacyPack = gameDirectory.toAbsolutePath().normalize().resolve("resourcepacks").resolve(GENERATED_PACK_NAME);
+        if (Files.exists(legacyPack)) {
+            deleteTree(legacyPack);
+            Constants.LOG.info("Removed legacy generated pack {}; original styles remain in {}", legacyPack, stylesDirectory);
+        }
+        initialized = true;
+        return generatedPackDirectory;
     }
 
     public static DollResourceId importSkin(

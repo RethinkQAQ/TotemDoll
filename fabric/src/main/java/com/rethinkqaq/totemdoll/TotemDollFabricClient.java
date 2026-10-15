@@ -50,10 +50,7 @@ public final class TotemDollFabricClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        TotemDollClient.init(
-                FabricLoader.getInstance().getConfigDir(),
-                FabricLoader.getInstance().getGameDir()
-        );
+        TotemDollClient.init(FabricLoader.getInstance().getConfigDir());
         ModelLoadingPlugin.register(context ->
                 DollStyleLoader.reload(Minecraft.getInstance().getResourceManager()));
         KeyMapping openConfig =

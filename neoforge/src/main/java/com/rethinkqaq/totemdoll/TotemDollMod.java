@@ -29,11 +29,13 @@ import com.rethinkqaq.totemdoll.client.gui.DollSelectionScreen;
 import com.rethinkqaq.totemdoll.client.gui.screen.DollScreenAdapter;
 import com.rethinkqaq.totemdoll.doll.DollStyleLoader;
 import com.rethinkqaq.totemdoll.doll.DollAnimationManager;
+import com.rethinkqaq.totemdoll.doll.DollGeneratedPackSource;
 import com.rethinkqaq.totemdoll.utils.DollMinecraftResourceUtil;
 import com.rethinkqaq.totemdoll.utils.DollResourceId;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.server.packs.PackType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -47,6 +49,7 @@ import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 /*import net.neoforged.neoforge.client.event.RegisterPictureInPictureRenderersEvent;
 *///?}
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.AddPackFindersEvent;
 //? < 26.3 {
 import org.lwjgl.glfw.GLFW;
 //?}
@@ -83,6 +86,7 @@ public class TotemDollMod {
                 FMLEnvironment.dist.isClient()
                 //?}
         ) {
+            eventBus.addListener(this::registerGeneratedPack);
             eventBus.addListener(this::registerAdditionalModels);
             container.registerExtensionPoint(IConfigScreenFactory.class, (minecraft, parent) -> new DollSelectionScreen(parent));
             eventBus.addListener(this::registerKeyMappings);
@@ -90,7 +94,13 @@ public class TotemDollMod {
             /*eventBus.addListener(this::registerPictureInPictureRenderer);
             *///?}
             NeoForge.EVENT_BUS.addListener(this::onClientTick);
-            TotemDollClient.init(FMLPaths.CONFIGDIR.get(), FMLPaths.GAMEDIR.get());
+            TotemDollClient.init(FMLPaths.CONFIGDIR.get());
+        }
+    }
+
+    private void registerGeneratedPack(AddPackFindersEvent event) {
+        if (event.getPackType() == PackType.CLIENT_RESOURCES) {
+            event.addRepositorySource(new DollGeneratedPackSource(FMLPaths.CONFIGDIR.get(), FMLPaths.GAMEDIR.get()));
         }
     }
 

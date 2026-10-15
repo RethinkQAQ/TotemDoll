@@ -7,7 +7,7 @@
   "mixins": [],
   "client": [
     "fabric.GameRendererPreviewMixin",
-    "fabric.PackRepositoryMixin"
+    "fabric.MinecraftPackRepositoryMixin"
   ],
   "server": [],
   "injectors": {

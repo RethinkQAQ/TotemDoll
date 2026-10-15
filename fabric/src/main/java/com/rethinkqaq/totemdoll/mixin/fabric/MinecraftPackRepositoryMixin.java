@@ -20,29 +20,26 @@
 
 package com.rethinkqaq.totemdoll.mixin.fabric;
 
-import com.rethinkqaq.totemdoll.doll.DollLocalStyleStore;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.rethinkqaq.totemdoll.doll.DollGeneratedPackSource;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.Minecraft;
 import net.minecraft.server.packs.repository.PackRepository;
+import net.minecraft.server.packs.repository.RepositorySource;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/** Prepares the generated directory before vanilla discovers directory packs. */
-@Mixin(PackRepository.class)
-public abstract class PackRepositoryMixin {
+import java.util.Arrays;
 
-    private static boolean totemdoll$prepared;
+@Mixin(Minecraft.class)
+public abstract class MinecraftPackRepositoryMixin {
 
-    @Inject(method = "reload", at = @At("HEAD"))
-    private void totemdoll$prepareGeneratedStyles(CallbackInfo callback) {
-        if (totemdoll$prepared) {
-            return;
-        }
-        totemdoll$prepared = true;
-        DollLocalStyleStore.initialize(
-                FabricLoader.getInstance().getConfigDir(),
-                FabricLoader.getInstance().getGameDir()
-        );
+    @WrapOperation(method = "<init>", at = @At(value = "NEW", target = "Lnet/minecraft/server/packs/repository/PackRepository;"))
+    private PackRepository totemdoll$registerGeneratedStyles(RepositorySource[] sources, Operation<PackRepository> original) {
+        RepositorySource[] registeredSources = Arrays.copyOf(sources, sources.length + 1);
+        FabricLoader loader = FabricLoader.getInstance();
+        registeredSources[sources.length] = new DollGeneratedPackSource(loader.getConfigDir(), loader.getGameDir());
+        return original.call((Object) registeredSources);
     }
 }

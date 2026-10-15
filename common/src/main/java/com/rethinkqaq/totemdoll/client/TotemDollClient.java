@@ -21,10 +21,8 @@
 package com.rethinkqaq.totemdoll.client;
 
 import com.rethinkqaq.totemdoll.config.TotemDollConfigRuntime;
-import com.rethinkqaq.totemdoll.doll.DollLocalStyleStore;
 import com.rethinkqaq.totemdoll.doll.DollStyles;
 import net.minecraft.client.Minecraft;
-import net.minecraft.server.packs.repository.PackRepository;
 
 import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
@@ -33,10 +31,9 @@ public final class TotemDollClient {
 
     private static boolean initialStylesReconciled;
 
-    public static void init(Path configDirectory, Path gameDirectory) {
+    public static void init(Path configDirectory) {
         DollStyles.init();
         TotemDollConfigRuntime.initialize(configDirectory);
-        DollLocalStyleStore.initialize(configDirectory, gameDirectory);
         initialStylesReconciled = false;
     }
 
@@ -56,17 +53,9 @@ public final class TotemDollClient {
 
     public static CompletableFuture<Void> reloadGeneratedStyles() {
         Minecraft client = Minecraft.getInstance();
-        enableGeneratedPack(client);
+        client.getResourcePackRepository().reload();
         return client.reloadResourcePacks()
                 .thenRun(TotemDollConfigRuntime::reconcileSelectedStyle);
-    }
-
-    private static void enableGeneratedPack(Minecraft client) {
-        PackRepository repository = client.getResourcePackRepository();
-        repository.reload();
-        if (!repository.addPack(DollLocalStyleStore.GENERATED_PACK_ID)) {
-            repository.setSelected(repository.getSelectedIds());
-        }
     }
 
     private TotemDollClient() {
